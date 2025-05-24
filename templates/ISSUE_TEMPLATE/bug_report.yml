@@ -16,6 +16,7 @@ body:
         - Build/Deployment Issue (installation, CI/CD, packaging)
         - Regression (previously working, now broken)
         - Other validations
+    validations:
       required: true
 
   - type: textarea
