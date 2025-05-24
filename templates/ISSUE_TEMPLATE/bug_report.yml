@@ -15,7 +15,7 @@ body:
         - Security Issue (vulnerability, data leak, auth problem)
         - Build/Deployment Issue (installation, CI/CD, packaging)
         - Regression (previously working, now broken)
-        - Other validations:
+        - Other validations
       required: true
 
   - type: textarea
