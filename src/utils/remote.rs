@@ -3,7 +3,6 @@ use std::io::Write;
 use std::path::Path;
 
 use crate::utils::pretty_print;
-use anyhow::Context;
 
 const REMOTE_BASE_URL: &str =
     "https://raw.githubusercontent.com/rafaeljohn9/github-templates/main/templates";
@@ -22,8 +21,17 @@ pub fn fetch_template(
         REMOTE_BASE_URL, category, template, extension
     );
 
-    let response =
-        reqwest::blocking::get(&url).with_context(|| format!("Failed to GET from: {url}"))?;
+    let response = match reqwest::blocking::get(&url) {
+        Ok(resp) => resp,
+        Err(e) if e.is_connect() => {
+            return Err(anyhow::anyhow!(
+                "Network connection error while fetching template: {category}/{template}.{extension} from {url}"
+            ));
+        }
+        Err(e) => {
+            return Err(anyhow::anyhow!("Failed to GET from: {url} ({e})"));
+        }
+    };
 
     if !response.status().is_success() {
         return Err(anyhow::anyhow!(
@@ -50,11 +58,21 @@ pub fn fetch_template_list(category: &str) -> anyhow::Result<Vec<String>> {
     let url = format!("{}/{}-templates", REMOTE_API_URL, category);
 
     let client = reqwest::blocking::Client::new();
-    let response = client
+    let response = match client
         .get(&url)
         .header("User-Agent", "github-templates-fetcher")
         .send()
-        .with_context(|| format!("Failed to GET from: {url}"))?;
+    {
+        Ok(resp) => resp,
+        Err(e) if e.is_connect() => {
+            return Err(anyhow::anyhow!(
+                "Network connection error while fetching template list for category: {category} from {url}"
+            ));
+        }
+        Err(e) => {
+            return Err(anyhow::anyhow!("Failed to GET from: {url} ({e})"));
+        }
+    };
 
     if !response.status().is_success() {
         return Err(anyhow::anyhow!(
@@ -91,8 +109,17 @@ pub fn fetch_template_preview(
         REMOTE_BASE_URL, category, template, extension
     );
 
-    let response =
-        reqwest::blocking::get(&url).with_context(|| format!("Failed to GET from: {url}"))?;
+    let response = match reqwest::blocking::get(&url) {
+        Ok(resp) => resp,
+        Err(e) if e.is_connect() => {
+            return Err(anyhow::anyhow!(
+                "Network connection error while fetching template preview: {category}/{template}.{extension} from {url}"
+            ));
+        }
+        Err(e) => {
+            return Err(anyhow::anyhow!("Failed to GET from: {url} ({e})"));
+        }
+    };
 
     if !response.status().is_success() {
         return Err(anyhow::anyhow!(
