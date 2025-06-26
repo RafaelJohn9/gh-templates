@@ -41,7 +41,6 @@ ALL_FILES=(
   "05-developer-experience-feedback.yml"
   "06-support-question.yml"
   "07-test.yml"
-  "config.yml"
 )
 
 # If arguments are provided, use them as the list of files to download
