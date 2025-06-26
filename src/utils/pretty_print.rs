@@ -1,7 +1,7 @@
 use syntect::easy::HighlightLines;
 use syntect::highlighting::{Style, ThemeSet};
 use syntect::parsing::SyntaxSet;
-use syntect::util::{LinesWithEndings, as_24_bit_terminal_escaped};
+use syntect::util::{as_24_bit_terminal_escaped, LinesWithEndings};
 
 /// Prints highlighted content to the terminal according to the file extension.
 ///
@@ -12,6 +12,9 @@ pub fn print_highlighted(ext: &str, content: &str) {
     let ps = SyntaxSet::load_defaults_newlines();
     let ts = ThemeSet::load_defaults();
     let theme = &ts.themes["base16-ocean.dark"];
+
+    // Use "txt" as the default extension if ext is empty
+    let ext = if ext.is_empty() { "txt" } else { ext };
 
     let syntax = ps
         .find_syntax_by_extension(ext)

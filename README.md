@@ -1,6 +1,6 @@
-# GitHub Templates
+# Git Templates
 
-This repository provides a collection of reusable GitHub templates to streamline your workflow across multiple repositories. It includes fully supported **Issue Templates**, **Pull Request Templates**, and more.
+This repository provides a collection of reusable Git templates to streamline your workflow across multiple repositories. It includes fully supported **Issue Templates**, **Pull Request Templates**, and more.
 
 ## Features
 
@@ -16,7 +16,7 @@ This repository provides a collection of reusable GitHub templates to streamline
 To install the issue templates in your repository, run:
 
 ```sh
-wget -qO- https://raw.githubusercontent.com/rafaeljohn9/github-templates/main/scripts/install_issue_template.sh | sh
+wget -qO- https://raw.githubusercontent.com/rafaeljohn9/git-templates/main/scripts/install_issue_template.sh | sh
 ```
 
 #### Installing Specific Templates
@@ -24,7 +24,7 @@ wget -qO- https://raw.githubusercontent.com/rafaeljohn9/github-templates/main/sc
 If you only want to install certain issue templates instead of all, you can use the `install_issue_template.sh` script and specify the template filenames as arguments. For example:
 
 ```sh
-wget -O install_issue_template.sh https://raw.githubusercontent.com/rafaeljohn9/github-templates/main/scripts/install_issue_template.sh
+wget -O install_issue_template.sh https://raw.githubusercontent.com/rafaeljohn9/git-templates/main/scripts/install_issue_template.sh
 chmod +x install_issue_template.sh
 ./install_issue_template.sh 01-bug.yml 02-feature-request.yml
 ```
