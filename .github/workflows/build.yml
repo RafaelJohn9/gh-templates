@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  # === Linux + Windows (via cross on Linux runner) ===
+  # === Linux + Windows builds using `cross` ===
   build-and-release-linux-windows:
     runs-on: ubuntu-latest
     strategy:
@@ -31,6 +31,9 @@ jobs:
 
       - name: Build with cross
         run: cross build --release --target ${{ matrix.target }}
+        env:
+          OPENSSL_NO_VENDOR: "0"
+          OPENSSL_STATIC: "1"
 
       - name: Rename binary
         run: |
@@ -47,7 +50,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # === macOS (uses macOS runner natively) ===
+  # === macOS builds using native cargo ===
   build-and-release-macos:
     runs-on: macos-latest
     strategy:
@@ -68,6 +71,9 @@ jobs:
 
       - name: Build with cargo
         run: cargo build --release --target ${{ matrix.target }}
+        env:
+          OPENSSL_NO_VENDOR: "0"
+          OPENSSL_STATIC: "1"
 
       - name: Rename binary
         run: |
