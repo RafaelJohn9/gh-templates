@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   # === Linux + Windows builds using `cross` ===
   build-and-release-linux-windows:
