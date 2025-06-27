@@ -40,9 +40,11 @@ jobs:
 
       - name: Rename binary
         run: |
-          ext=""
-          if [[ "${{ matrix.target }}" == *"windows"* ]]; then ext=".exe"; fi
-          cp target/${{ matrix.target }}/release/git-templates git-templates-${{ matrix.target }}$ext
+          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
+            cp target/${{ matrix.target }}/release/git-templates.exe git-templates-${{ matrix.target }}.exe
+          else
+            cp target/${{ matrix.target }}/release/git-templates git-templates-${{ matrix.target }}
+          fi
 
       - name: Upload asset to GitHub Release
         uses: softprops/action-gh-release@v2
