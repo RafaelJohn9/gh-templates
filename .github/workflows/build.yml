@@ -92,7 +92,7 @@ jobs:
           files: git-templates-${{ matrix.target }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+          
   generate-changelog:
     runs-on: ubuntu-latest
     steps:
@@ -112,11 +112,16 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add CHANGELOG.md
           git commit -m "chore: update CHANGELOG [skip ci]" || echo "No changes to commit"
-          git branch --show-current
-          branch_name=$(git branch --show-current)
-          if [ -z "$branch_name" ]; then
-          branch_name="${GITHUB_REF##*/}"
+          # Only push if not on a tag (avoid pushing to tag refs)
+          ref_type=$(echo "${GITHUB_REF}" | cut -d/ -f2)
+          if [ "$ref_type" != "tags" ]; then
+            branch_name=$(git branch --show-current)
+            if [ -z "$branch_name" ]; then
+              branch_name="${GITHUB_REF##*/}"
+            fi
+            git push origin HEAD:$branch_name
+          else
+            echo "On a tag ref, skipping push."
           fi
-          git push origin HEAD:$branch_name
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
