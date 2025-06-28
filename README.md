@@ -11,7 +11,7 @@ This repository provides a collection of reusable Git templates to streamline yo
 
 ## Alpha Release Downloads
 
-You can download the latest beta release binaries for your platform from the `/releases/<tag>` directory. These are currently available as artifacts for different operating systems and architectures:
+You can download the latest alpha release binaries for your platform from the `/releases/<tag>` directory. These are currently available as artifacts for different operating systems and architectures:
 
 | Platform                          | Filename                                    | SHA256                                                             |
 |------------------------------------|---------------------------------------------|--------------------------------------------------------------------|
@@ -129,7 +129,7 @@ git-templates add license mit --force
 
 > **Note:** Currently, only `issue` templates are supported. Support for PR, license, CI, .gitignore, and other templates will be added in future releases.
 
-### listing Templates
+### Listing Templates
 
 In the future, you will be able to preview templates before adding them:
 
@@ -141,7 +141,7 @@ git-templates list issue
 git-templates preview license mit
 ```
 
-### Previewing Templates (Planned Feature)
+### Previewing Templates
 
 In the future, you will be able to preview templates before adding them:
 
