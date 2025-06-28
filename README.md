@@ -80,6 +80,7 @@ mv git-templates-x86_64-apple-darwin ~/.local/bin/git-templates
 Download the binary manually or use PowerShell:
 
 ```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\bin"
 Invoke-WebRequest -Uri "https://github.com/RafaelJohn9/git-templates/releases/download/v0.0.14/git-templates-x86_64-pc-windows-gnu.exe" -OutFile "$env:USERPROFILE\bin\git-templates.exe"
 ```
 
