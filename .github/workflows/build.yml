@@ -112,6 +112,11 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add CHANGELOG.md
           git commit -m "chore: update CHANGELOG [skip ci]" || echo "No changes to commit"
-          git push
+          git branch --show-current
+          branch_name=$(git branch --show-current)
+          if [ -z "$branch_name" ]; then
+          branch_name="${GITHUB_REF##*/}"
+          fi
+          git push origin HEAD:$branch_name
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
