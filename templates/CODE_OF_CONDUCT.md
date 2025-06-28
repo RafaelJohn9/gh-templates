@@ -38,7 +38,7 @@ The following behaviors are considered unacceptable and will not be tolerated:
 
 Project maintainers are responsible for upholding this Code of Conduct. They will take appropriate and fair action in response to violations, including warnings, temporary bans, or permanent exclusion from the project and its spaces.
 
-If you witness or experience unacceptable behavior, please report it to the project team at **<johnmkagunda@gmail.com>**. All reports will be handled with confidentiality and seriousness.
+If you witness or experience unacceptable behavior, please report it to the project team at **[INSERT CONTACT EMAIL]**. All reports will be handled with confidentiality and seriousness.
 
 ---
 
