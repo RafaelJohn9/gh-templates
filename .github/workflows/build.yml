@@ -41,17 +41,17 @@ jobs:
       - name: Rename binary
         run: |
           if [[ "${{ matrix.target }}" == *"windows"* ]]; then
-            cp target/${{ matrix.target }}/release/git-templates.exe git-templates-${{ matrix.target }}.exe
+            cp target/${{ matrix.target }}/release/gh-templates.exe gh-templates-${{ matrix.target }}.exe
           else
-            cp target/${{ matrix.target }}/release/git-templates git-templates-${{ matrix.target }}
+            cp target/${{ matrix.target }}/release/gh-templates gh-templates-${{ matrix.target }}
           fi
 
       - name: Upload asset to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: git-templates-${{ matrix.target }}
+          name: gh-templates-${{ matrix.target }}
           tag_name: ${{ github.ref_name }}
-          files: git-templates-${{ matrix.target }}*
+          files: gh-templates-${{ matrix.target }}*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -82,14 +82,14 @@ jobs:
 
       - name: Rename binary
         run: |
-          cp target/${{ matrix.target }}/release/git-templates git-templates-${{ matrix.target }}
+          cp target/${{ matrix.target }}/release/gh-templates gh-templates-${{ matrix.target }}
 
       - name: Upload asset to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: git-templates-${{ matrix.target }}
+          name: gh-templates-${{ matrix.target }}
           tag_name: ${{ github.ref_name }}
-          files: git-templates-${{ matrix.target }}
+          files: gh-templates-${{ matrix.target }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
