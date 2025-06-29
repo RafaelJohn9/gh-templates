@@ -1,5 +1,6 @@
 [package]
-name = "git-templates"
+
+name = "gh-templates"
 version = "0.1.0"
 edition = "2024"
 

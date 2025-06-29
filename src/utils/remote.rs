@@ -5,9 +5,9 @@ use std::path::Path;
 use crate::utils::pretty_print;
 
 const REMOTE_BASE_URL: &str =
-    "https://raw.githubusercontent.com/rafaeljohn9/git-templates/main/templates";
+    "https://raw.githubusercontent.com/rafaeljohn9/gh-templates/main/templates";
 const REMOTE_API_URL: &str =
-    "https://api.github.com/repos/rafaeljohn9/git-templates/contents/templates";
+    "https://api.github.com/repos/rafaeljohn9/gh-templates/contents/templates";
 
 pub fn fetch_template(
     category: &str,
@@ -60,7 +60,7 @@ pub fn fetch_template_list(category: &str) -> anyhow::Result<Vec<String>> {
     let client = reqwest::blocking::Client::new();
     let response = match client
         .get(&url)
-        .header("User-Agent", "git-templates-fetcher")
+        .header("User-Agent", "gh-templates-fetcher")
         .send()
     {
         Ok(resp) => resp,

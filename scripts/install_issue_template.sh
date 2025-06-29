@@ -31,7 +31,8 @@
 
 set -euo pipefail
 
-REPO_BASE_URL="https://raw.githubusercontent.com/RafaelJohn9/git-templates/main"
+REPO_BASE_URL="https://raw.githubusercontent.com/RafaelJohn9/gh-templates/main"
+
 TEMPLATE_DIR=".github/ISSUE_TEMPLATE"
 ALL_FILES=(
   "01-bug.yml"
