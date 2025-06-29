@@ -1,0 +1,96 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  # === Linux + Windows builds using `cross` ===
+  build-and-release-linux-windows:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-unknown-linux-musl
+          - x86_64-pc-windows-gnu
+          - aarch64-unknown-linux-gnu
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Install cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Build with cross
+        run: cross build --release --target ${{ matrix.target }}
+        env:
+          OPENSSL_NO_VENDOR: "0"
+          OPENSSL_STATIC: "1"
+
+      - name: Rename binary
+        run: |
+          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
+            cp target/${{ matrix.target }}/release/git-templates.exe git-templates-${{ matrix.target }}.exe
+          else
+            cp target/${{ matrix.target }}/release/git-templates git-templates-${{ matrix.target }}
+          fi
+
+      - name: Upload asset to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: git-templates-${{ matrix.target }}
+          tag_name: ${{ github.ref_name }}
+          files: git-templates-${{ matrix.target }}*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # === macOS builds using native cargo ===
+  build-and-release-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-apple-darwin
+          - aarch64-apple-darwin
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+
+      - name: Build with cargo
+        run: cargo build --release --target ${{ matrix.target }}
+        env:
+          OPENSSL_NO_VENDOR: "0"
+          OPENSSL_STATIC: "1"
+
+      - name: Rename binary
+        run: |
+          cp target/${{ matrix.target }}/release/git-templates git-templates-${{ matrix.target }}
+
+      - name: Upload asset to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: git-templates-${{ matrix.target }}
+          tag_name: ${{ github.ref_name }}
+          files: git-templates-${{ matrix.target }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  
