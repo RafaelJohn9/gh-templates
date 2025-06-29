@@ -13,14 +13,14 @@ This repository provides a collection of reusable Git templates to streamline yo
 
 You can download the latest alpha release binaries for your platform from the `/releases/<tag>` directory. These are currently available as artifacts for different operating systems and architectures:
 
-| Platform                          | Filename                                    | SHA256                                                             |
-|------------------------------------|---------------------------------------------|--------------------------------------------------------------------|
-| macOS (Apple Silicon)              | `gh-templates-aarch64-apple-darwin`        | `86ef1d883c43ed19c94d4911e5ea032a27b7fb5b7cc3a64d493bef03b82a2235`|
-| Linux (aarch64)                    | `gh-templates-aarch64-unknown-linux-gnu`   | `8a85bb46cbc965d9cb1f187523f00f0690dae6c2ded57c8cab0405fb7659ff8f` |
-| macOS (Intel)                      | `gh-templates-x86_64-apple-darwin`         | `169e635a170f467ee398947dfc9e76a8a597d1669d01996d0945813fce89d069`|
-| Windows (x86_64)                   | `gh-templates-x86_64-pc-windows-gnu.exe`   | `e422d225d61abb90861d5e2cfb09859d0d94bc6f0c3367cd9be244d2874b168b`|
-| Linux (x86_64, GNU)                | `gh-templates-x86_64-unknown-linux-gnu`    | `97d62de5399838e35a43b0ad78a99899322b18bf3b7a695ab15729d3aca2526f`|
-| Linux (x86_64, musl)               | `gh-templates-x86_64-unknown-linux-musl`   | `48fe89460bc945522c6ba42844cd6418a52220f01eec5b6f7c622fe9d32cbf9c`                                              |
+| Platform                          | Filename                                    |
+|------------------------------------|---------------------------------------------|
+| macOS (Apple Silicon)              | `gh-templates-aarch64-apple-darwin`        |
+| Linux (aarch64)                    | `gh-templates-aarch64-unknown-linux-gnu`   |
+| macOS (Intel)                      | `gh-templates-x86_64-apple-darwin`         |
+| Windows (x86_64)                   | `gh-templates-x86_64-pc-windows-gnu.exe`   |
+| Linux (x86_64, GNU)                | `gh-templates-x86_64-unknown-linux-gnu`    |
+| Linux (x86_64, musl)               | `gh-templates-x86_64-unknown-linux-musl`   |
 
 To download, visit the [releases page](https://github.com/rafaeljohn9/gh-templates/releases) and select the appropriate binary for your OS and architecture. Verify the SHA256 checksum after downloading.
 
