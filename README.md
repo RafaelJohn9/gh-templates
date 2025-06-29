@@ -15,25 +15,25 @@ You can download the latest alpha release binaries for your platform from the `/
 
 | Platform                          | Filename                                    | SHA256                                                             |
 |------------------------------------|---------------------------------------------|--------------------------------------------------------------------|
-| macOS (Apple Silicon)              | `gh-templates-aarch64-apple-darwin`        | `86ef1d883c43ed19c94d4911e5ea032a27b7fb5b7cc3a64d493bef03b82a1435`|
+| macOS (Apple Silicon)              | `gh-templates-aarch64-apple-darwin`        | `86ef1d883c43ed19c94d4911e5ea032a27b7fb5b7cc3a64d493bef03b82a2235`|
 | Linux (aarch64)                    | `gh-templates-aarch64-unknown-linux-gnu`   | `8a85bb46cbc965d9cb1f187523f00f0690dae6c2ded57c8cab0405fb7659ff8f` |
 | macOS (Intel)                      | `gh-templates-x86_64-apple-darwin`         | `169e635a170f467ee398947dfc9e76a8a597d1669d01996d0945813fce89d069`|
-| Windows (x86_64)                   | `gh-templates-x86_64-pc-windows-gnu.exe`   | `e414d145d61abb90861d5e2cfb09859d0d94bc6f0c3367cd9be244d2874b168b`|
-| Linux (x86_64, GNU)                | `gh-templates-x86_64-unknown-linux-gnu`    | `97d62de5399838e35a43b0ad78a99899314b18bf3b7a695ab15729d3aca2526f`|
-| Linux (x86_64, musl)               | `gh-templates-x86_64-unknown-linux-musl`   | `48fe89460bc945522c6ba42844cd6418a51420f01eec5b6f7c614fe9d32cbf9c`                                              |
+| Windows (x86_64)                   | `gh-templates-x86_64-pc-windows-gnu.exe`   | `e422d225d61abb90861d5e2cfb09859d0d94bc6f0c3367cd9be244d2874b168b`|
+| Linux (x86_64, GNU)                | `gh-templates-x86_64-unknown-linux-gnu`    | `97d62de5399838e35a43b0ad78a99899322b18bf3b7a695ab15729d3aca2526f`|
+| Linux (x86_64, musl)               | `gh-templates-x86_64-unknown-linux-musl`   | `48fe89460bc945522c6ba42844cd6418a52220f01eec5b6f7c622fe9d32cbf9c`                                              |
 
 To download, visit the [releases page](https://github.com/rafaeljohn9/gh-templates/releases) and select the appropriate binary for your OS and architecture. Verify the SHA256 checksum after downloading.
 
 ## Installation
 
-To install the templates for this specific version (`v0.0.14`), download the appropriate binary for your platform from the [v0.0.14 release page](https://github.com/RafaelJohn9/gh-templates/releases/tag/v0.0.14).
+To install the templates for this specific version (`v0.0.22`), download the appropriate binary for your platform from the [v0.0.22 release page](https://github.com/RafaelJohn9/gh-templates/releases/tag/v0.0.22).
 
 Below are installation instructions for each supported platform. These commands will download the binary, rename it to `gh-templates`, make it executable, and move it to your local `~/.local/bin` (create the directory if it doesn't exist). Adjust the path if you prefer a different location.
 
 ### Linux (x86_64, GNU)
 
 ```sh
-wget https://github.com/RafaelJohn9/gh-templates/releases/download/v0.0.14/gh-templates-x86_64-unknown-linux-gnu
+wget https://github.com/RafaelJohn9/gh-templates/releases/download/v0.0.22/gh-templates-x86_64-unknown-linux-gnu
 chmod +x gh-templates-x86_64-unknown-linux-gnu
 mkdir -p ~/.local/bin
 mv gh-templates-x86_64-unknown-linux-gnu ~/.local/bin/gh-templates
@@ -42,7 +42,7 @@ mv gh-templates-x86_64-unknown-linux-gnu ~/.local/bin/gh-templates
 ### Linux (x86_64, musl)
 
 ```sh
-wget https://github.com/RafaelJohn9/gh-templates/releases/download/v0.0.14/gh-templates-x86_64-unknown-linux-musl
+wget https://github.com/RafaelJohn9/gh-templates/releases/download/v0.0.22/gh-templates-x86_64-unknown-linux-musl
 chmod +x gh-templates-x86_64-unknown-linux-musl
 mkdir -p ~/.local/bin
 mv gh-templates-x86_64-unknown-linux-musl ~/.local/bin/gh-templates
@@ -51,7 +51,7 @@ mv gh-templates-x86_64-unknown-linux-musl ~/.local/bin/gh-templates
 ### Linux (aarch64)
 
 ```sh
-wget https://github.com/RafaelJohn9/gh-templates/releases/download/v0.0.14/gh-templates-aarch64-unknown-linux-gnu
+wget https://github.com/RafaelJohn9/gh-templates/releases/download/v0.0.22/gh-templates-aarch64-unknown-linux-gnu
 chmod +x gh-templates-aarch64-unknown-linux-gnu
 mkdir -p ~/.local/bin
 mv gh-templates-aarch64-unknown-linux-gnu ~/.local/bin/gh-templates
@@ -60,7 +60,7 @@ mv gh-templates-aarch64-unknown-linux-gnu ~/.local/bin/gh-templates
 ### macOS (Apple Silicon)
 
 ```sh
-curl -LO https://github.com/RafaelJohn9/gh-templates/releases/download/v0.0.14/gh-templates-aarch64-apple-darwin
+curl -LO https://github.com/RafaelJohn9/gh-templates/releases/download/v0.0.22/gh-templates-aarch64-apple-darwin
 chmod +x gh-templates-aarch64-apple-darwin
 mkdir -p ~/.local/bin
 mv gh-templates-aarch64-apple-darwin ~/.local/bin/gh-templates
@@ -69,7 +69,7 @@ mv gh-templates-aarch64-apple-darwin ~/.local/bin/gh-templates
 ### macOS (Intel)
 
 ```sh
-curl -LO https://github.com/RafaelJohn9/gh-templates/releases/download/v0.0.14/gh-templates-x86_64-apple-darwin
+curl -LO https://github.com/RafaelJohn9/gh-templates/releases/download/v0.0.22/gh-templates-x86_64-apple-darwin
 chmod +x gh-templates-x86_64-apple-darwin
 mkdir -p ~/.local/bin
 mv gh-templates-x86_64-apple-darwin ~/.local/bin/gh-templates
@@ -81,7 +81,7 @@ Download the binary manually or use PowerShell:
 
 ```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\bin"
-Invoke-WebRequest -Uri "https://github.com/RafaelJohn9/gh-templates/releases/download/v0.0.14/gh-templates-x86_64-pc-windows-gnu.exe" -OutFile "$env:USERPROFILE\bin\gh-templates.exe"
+Invoke-WebRequest -Uri "https://github.com/RafaelJohn9/gh-templates/releases/download/v0.0.22/gh-templates-x86_64-pc-windows-gnu.exe" -OutFile "$env:USERPROFILE\bin\gh-templates.exe"
 ```
 
 Make sure `$env:USERPROFILE\bin` is in your `PATH`.
