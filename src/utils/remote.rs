@@ -2,6 +2,7 @@ use std::fs::{File, create_dir_all};
 use std::io::Write;
 use std::path::Path;
 
+use crate::utils::get_comment;
 use crate::utils::pretty_print;
 
 const REMOTE_BASE_URL: &str =
@@ -54,7 +55,7 @@ pub fn fetch_template(
     Ok(())
 }
 
-pub fn fetch_template_list(category: &str) -> anyhow::Result<Vec<String>> {
+pub fn fetch_template_list(category: &str) -> anyhow::Result<Vec<(String, Option<String>)>> {
     let url = format!("{}/{}-templates", REMOTE_API_URL, category);
 
     let client = reqwest::blocking::Client::new();
@@ -87,11 +88,33 @@ pub fn fetch_template_list(category: &str) -> anyhow::Result<Vec<String>> {
         for entry in array {
             if let Some(name) = entry.get("name").and_then(|n| n.as_str()) {
                 // Remove the extension if present
-                let name_without_ext = match name.rfind('.') {
-                    Some(idx) => &name[..idx],
-                    None => name,
+                let (name_without_ext, extension) = match name.rfind('.') {
+                    Some(idx) => (&name[..idx], &name[idx + 1..]),
+                    None => (name, ""),
                 };
-                templates.push(name_without_ext.to_string());
+
+                // Fetch the template file to read the first line (comment)
+                let file_url = format!(
+                    "{}/{}-templates/{}.{}",
+                    REMOTE_BASE_URL, category, name_without_ext, extension
+                );
+
+                let comment = match reqwest::blocking::get(&file_url) {
+                    Ok(response) if response.status().is_success() => {
+                        if let Ok(text) = response.text() {
+                            if let Some(first_line) = text.lines().next() {
+                                Some(get_comment::extract_comment(first_line, extension))
+                            } else {
+                                None
+                            }
+                        } else {
+                            None
+                        }
+                    }
+                    _ => None,
+                };
+
+                templates.push((name_without_ext.to_string(), comment.flatten()));
             }
         }
     }
