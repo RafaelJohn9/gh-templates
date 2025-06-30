@@ -92,6 +92,10 @@ Make sure `$env:USERPROFILE\bin` is in your `PATH`.
 
 Below are some example commands for using `gh-templates` to add templates to your repository:
 
+> **Note:**  
+> It is recommended you use the labels from this repository by running:  
+> `gh label clone rafaeljohn9/gh-templates`
+
 ```sh
 # Add an issue template
 gh-templates add issue bug
