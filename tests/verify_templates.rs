@@ -1,4 +1,3 @@
-use pretty_assertions::assert_eq;
 use std::collections::HashMap;
 use std::fs;
 use std::io::{BufRead, BufReader};
@@ -18,35 +17,33 @@ fn all_templates_start_with_comment() {
     comment_map.insert("sh", "#");
     comment_map.insert("js", "//");
     comment_map.insert("ts", "//");
-    comment_map.insert("html", "<!--"); // Will require special closing check if desired
-    comment_map.insert("css", "/*"); // Usually block comments
+    comment_map.insert("html", "<!--");
+    comment_map.insert("css", "/*");
     comment_map.insert("yaml", "#");
     comment_map.insert("yml", "#");
     comment_map.insert("toml", "#");
     comment_map.insert("md", "<!--");
+
     assert!(
         template_dir.exists(),
         "Template directory does not exist: {:?}",
         template_dir
     );
 
-    fn check_templates_in_dir(dir: &Path, comment_map: &HashMap<&str, &str>) {
+    fn check_templates_in_dir(
+        dir: &Path,
+        comment_map: &HashMap<&str, &str>,
+        failed_files: &mut Vec<(String, String, String)>,
+    ) {
         for entry in fs::read_dir(dir).expect("Failed to read templates directory") {
             let entry = entry.expect("Failed to read file entry");
             let path = entry.path();
 
             if path.is_dir() {
-                check_templates_in_dir(&path, comment_map);
+                check_templates_in_dir(&path, comment_map, failed_files);
             } else if path.is_file() {
                 let extension = path.extension().and_then(|s| s.to_str()).unwrap_or("");
                 let comment_prefix = comment_map.get(extension).unwrap_or(&"#");
-
-                println!(
-                    "Checking file: {:?} (extension: {:?}, expected comment: {:?})",
-                    path.file_name().unwrap_or_default(),
-                    extension,
-                    comment_prefix
-                );
 
                 let file = fs::File::open(&path).expect("Failed to open template file");
                 let mut reader = BufReader::new(file);
@@ -58,24 +55,35 @@ fn all_templates_start_with_comment() {
 
                 let trimmed = first_line.trim_start();
 
-                // Use pretty_assertions for better diff if the assertion fails
                 let starts_with_comment = trimmed.starts_with(comment_prefix);
                 if !starts_with_comment {
-                    println!(
-                        "❌ File {:?} does not start with a comment (expected prefix: {:?})\nFirst line: {}",
-                        path, comment_prefix, first_line
-                    );
-                } else {
-                    println!("✅ File {:?} starts with the expected comment.", path);
+                    failed_files.push((
+                        path.display().to_string(),
+                        comment_prefix.to_string(),
+                        first_line.clone(),
+                    ));
                 }
-                assert_eq!(
-                    starts_with_comment, true,
-                    "File {:?} does not start with a comment (expected prefix: {:?})\nFirst line: {}",
-                    path, comment_prefix, first_line
-                );
             }
         }
     }
 
-    check_templates_in_dir(template_dir, &comment_map);
+    let mut failed_files = Vec::new();
+    check_templates_in_dir(template_dir, &comment_map, &mut failed_files);
+
+    if !failed_files.is_empty() {
+        println!("\n❌ The following files do not start with the expected comment:");
+        for (file, expected, first_line) in &failed_files {
+            println!(
+                "File: {}\n  Expected prefix: {:?}\n  First line: {}\n",
+                file,
+                expected,
+                first_line.trim_end()
+            );
+        }
+    }
+
+    assert!(
+        failed_files.is_empty(),
+        "Some template files do not start with the expected comment. See output above."
+    );
 }
