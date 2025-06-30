@@ -1,0 +1,35 @@
+# GitHub Actions Workflow: Pylint Code Quality Check
+
+name: Pylint Code Quality Check
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/pylint.yml'    # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/pylint.yml'
+
+jobs:
+  pylint-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install Pylint
+      - name: Install Pylint
+        run: pip install pylint
+
+      # Run Pylint to check code quality
+      - name: Run Pylint
+        run: pylint .
