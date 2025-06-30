@@ -1,4 +1,6 @@
+<!-- Submit a fix for a known bug -->
 ---
+
 name: 🐞 Bug Fix
 about: Submit a fix for a known bug
 title: "[BUGFIX] <short summary>"
