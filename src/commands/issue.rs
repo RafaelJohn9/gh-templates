@@ -28,8 +28,11 @@ pub fn list() -> anyhow::Result<()> {
     if templates.is_empty() {
         println!("No issue templates found.");
     } else {
-        for template in templates {
-            println!("{}", template);
+        for (name, description_opt) in templates {
+            match description_opt {
+                Some(description) => println!("> {:<12} {}", name, description),
+                None => println!("{}", name),
+            }
         }
     }
     Ok(())
