@@ -74,7 +74,7 @@ fn all_templates_start_with_comment() {
         println!("\n❌ The following files do not start with the expected comment:");
         for (file, expected, first_line) in &failed_files {
             println!(
-                "File: {}\n  Expected prefix: {:?}\n  First line: {}\n",
+                "🔺 File: {}\n  Expected prefix: {:?}\n  First line: {}\n",
                 file,
                 expected,
                 first_line.trim_end()
