@@ -1,7 +1,8 @@
 # Report issues or suggest improvements related to documentation, guides, or help content.
 name: 📄 Documentation
 description: Report issues or suggest improvements related to documentation, guides, or help content.
-labels: [documentation]
+labels:
+  - documentation
 body:
   - type: markdown
     attributes:
