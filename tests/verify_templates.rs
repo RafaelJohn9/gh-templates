@@ -11,18 +11,19 @@ fn all_templates_start_with_comment() {
     let template_dir = Path::new("./templates");
 
     // Map extensions to comment symbols
-    let mut comment_map = HashMap::new();
-    comment_map.insert("rs", "//");
-    comment_map.insert("py", "#");
-    comment_map.insert("sh", "#");
-    comment_map.insert("js", "//");
-    comment_map.insert("ts", "//");
-    comment_map.insert("html", "<!--");
-    comment_map.insert("css", "/*");
-    comment_map.insert("yaml", "#");
-    comment_map.insert("yml", "#");
-    comment_map.insert("toml", "#");
-    comment_map.insert("md", "<!--");
+    let comment_map = HashMap::from([
+        ("rs", "//"),
+        ("py", "#"),
+        ("sh", "#"),
+        ("js", "//"),
+        ("ts", "//"),
+        ("html", "<!--"),
+        ("css", "/*"),
+        ("yaml", "#"),
+        ("yml", "#"),
+        ("toml", "#"),
+        ("md", "<!--"),
+    ]);
 
     assert!(
         template_dir.exists(),
