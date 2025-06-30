@@ -1,0 +1,35 @@
+# GitHub Actions Workflow: Ruff Code Linter and Formatter
+
+name: Ruff Code Quality Check
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/ruff.yml'      # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/ruff.yml'
+
+jobs:
+  ruff-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install Ruff
+      - name: Install Ruff
+        run: pip install ruff
+
+      # Run Ruff to check code quality
+      - name: Run Ruff
+        run: ruff .
