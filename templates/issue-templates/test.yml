@@ -1,7 +1,7 @@
 # Report issues related to testing or quality assurance.
 name: 🧪 Testing & QA
 description: Report issues related to testing or quality assurance
-labels: [testing, QA]
+labels: [testing, QA, enhancement]
 body:
   - type: markdown
     attributes:

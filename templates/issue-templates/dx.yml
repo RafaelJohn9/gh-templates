@@ -1,7 +1,7 @@
 # Report issues that affect developers' experience
 name: "🧑‍💻 Developer Experience (DX) Feedback"
 description: Report issues that affect developers' experience
-labels: [dx, feedback]
+labels: [dx, feedback, enhancement]
 body:
   - type: markdown
     attributes:
