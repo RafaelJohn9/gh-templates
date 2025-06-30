@@ -1,4 +1,7 @@
+<!-- Propose or enhance collaboration with the community -->
+
 ---
+
 name: 🤝 Community Collaboration
 about: Propose or enhance collaboration with the community
 title: "[COMMUNITY] <short summary>"

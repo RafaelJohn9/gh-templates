@@ -1,3 +1,4 @@
+<!-- Propose improvements or additions to project documentation -->
 ---
 name: 📚 Documentation Update
 about: Propose improvements or additions to project documentation

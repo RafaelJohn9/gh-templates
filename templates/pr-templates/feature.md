@@ -1,3 +1,4 @@
+<!-- Propose and implement a new feature -->
 ---
 name: ✨ Feature Request
 about: Propose and implement a new feature
