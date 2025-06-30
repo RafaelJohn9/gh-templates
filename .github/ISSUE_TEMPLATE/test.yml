@@ -1,6 +1,10 @@
+# Report issues related to testing or quality assurance.
 name: 🧪 Testing & QA
 description: Report issues related to testing or quality assurance
-labels: [testing, QA]
+labels:
+  - testing
+  - QA
+  - enhancement
 body:
   - type: markdown
     attributes:
@@ -31,7 +35,7 @@ body:
     validations:
       required: true
 
-  - type: textarea
+  - type: textareahelp wanted
     id: steps
     attributes:
       label: Steps to Reproduce

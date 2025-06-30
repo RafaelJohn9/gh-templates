@@ -1,6 +1,10 @@
+# Report issues or suggestions related to community, collaboration, or project governance.
 name: "💬 Community & Collaboration"
 description: Report issues or suggestions related to community, collaboration, or project governance.
-labels: [community, collaboration]
+labels:
+  - community
+  - collaboration
+  - enhancement
 body:
   - type: markdown
     attributes:
