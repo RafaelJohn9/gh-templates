@@ -1,3 +1,4 @@
+<!-- outlines the expected standards of behavior for individuals within an organization or group. -->
 # Code of Conduct
 
 ## Our Commitment
