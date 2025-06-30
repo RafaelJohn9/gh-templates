@@ -1,0 +1,35 @@
+# GitHub Actions Workflow: Flake8 enforce PEP8 standards and catch style issues.
+
+name: Flake8 Code Quality Check
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/flake8.yml'    # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/flake8.yml'
+
+
+jobs:
+  flake8-check:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install Flake8
+      - name: Install Flake8
+        run: pip install flake8
+
+      # Run Flake8 to check code style
+      - name: Run Flake8
+        run: flake8 .
