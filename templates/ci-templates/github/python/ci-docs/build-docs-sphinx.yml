@@ -1,0 +1,35 @@
+# GitHub Actions Workflow: Build documentation using Sphinx.
+
+name: Build Documentation with Sphinx
+on:
+  push:
+    paths:
+      - 'docs/**'                          # Trigger on documentation changes
+      - '.github/workflows/build-docs.yml' # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/build-docs.yml'
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install Sphinx
+      - name: Install Sphinx
+        run: |
+          pip install sphinx
+
+      # Build documentation
+      - name: Build documentation
+        run: sphinx-build -b html docs/ docs/_build/html
