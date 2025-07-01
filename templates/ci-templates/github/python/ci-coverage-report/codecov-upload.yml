@@ -1,0 +1,41 @@
+# GitHub Actions Workflow: Codecov upload coverage reports to Codecov.
+
+name: Codecov Coverage Report Upload
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/codecov-upload.yml'  # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/codecov-upload.yml'
+jobs:
+  codecov-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Generate coverage report
+      - name: Generate Coverage Report
+        run: |
+          pip install coverage
+          coverage run -m unittest discover  
+          coverage xml  
+
+      # Upload coverage report to Codecov
+      - name: Upload Coverage Report to Codecov
+        uses: codecov/codecov-action@v3
+          with:
+            file: coverage.xml
+            token: ${{ secrets.CODECOV_TOKEN }}
+            
