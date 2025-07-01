@@ -1,4 +1,4 @@
-# Git Templates
+# Gh Templates
 
 This repository provides a collection of reusable Git templates to streamline your workflow across multiple repositories. It includes fully supported **Issue Templates**, **Pull Request Templates**, and more.
 
