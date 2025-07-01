@@ -16,6 +16,10 @@ All notable changes to this project will be documented in this file.
 
 - update README to read the latest version (add3290)
 
+- enforced semantic versioning in build yml, updated changelog yml logic (87c1b23)
+
+- run: 16012293293 (71d000c)
+
 
 ## [v0.0.38]
 
