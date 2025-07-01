@@ -13,14 +13,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history
 
       - name: Install git-cliff
         uses: taiki-e/install-action@v2
         with:
           tool: git-cliff
 
-      - name: Generate/Update CHANGELOG.md
-        run: git cliff -o CHANGELOG.md
+      - name: Generate/Prepend latest to CHANGELOG.md
+        run: |
+          touch CHANGELOG.md
+          git cliff --latest --prepend CHANGELOG.md -o temp_changelog.md
+          mv temp_changelog.md CHANGELOG.md
+
+
+
+
 
       - name: Commit and push CHANGELOG.md
         run: |
@@ -33,4 +42,4 @@ jobs:
 
       - name: Push if not on a tag
         if: github.ref_type != 'tag'
-        run: git push origin HEAD
+        run: git push origin ${{ github.ref_name }}
