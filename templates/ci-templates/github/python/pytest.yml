@@ -1,0 +1,33 @@
+# GitHub Actions Workflow: Pytest Testing
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/pytest.yml'    # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/pytest.yml'
+
+jobs:
+  pytest-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Run Pytest
+      - name: Run Pytest
+        run: pytest
