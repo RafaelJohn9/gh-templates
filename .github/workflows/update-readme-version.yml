@@ -33,13 +33,13 @@ jobs:
         ESCAPED_VERSION=$(echo "$VERSION" | sed 's/\./\\./g')
 
         # Update "To install the templates..." sentence with new version
-        sed -E -i "s|To install the templates for this specific version \(`v[0-9]+\.[0-9]+\.[0-9]+`\), download the appropriate binary for your platform from the \[v[0-9]+\.[0-9]+\.[0-9]+ release page\]\(https://github.com/RafaelJohn9/gh-templates/releases/tag/v[0-9]+\.[0-9]+\.[0-9]+\)|To install the templates for this specific version (\`v$VERSION\`), download the appropriate binary for your platform from the \[v$VERSION release page\](https://github.com/RafaelJohn9/gh-templates/releases/tag/v$VERSION)|" README.md
+        sed -E -i "s|To install the templates for this specific version \(`v[0-9]+\.[0-9]+\.[0-9]+`\), download the appropriate binary for your platform from the \[v[0-9]+\.[0-9]+\.[0-9]+ release page\]\(https://github.com/RafaelJohn9/gh-templates/releases/tag/v[0-9]+\.[0-9]+\.[0-9]+\)|To install the templates for this specific version (\`$VERSION\`), download the appropriate binary for your platform from the \[$VERSION release page\](https://github.com/RafaelJohn9/gh-templates/releases/tag/$VERSION)|" README.md
 
         # Update all GitHub release **tag** links
-        sed -E -i "s|https://github.com/RafaelJohn9/gh-templates/releases/tag/v[0-9]+\.[0-9]+\.[0-9]+|https://github.com/RafaelJohn9/gh-templates/releases/tag/v$VERSION|g" README.md
+        sed -E -i "s|https://github.com/RafaelJohn9/gh-templates/releases/tag/v[0-9]+\.[0-9]+\.[0-9]+|https://github.com/RafaelJohn9/gh-templates/releases/tag/$VERSION|g" README.md
 
         # Update all GitHub release **download** links
-        sed -E -i "s|https://github.com/RafaelJohn9/gh-templates/releases/download/v[0-9]+\.[0-9]+\.[0-9]+|https://github.com/RafaelJohn9/gh-templates/releases/download/v$VERSION|g" README.md
+        sed -E -i "s|https://github.com/RafaelJohn9/gh-templates/releases/download/v[0-9]+\.[0-9]+\.[0-9]+|https://github.com/RafaelJohn9/gh-templates/releases/download/$VERSION|g" README.md
 
     
     
