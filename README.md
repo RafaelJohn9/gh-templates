@@ -2,6 +2,10 @@
 
 This repository provides a collection of reusable Git templates to streamline your workflow across multiple repositories. It includes fully supported **Issue Templates**, **Pull Request Templates**, and more.
 
+## Contributing
+
+We welcome contributions from everyone! Don’t worry if you’re not familiar with Rust—the project is primarily composed of YAML files (for workflows), Markdown files (for templates and documentation), and license files. Rust is only used for the CLI interface. You can help by opening issues, suggesting new GitHub templates, or sharing feedback to improve the project. Your ideas and participation are valued, and we’re happy to support you as you get involved.
+
 ## Features
 
 - **Issue Templates**: Standardized templates for bug reports, feature requests, documentation, community collaboration, developer experience feedback, support questions, and tests.
