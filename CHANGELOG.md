@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fix
 
-- run: 16012346792 (fc00066)
+- syntax error in change log update workflow (8bf28b7)
 
 
 ## [v0.0.38]
