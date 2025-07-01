@@ -54,4 +54,4 @@ jobs:
 
       - name: Push to main if on a tag
         if: github.ref_type == 'tag'
-        run: git push origin main
+        run: git push origin HEAD:main
