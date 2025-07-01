@@ -1,4 +1,4 @@
-$ GitHub Actions Workflow: Generate code coverage reports using coverage.py
+# GitHub Actions Workflow: Generate code coverage reports using coverage.py
 
 name: Code Coverage Report
 on:
