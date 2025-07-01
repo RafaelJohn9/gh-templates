@@ -1,0 +1,50 @@
+# .github/workflows/update-readme-version.yml
+name: Update README Version
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on any tag starting with 'v'
+
+permissions:
+  contents: write  # Required for pushing changes
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        ref: main  # Checkout main branch instead of the tag
+        fetch-depth: 0  # Fetch all history for all tags and branches
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Get the version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+    
+    - name: Update README.md
+      run: |
+        # Replace the version in the specific line
+        sed -i "s/To install the templates for this specific version (\`v[0-9]\+\.[0-9]\+\.[0-9]\+\`)/To install the templates for this specific version (\`${{ steps.get_version.outputs.VERSION }}\`)/g" README.md
+        sed -i "s|https://github.com/RafaelJohn9/gh-templates/releases/tag/v[0-9]\+\.[0-9]\+\.[0-9]\+|https://github.com/RafaelJohn9/gh-templates/releases/tag/${{ steps.get_version.outputs.VERSION }}|g" README.md
+    
+    - name: Check if README was modified
+      id: check_changes
+      run: |
+        if git diff --quiet README.md; then
+          echo "changed=false" >> $GITHUB_OUTPUT
+        else
+          echo "changed=true" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Commit and push changes
+      if: steps.check_changes.outputs.changed == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add README.md
+        git commit -m "Update README version to ${{ steps.get_version.outputs.VERSION }}"
+        git push origin main
