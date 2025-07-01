@@ -23,7 +23,8 @@ jobs:
           tool: git-cliff
 
       - name: Generate/Append to CHANGELOG.md
-        run: git cliff --latest --append -o CHANGELOG.md
+        run: git cliff --latest --prepend -o CHANGELOG.md
+
 
 
       - name: Commit and push CHANGELOG.md
