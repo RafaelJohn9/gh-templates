@@ -1,14 +1,16 @@
 [git]
 conventional = true
-tag_pattern = "v[0-9]*"
+tag_pattern = "v[0-9]+\\.[0-9]+\\.[0-9]+"
+
 
 [changelog]
 header = "# Changelog"
+prepent = true
 body = """
 {% for group, commits in commits | group_by(attribute="type") %}
 ### {{ group | upper_first }}
 {% for commit in commits %}
-- {{ commit.message }}
+- {{ commit.message | trim}}
 {% endfor %}
 {% endfor %}
 """

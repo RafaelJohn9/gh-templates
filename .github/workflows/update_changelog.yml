@@ -7,20 +7,24 @@ on:
   push:
     branches:
       - main
+  pull_request:
 
 jobs:
   update-changelog:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history
 
       - name: Install git-cliff
         uses: taiki-e/install-action@v2
         with:
           tool: git-cliff
 
-      - name: Generate/Update CHANGELOG.md
-        run: git cliff -o CHANGELOG.md
+      - name: Generate/Append to CHANGELOG.md
+        run: git cliff --latest --append -o CHANGELOG.md
+
 
       - name: Commit and push CHANGELOG.md
         run: |
