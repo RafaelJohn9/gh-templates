@@ -54,5 +54,6 @@ jobs:
 
       - name: Push to main if on a tag
         if: github.ref_type == 'tag'
-        git pull --rebase origin main
-        run: git push origin HEAD:main
+        run: |
+          git pull --rebase origin main
+          git push origin HEAD:main
