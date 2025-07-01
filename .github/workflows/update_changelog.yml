@@ -23,7 +23,11 @@ jobs:
           tool: git-cliff
 
       - name: Generate/Prepend latest to CHANGELOG.md
-        run: git cliff --latest --prepend  CHANGELOG.md -o CHANGELOG.md
+        run: |
+          touch CHANGELOG.md
+          git cliff --latest --prepend CHANGELOG.md -o temp_changelog.md
+          mv temp_changelog.md CHANGELOG.md
+
 
 
 
