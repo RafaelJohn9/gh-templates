@@ -7,18 +7,9 @@ All notable changes to this project will be documented in this file.
 
 
 
-### Feat
-
-- updated README:: piece of info to new contributors (0e2b1ae)
-
-
 ### Fix
 
-- update README to read the latest version (add3290)
-
-- enforced semantic versioning in build yml, updated changelog yml logic (87c1b23)
-
-- run: 16012293293 (71d000c)
+- run: 16012346792 (fc00066)
 
 
 ## [v0.0.38]
