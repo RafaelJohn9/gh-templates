@@ -33,10 +33,10 @@ jobs:
         run: |
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             # On tag: Generate full history
-            git-cliff --output CHANGELOG.md --latest 0 --prepend
+            git-cliff --latest 0 --prepend CHANGELOG.md
           else
             # On push: Only unreleased changes
-            git-cliff --output CHANGELOG.md --unreleased --prepend
+            git-cliff --unreleased --prepend CHANGELOG.md
           fi
 
       - name: Commit and push CHANGELOG.md
