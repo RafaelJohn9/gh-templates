@@ -30,8 +30,6 @@ To download, visit the [releases page](https://github.com/rafaeljohn9/gh-templat
 
 ## Installation
 
-To install the latest version (`v0.0.38`), download the appropriate binary for your platform from the [v0.0.38 release page](https://github.com/RafaelJohn9/gh-templates/releases/tag/v0.0.43).
-
 Below are installation instructions for each supported platform. These commands will download the binary, rename it to `gh-templates`, make it executable, and move it to your local `~/.local/bin` (create the directory if it doesn't exist). Adjust the path if you prefer a different location.
 
 ### Linux (x86_64, GNU)
