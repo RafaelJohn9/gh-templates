@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 
 
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (ab2c33b)
+
+- update CHANGELOG [skip ci] (c2a3c27)
+
+
+### Fix
+
+- installation instructions: made it clearer (e29fd27)
+
+
 ## [v0.0.43]
 
 
