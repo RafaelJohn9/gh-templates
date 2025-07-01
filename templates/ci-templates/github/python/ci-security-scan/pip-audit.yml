@@ -1,0 +1,34 @@
+# GitHub Actions Workflow: Ppip-audit security scan for Python dependencies
+
+name: Pip-Audit Security Scan
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/pip-audit.yml' # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/pip-audit.yml'
+jobs:
+  pip-audit-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install pip-audit
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      # Run pip-audit security scan
+      - name: Run pip-audit (Security Scan)
+        run: pip-audit
