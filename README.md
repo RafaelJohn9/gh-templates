@@ -158,3 +158,21 @@ gh-templates preview pr feature-request
 # Preview a license (planned)
 gh-templates preview license mit
 ```
+
+## Troubleshooting
+
+### Workflow Issues
+
+If you're experiencing issues with GitHub Actions workflows not triggering properly, see our [Workflow Troubleshooting Guide](docs/WORKFLOW_TROUBLESHOOTING.md) for common solutions.
+
+**Common Issues:**
+- Auto-version workflow not triggering build/release workflows
+- Workflows not chaining properly after tag pushes
+- Token configuration problems
+
+### General Support
+
+If you encounter any issues or have questions:
+1. Check the [troubleshooting documentation](docs/WORKFLOW_TROUBLESHOOTING.md)
+2. Search existing [issues](https://github.com/RafaelJohn9/gh-templates/issues)
+3. Open a new issue with details about your problem

@@ -17,11 +17,21 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[skip version]')"
     
     steps:
+      - name: Check token configuration
+        run: |
+          if [ -n "${{ secrets.PAT_TOKEN }}" ]; then
+            echo "✅ PAT_TOKEN is configured - other workflows will be triggered by tag pushes"
+          else
+            echo "⚠️  PAT_TOKEN not configured - using GITHUB_TOKEN (other workflows won't be triggered)"
+            echo "To fix this: Create a PAT with 'contents:write' and 'actions:write' permissions and add it as PAT_TOKEN secret"
+          fi
+      
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch full history to get all tags
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Use PAT if available to trigger other workflows, fallback to GITHUB_TOKEN
+          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Get latest tag
         id: get_tag
@@ -114,6 +124,9 @@ jobs:
           git push origin "$new_version"
           
           echo "Created and pushed tag: $new_version"
+        env:
+          # Use PAT if available to trigger other workflows, fallback to GITHUB_TOKEN
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Skip tagging - no changes
         if: steps.check_tag.outputs.tag_exists == 'false' && steps.check_changes.outputs.has_changes == 'false'
