@@ -1,0 +1,126 @@
+name: Auto Version and Tag
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'CHANGELOG.md'
+      - 'README.md'
+
+permissions:
+  contents: write
+
+jobs:
+  auto-version:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[skip version]')"
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history to get all tags
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          # Get the latest tag in v0.0.x format
+          echo "Fetching existing tags..."
+          git tag -l "v0.0.*" | sort -V
+          
+          latest_tag=$(git tag -l "v0.0.*" | sort -V | tail -1)
+          
+          if [ -z "$latest_tag" ]; then
+            # If no tags exist, start with v0.0.1
+            echo "No existing v0.0.* tags found, starting from v0.0.0"
+            latest_tag="v0.0.0"
+          fi
+          
+          echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
+          echo "Latest tag found: $latest_tag"
+
+      - name: Calculate new version
+        id: new_version
+        run: |
+          latest_tag="${{ steps.get_tag.outputs.latest_tag }}"
+          
+          # Extract version number (remove 'v' prefix)
+          version_num=${latest_tag#v}
+          
+          # Split version into parts (e.g., 0.0.44 -> 0, 0, 44)
+          IFS='.' read -ra VERSION_PARTS <<< "$version_num"
+          major=${VERSION_PARTS[0]}
+          minor=${VERSION_PARTS[1]}
+          patch=${VERSION_PARTS[2]}
+          
+          # Increment patch version by 1
+          new_patch=$((patch + 1))
+          new_version="v${major}.${minor}.${new_patch}"
+          
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+          echo "New version: $new_version"
+
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          new_version="${{ steps.new_version.outputs.new_version }}"
+          if git tag --list | grep -q "^${new_version}$"; then
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+            echo "Tag $new_version already exists!"
+          else
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
+            echo "Tag $new_version does not exist, proceeding with tagging"
+          fi
+
+      - name: Check for changes since last tag
+        id: check_changes
+        if: steps.check_tag.outputs.tag_exists == 'false'
+        run: |
+          latest_tag="${{ steps.get_tag.outputs.latest_tag }}"
+          
+          if [ "$latest_tag" = "v0.0.0" ]; then
+            # No previous tags, so we definitely have changes
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "No previous tags found, assuming changes exist"
+          else
+            # Check if there are commits since the last tag
+            commits_since_tag=$(git rev-list ${latest_tag}..HEAD --count)
+            echo "Commits since $latest_tag: $commits_since_tag"
+            
+            if [ "$commits_since_tag" -gt 0 ]; then
+              echo "has_changes=true" >> $GITHUB_OUTPUT
+              echo "Found $commits_since_tag commits since last tag"
+            else
+              echo "has_changes=false" >> $GITHUB_OUTPUT
+              echo "No commits since last tag"
+            fi
+          fi
+
+      - name: Create and push new tag
+        if: steps.check_tag.outputs.tag_exists == 'false' && steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          new_version="${{ steps.new_version.outputs.new_version }}"
+          
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create annotated tag
+          git tag -a "$new_version" -m "chore: release $new_version"
+          
+          # Push the tag
+          git push origin "$new_version"
+          
+          echo "Created and pushed tag: $new_version"
+
+      - name: Skip tagging - no changes
+        if: steps.check_tag.outputs.tag_exists == 'false' && steps.check_changes.outputs.has_changes == 'false'
+        run: |
+          echo "No changes since last tag, skipping version creation"
+
+      - name: Skip tagging - tag exists
+        if: steps.check_tag.outputs.tag_exists == 'true'
+        run: |
+          echo "Tag already exists, skipping version creation"
