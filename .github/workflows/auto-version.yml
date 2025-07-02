@@ -27,10 +27,14 @@ jobs:
         id: get_tag
         run: |
           # Get the latest tag in v0.0.x format
+          echo "Fetching existing tags..."
+          git tag -l "v0.0.*" | sort -V
+          
           latest_tag=$(git tag -l "v0.0.*" | sort -V | tail -1)
           
           if [ -z "$latest_tag" ]; then
             # If no tags exist, start with v0.0.1
+            echo "No existing v0.0.* tags found, starting from v0.0.0"
             latest_tag="v0.0.0"
           fi
           
@@ -70,8 +74,32 @@ jobs:
             echo "Tag $new_version does not exist, proceeding with tagging"
           fi
 
-      - name: Create and push new tag
+      - name: Check for changes since last tag
+        id: check_changes
         if: steps.check_tag.outputs.tag_exists == 'false'
+        run: |
+          latest_tag="${{ steps.get_tag.outputs.latest_tag }}"
+          
+          if [ "$latest_tag" = "v0.0.0" ]; then
+            # No previous tags, so we definitely have changes
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "No previous tags found, assuming changes exist"
+          else
+            # Check if there are commits since the last tag
+            commits_since_tag=$(git rev-list ${latest_tag}..HEAD --count)
+            echo "Commits since $latest_tag: $commits_since_tag"
+            
+            if [ "$commits_since_tag" -gt 0 ]; then
+              echo "has_changes=true" >> $GITHUB_OUTPUT
+              echo "Found $commits_since_tag commits since last tag"
+            else
+              echo "has_changes=false" >> $GITHUB_OUTPUT
+              echo "No commits since last tag"
+            fi
+          fi
+
+      - name: Create and push new tag
+        if: steps.check_tag.outputs.tag_exists == 'false' && steps.check_changes.outputs.has_changes == 'true'
         run: |
           new_version="${{ steps.new_version.outputs.new_version }}"
           
@@ -87,7 +115,12 @@ jobs:
           
           echo "Created and pushed tag: $new_version"
 
-      - name: Skip tagging
+      - name: Skip tagging - no changes
+        if: steps.check_tag.outputs.tag_exists == 'false' && steps.check_changes.outputs.has_changes == 'false'
+        run: |
+          echo "No changes since last tag, skipping version creation"
+
+      - name: Skip tagging - tag exists
         if: steps.check_tag.outputs.tag_exists == 'true'
         run: |
           echo "Tag already exists, skipping version creation"
