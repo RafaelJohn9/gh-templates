@@ -1,17 +1,17 @@
-# GitHub Actions Workflow: Build documentation using MkDocs.    
+# GitHub Actions Workflow: Build python package using setup tools
 
-name: Build Documentation with MkDocs
+name: Build Python Package with Setuptools
 on:
   push:
     paths:
-      - 'docs/**'                          # Trigger on documentation changes
-      - '.github/workflows/build-docs.yml' # Trigger on workflow file changes
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/build-setuptools.yml'  # Trigger on workflow file changes
   pull_request:
     paths:
-      - 'docs/**'
-      - '.github/workflows/build-docs.yml'
+      - '**.py'
+      - '.github/workflows/build-setuptools.yml'
 jobs:
-  build-docs:
+  build-setuptools:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,11 +25,12 @@ jobs:
         with:
           python-version: '3.x'
 
-      # Install MkDocs
-      - name: Install MkDocs
+      # Install build tools
+      - name: Install build tools
         run: |
-          pip install mkdocs
+          python -m pip install --upgrade pip setuptools wheel build
 
-      # Build documentation
-      - name: Build documentation
-        run: mkdocs build
+      # Build Python package using setuptools
+      - name: Build package (setuptools)
+        run: |
+          python -m build
