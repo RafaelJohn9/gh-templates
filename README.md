@@ -12,7 +12,6 @@ We welcome contributions from everyone! Don’t worry if you’re not familiar w
 - **Pull Request Templates**: Easily add consistent PR templates to your repositories.
 - **Easy Installation**: Quickly set up templates using a provided installation script.
 - **Customizable**: All templates can be tailored to fit your project's needs.
-- **Automated Versioning**: Automatic version incrementation and tagging on every push to main, with seamless integration to release workflows.
 
 ## Alpha Release Downloads
 
