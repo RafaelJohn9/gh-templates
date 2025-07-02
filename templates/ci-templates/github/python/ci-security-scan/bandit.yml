@@ -1,0 +1,33 @@
+# GitHub Actions Workflow: Bandit perform static security analysis
+name: Bandit Security Scan
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/bandit.yml'    # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/bandit.yml'
+jobs:
+  bandit-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install Bandit
+      - name: Install Bandit
+        run: pip install bandit
+
+      # Run Bandit security scan
+      - name: Run Bandit (Security Scan)
+        run: bandit -r . --quiet

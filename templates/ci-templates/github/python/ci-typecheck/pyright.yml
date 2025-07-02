@@ -1,0 +1,34 @@
+# GitHub Actions Workflow: Pyright ype checker for strict typing validation.
+
+name: Pyright Type Checking
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/pyright.yml'   # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/pyright.yml'
+jobs:
+  pyright-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install Pyright
+      - name: Install Pyright
+        run: pip install pyright
+
+      # Run Pyright to check type annotations
+      - name: Run Pyright (Type Checking)
+        run: pyright .

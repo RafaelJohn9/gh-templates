@@ -1,0 +1,38 @@
+# GitHub Actions Workflow: Matrix Test package installability across multiple Python/OS versions
+
+name: Matrix Installability Check
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/matrix-install.yml' # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/matrix-install.yml'
+jobs:
+  matrix-install:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-versions: '3.x' # Change to specific versions like '3.8', '3.9', etc.
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Install dependencies
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Run tests
+      - name: Run tests
+        run: pytest

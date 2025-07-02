@@ -1,0 +1,39 @@
+# Github Actions Workflow: Pip Dependency Check Verify all dependencies are resolvable and conflict-free
+
+name: Pip Dependency Check
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/pip-check.yml' # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/pip-check.yml'
+
+jobs:
+  pip-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install pip-tools
+      - name: Install pip-tools
+        run: pip install pip-tools
+
+      # Run pip-compile
+      - name: Run pip-compile
+        run: pip-compile --output-file requirements.txt requirements.in
+
+      # Run pip-check
+      - name: Run pip-check
+        run: pip check

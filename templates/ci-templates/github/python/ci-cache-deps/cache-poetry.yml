@@ -1,0 +1,43 @@
+# GitHub Actions Workflow: Cache Poetry Dependencies
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/cache-poetry.yml'  # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/cache-poetry.yml'
+
+jobs:
+  cache-poetry-deps:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install Poetry
+      - name: Install Poetry
+        run: pip install poetry
+
+      # Cache Poetry dependencies
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.local/share/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      # Install dependencies
+      - name: Install dependencies
+        run: poetry install --no-root

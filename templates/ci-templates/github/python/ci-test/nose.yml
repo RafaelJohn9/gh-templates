@@ -1,0 +1,33 @@
+# GitHub Actions Workflow: Nose2 test suite 
+name: Python Nose2 Suite
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/nose2.yml'     # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/nose2.yml'
+jobs:
+  nose2:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install Nose2
+      - name: Install Nose2
+        run: pip install nose2
+
+      # Run Nose2 tests
+      - name: Run Nose2 tests
+        run: nose2

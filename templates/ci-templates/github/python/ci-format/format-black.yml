@@ -1,0 +1,34 @@
+# GitHub Actions Workflow: Auto-format code using black.
+
+name: Black Code Formatter
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/format-black.yml'  # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/format-black.yml'
+jobs:
+  black-format:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install Black formatter
+      - name: Install Black
+        run: pip install black
+
+      # Run Black to format code
+      - name: Run Black (Code Formatting)
+        run: black --check --diff .

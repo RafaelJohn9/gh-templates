@@ -1,0 +1,36 @@
+# GitHub Actions Workflow: Build python package using setup tools
+
+name: Build Python Package with Setuptools
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/build-setuptools.yml'  # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/build-setuptools.yml'
+jobs:
+  build-setuptools:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install build tools
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip setuptools wheel build
+
+      # Build Python package using setuptools
+      - name: Build package (setuptools)
+        run: |
+          python -m build

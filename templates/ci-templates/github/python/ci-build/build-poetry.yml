@@ -1,0 +1,45 @@
+# GitHub Actions Workflow: Build Python package using poetry.
+
+name: Build Python Package with Poetry
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/build-poetry.yml'  # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/build-poetry.yml'
+jobs:
+  build-poetry:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install Poetry
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      # Configure poetry in path (fallback incase i doesn'tt place it after install)
+      - name: Configure Poetry in Path
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+          
+
+      # Install dependencies using Poetry
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      # Build the package using Poetry
+      - name: Build package
+        run: poetry build --no-interaction

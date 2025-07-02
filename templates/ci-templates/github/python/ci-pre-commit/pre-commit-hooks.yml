@@ -1,0 +1,34 @@
+# GitHub Actions Workflow:   Run all pre-commit hooks defined in .pre-commit-config.yaml
+
+name: Pre-commit Hooks
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/pre-commit-hooks.yml'  # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/pre-commit-hooks.yml'
+
+jobs:
+  pre-commit-check:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install pre-commit
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      # Run pre-commit hooks
+      - name: Run pre-commit hooks
+        run: pre-commit run --all-files

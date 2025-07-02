@@ -1,0 +1,32 @@
+# Github Actions workflow: Ensure poetry.lock matches pyproject.toml.
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/validate-poetry-lock.yml'  # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/validate-poetry-lock.yml'
+
+jobs:
+  validate-poetry-lock:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install Poetry
+      - name: Install Poetry
+        run: pip install poetry
+
+      # Run Poetry to validate poetry.lock
+      - name: Validate poetry.lock
+        run: poetry lock --check

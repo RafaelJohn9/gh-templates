@@ -1,0 +1,34 @@
+# GitHub Actions Workflow: Mypy static type checking on Python code
+
+name: Mypy Static Type Checking
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/mypy.yml'      # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/mypy.yml'
+jobs:
+  mypy-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install Mypy
+      - name: Install Mypy
+        run: pip install mypy
+
+      # Run Mypy to check type annotations
+      - name: Run Mypy (Type Checking)
+        run: mypy .

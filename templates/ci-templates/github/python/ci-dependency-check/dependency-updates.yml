@@ -1,0 +1,35 @@
+# GitHub Actions Workflow: Check for dependency updates
+
+name: Dependency Updates
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/dependency-updates.yml' # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/dependency-updates.yml'
+
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install Dependabot
+      - name: Install Dependabot
+        run: pip install dependabot
+
+      # Run Dependabot
+      - name: Run Dependabot
+        run: dependabot update

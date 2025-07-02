@@ -1,0 +1,34 @@
+# GitHub Actions Workflow: Sort and group imports with isort
+
+name: isort Code Formatting Check
+on:
+  push:
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/format-isort.yml'  # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/format-isort.yml'
+jobs:
+  isort-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install isort
+      - name: Install isort
+        run: pip install isort
+
+      # Run isort to check import formatting
+      - name: Run isort (Import Formatting)
+        run: isort --check-only --diff .
