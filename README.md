@@ -10,7 +10,6 @@ We welcome contributions from everyone! Don’t worry if you’re not familiar w
 
 - **Issue Templates**: Standardized templates for bug reports, feature requests, documentation, community collaboration, developer experience feedback, support questions, and tests.
 - **Pull Request Templates**: Easily add consistent PR templates to your repositories.
-- **Automated Issue Cleanup**: Includes a GitHub Actions workflow that automatically removes unfilled optional fields (sections with "_No response_") from issues when they are created, keeping your issues clean and minimal.
 - **Easy Installation**: Quickly set up templates using a provided installation script.
 - **Customizable**: All templates can be tailored to fit your project's needs.
 
@@ -135,29 +134,6 @@ gh-templates add license mit --force
 ```
 
 > **Note:** Currently, only `issue` templates are supported. Support for PR, license, CI, .gitignore, and other templates will be added in future releases.
-
-## Automated Workflows
-
-This repository includes automated GitHub Actions workflows that enhance the issue management experience:
-
-### Issue Cleanup Workflow
-
-The **Clean Issue Optional Fields** workflow automatically cleans up issues when they are created by removing sections that contain "_No response_" (which appears in optional template fields when users don't fill them out).
-
-**How it works:**
-- Triggers automatically when a new issue is opened
-- Scans the issue body for sections containing "_No response_"
-- Removes entire sections (heading + content) that are unfilled
-- Updates the issue with the cleaned body
-- Maintains proper formatting and spacing
-
-**Benefits:**
-- Keeps issues looking clean and minimal
-- Reduces visual clutter from unfilled optional fields
-- Improves issue readability and professionalism
-- Works automatically without any manual intervention
-
-The workflow is located at `.github/workflows/clean-issue-optional-fields.yml` and will work in any repository that uses this template collection.
 
 ### Listing Templates
 
