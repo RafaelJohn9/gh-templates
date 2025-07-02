@@ -1,0 +1,41 @@
+# Github Actions Workflow: Validate requirements.txt is up-to-date with lock files.
+
+name: Validate Setuptools Lock
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.py'  # Trigger on Python file changes
+      - 'requirements.in'  # Trigger on input dependency file changes
+      - 'requirements.txt'  # Trigger on lock file changes
+      - '.github/workflows/validate-setuptools-lock.yml'  # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - 'requirements.in'
+      - 'requirements.txt'
+      - '.github/workflows/validate-setuptools-lock.yml'
+
+jobs:
+  validate-setuptools-lock:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install pip-tools for dependency locking
+      - name: Install pip-tools
+        run: pip install pip-tools
+
+      # Validate that requirements.txt is in sync with requirements.in
+      - name: Validate setuptools lock file
+        run: pip-compile --check
