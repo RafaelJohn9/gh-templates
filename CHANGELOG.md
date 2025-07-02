@@ -3,8 +3,18 @@
 All notable changes to this project will be documented in this file.
 
 
-## [Unreleased]
+## [v0.0.47]
 
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (1935023)
+
+
+### Fix
+
+- update  remote.rs to be standard (df9248c)
 
 
 ## [v0.0.43]
