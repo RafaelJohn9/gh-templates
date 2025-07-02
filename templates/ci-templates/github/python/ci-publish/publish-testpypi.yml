@@ -1,0 +1,47 @@
+# Github Actions Workflow: Publish to TestPyPI for dry runs.
+
+name: Publish Python Package to TestPyPI
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags (e.g., v1.0.0)
+    paths:
+      - '**.py'                           # Trigger on Python file changes
+      - '.github/workflows/publish-testpypi.yml'  # Trigger on workflow file changes
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/publish-testpypi.yml'
+
+jobs:
+  publish-testpypi:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Install build tools
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip setuptools wheel twine
+
+      # Build Python package using setuptools
+      - name: Build package (setuptools)
+        run: |
+          python -m build
+
+      # Publish package to TestPyPI using Twine
+      - name: Publish to TestPyPI
+        env:
+          TWINE_USERNAME: ${{ secrets.TESTPYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TESTPYPI_PASSWORD }}
+        run: |
+          python -m twine upload --repository testpypi dist/*
