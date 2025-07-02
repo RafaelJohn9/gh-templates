@@ -1,156 +1,109 @@
 use std::fs::{File, create_dir_all};
 use std::io::Write;
 use std::path::Path;
+use std::time::Duration;
 
-use crate::utils::get_comment;
-use crate::utils::pretty_print;
+use anyhow::anyhow;
+use reqwest::blocking::Client;
 
-const REMOTE_BASE_URL: &str =
-    "https://raw.githubusercontent.com/rafaeljohn9/gh-templates/main/templates";
-const REMOTE_API_URL: &str =
-    "https://api.github.com/repos/rafaeljohn9/gh-templates/contents/templates";
-
-pub fn fetch_template(
-    category: &str,
-    template: &str,
-    extension: &str,
-    output_base_path: &Path,
-    output_path: &Path,
-) -> anyhow::Result<()> {
-    let url = format!(
-        "{}/{}-templates/{}.{}",
-        REMOTE_BASE_URL, category, template, extension
-    );
-
-    let response = match reqwest::blocking::get(&url) {
-        Ok(resp) => resp,
-        Err(e) if e.is_connect() => {
-            return Err(anyhow::anyhow!(
-                "Network connection error while fetching template: {category}/{template}.{extension} from {url}"
-            ));
-        }
-        Err(e) => {
-            return Err(anyhow::anyhow!("Failed to GET from: {url} ({e})"));
-        }
-    };
-
-    if !response.status().is_success() {
-        return Err(anyhow::anyhow!(
-            "Template not found: {category}/{template}.{extension}"
-        ));
-    }
-
-    let content = response.text()?;
-
-    // Prepend output_base_path to the output_path
-    let full_output_path = output_base_path.join(output_path);
-
-    if let Some(parent) = full_output_path.parent() {
-        create_dir_all(parent)?;
-    }
-
-    let mut file = File::create(&full_output_path)?;
-    file.write_all(content.as_bytes())?;
-
-    Ok(())
+pub struct Fetcher {
+    client: Client,
 }
 
-pub fn fetch_template_list(category: &str) -> anyhow::Result<Vec<(String, Option<String>)>> {
-    let url = format!("{}/{}-templates", REMOTE_API_URL, category);
+impl Fetcher {
+    pub fn new() -> Self {
+        Self {
+            client: Client::builder()
+                .timeout(Duration::from_secs(30))
+                .user_agent("gh-templates-fetcher")
+                .build()
+                .unwrap(),
+        }
+    }
 
-    let client = reqwest::blocking::Client::new();
-    let response = match client
-        .get(&url)
-        .header("User-Agent", "gh-templates-fetcher")
-        .send()
-    {
-        Ok(resp) => resp,
-        Err(e) if e.is_connect() => {
-            return Err(anyhow::anyhow!(
-                "Network connection error while fetching template list for category: {category} from {url}"
+    /// Fetch raw content from a URL
+    pub fn fetch_content(&self, url: &str) -> anyhow::Result<String> {
+        let response = self
+            .client
+            .get(url)
+            .send()
+            .map_err(|e| anyhow!("Failed to fetch from {}: {}", url, e))?;
+
+        if !response.status().is_success() {
+            return Err(anyhow!(
+                "Request failed with status {}: {}",
+                response.status(),
+                url
             ));
         }
-        Err(e) => {
-            return Err(anyhow::anyhow!("Failed to GET from: {url} ({e})"));
-        }
-    };
 
-    if !response.status().is_success() {
-        return Err(anyhow::anyhow!(
-            "Failed to fetch template list for category: {category}"
-        ));
+        response
+            .text()
+            .map_err(|e| anyhow!("Failed to read response: {}", e))
     }
 
-    let entries: serde_json::Value = response.json()?;
-    let mut templates = Vec::new();
+    /// Fetch and parse JSON from a URL
+    pub fn fetch_json(&self, url: &str) -> anyhow::Result<serde_json::Value> {
+        let response = self
+            .client
+            .get(url)
+            .send()
+            .map_err(|e| anyhow!("Failed to fetch JSON from {}: {}", url, e))?;
 
-    if let Some(array) = entries.as_array() {
-        for entry in array {
-            if let Some(name) = entry.get("name").and_then(|n| n.as_str()) {
-                // Remove the extension if present
-                let (name_without_ext, extension) = match name.rfind('.') {
-                    Some(idx) => (&name[..idx], &name[idx + 1..]),
-                    None => (name, ""),
-                };
-
-                // Fetch the template file to read the first line (comment)
-                let file_url = format!(
-                    "{}/{}-templates/{}.{}",
-                    REMOTE_BASE_URL, category, name_without_ext, extension
-                );
-
-                let comment = match reqwest::blocking::get(&file_url) {
-                    Ok(response) if response.status().is_success() => {
-                        if let Ok(text) = response.text() {
-                            if let Some(first_line) = text.lines().next() {
-                                Some(get_comment::extract_comment(first_line, extension))
-                            } else {
-                                None
-                            }
-                        } else {
-                            None
-                        }
-                    }
-                    _ => None,
-                };
-
-                templates.push((name_without_ext.to_string(), comment.flatten()));
-            }
-        }
-    }
-
-    Ok(templates)
-}
-
-pub fn fetch_template_preview(
-    category: &str,
-    template: &str,
-    extension: &str,
-) -> anyhow::Result<()> {
-    let url = format!(
-        "{}/{}-templates/{}.{}",
-        REMOTE_BASE_URL, category, template, extension
-    );
-
-    let response = match reqwest::blocking::get(&url) {
-        Ok(resp) => resp,
-        Err(e) if e.is_connect() => {
-            return Err(anyhow::anyhow!(
-                "Network connection error while fetching template preview: {category}/{template}.{extension} from {url}"
+        if !response.status().is_success() {
+            return Err(anyhow!(
+                "JSON request failed with status {}: {}",
+                response.status(),
+                url
             ));
         }
-        Err(e) => {
-            return Err(anyhow::anyhow!("Failed to GET from: {url} ({e})"));
-        }
-    };
 
-    if !response.status().is_success() {
-        return Err(anyhow::anyhow!(
-            "Template not found: {category}/{template}.{extension}"
-        ));
+        response
+            .json()
+            .map_err(|e| anyhow!("Failed to parse JSON: {}", e))
     }
 
-    let content = response.text()?;
-    pretty_print::print_highlighted(extension, &content);
-    Ok(())
+    /// Fetch content from URL and save to file
+    pub fn fetch_to_file(&self, url: &str, output_path: &Path) -> anyhow::Result<()> {
+        let content = self.fetch_content(url)?;
+
+        if let Some(parent) = output_path.parent() {
+            create_dir_all(parent)?;
+        }
+
+        let mut file = File::create(output_path)?;
+        file.write_all(content.as_bytes())?;
+
+        Ok(())
+    }
+
+    /// Download binary content and save to file
+    pub fn download_to_file(&self, url: &str, output_path: &Path) -> anyhow::Result<()> {
+        let response = self
+            .client
+            .get(url)
+            .send()
+            .map_err(|e| anyhow!("Failed to download from {}: {}", url, e))?;
+
+        if !response.status().is_success() {
+            return Err(anyhow!(
+                "Download failed with status {}: {}",
+                response.status(),
+                url
+            ));
+        }
+
+        if let Some(parent) = output_path.parent() {
+            create_dir_all(parent)?;
+        }
+
+        let bytes = response
+            .bytes()
+            .map_err(|e| anyhow!("Failed to read response bytes: {}", e))?;
+
+        let mut file = File::create(output_path)?;
+        file.write_all(&bytes)?;
+
+        Ok(())
+    }
 }
