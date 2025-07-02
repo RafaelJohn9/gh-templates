@@ -16,6 +16,8 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (7ef4982)
 
+- update CHANGELOG [skip ci] (fd876fa)
+
 
 ### Feat
 
