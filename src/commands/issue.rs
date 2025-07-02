@@ -1,37 +1,87 @@
 use std::path::Path;
+use std::time::Duration;
 
-use crate::utils::remote;
+use indicatif::{ProgressBar, ProgressStyle};
+
+use crate::utils::get_comment;
+use crate::utils::pretty_print;
+use crate::utils::remote::Fetcher;
 
 const OUTPUT_BASE_PATH: &str = ".github";
 const OUTPUT: &str = "ISSUE_TEMPLATE";
+const GITHUB_RAW_BASE: &str =
+    "https://raw.githubusercontent.com/rafaeljohn9/gh-templates/main/templates";
+const GITHUB_API_BASE: &str =
+    "https://api.github.com/repos/rafaeljohn9/gh-templates/contents/templates";
 
 pub fn add(template: &str) -> anyhow::Result<()> {
-    let dest_path = format!("{}/{}.yml", OUTPUT, template);
+    let fetcher = Fetcher::new();
+    let url = format!("{}/issue-templates/{}.yml", GITHUB_RAW_BASE, template);
+    let dest_path = Path::new(OUTPUT_BASE_PATH)
+        .join(OUTPUT)
+        .join(format!("{}.yml", template));
 
-    let output_path = Path::new(&dest_path);
-    remote::fetch_template(
-        "issue",
-        template,
-        "yml",
-        Path::new(OUTPUT_BASE_PATH),
-        output_path,
-    )?;
+    fetcher.fetch_to_file(&url, &dest_path)?;
 
     println!(
-        "Downloaded and added issue template: {}",
-        output_path.display()
+        "\x1b[32m✓\x1b[0m Downloaded and added issue template: {}",
+        dest_path.display()
     );
     Ok(())
 }
+
 pub fn list() -> anyhow::Result<()> {
-    let templates = remote::fetch_template_list("issue")?;
+    let fetcher = Fetcher::new();
+
+    let pb = ProgressBar::new_spinner();
+    pb.set_style(
+        ProgressStyle::default_spinner()
+            .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
+            .template("{spinner} {msg}")
+            .unwrap(),
+    );
+    pb.enable_steady_tick(Duration::from_millis(100));
+    pb.set_message("Fetching template list...");
+
+    let url = format!("{}/issue-templates", GITHUB_API_BASE);
+    let entries = fetcher.fetch_json(&url)?;
+    let mut templates = Vec::new();
+
+    if let Some(array) = entries.as_array() {
+        for entry in array {
+            if let Some(name) = entry.get("name").and_then(|n| n.as_str()) {
+                let (name_without_ext, extension) = match name.rfind('.') {
+                    Some(idx) => (&name[..idx], &name[idx + 1..]),
+                    None => (name, ""),
+                };
+
+                pb.set_message(format!("Reading template: {}", name_without_ext));
+
+                // Fetch the template file to read the first line comment
+                let file_url = format!("{}/issue-templates/{}", GITHUB_RAW_BASE, name);
+                let comment = match fetcher.fetch_content(&file_url) {
+                    Ok(text) => text
+                        .lines()
+                        .next()
+                        .and_then(|line| get_comment::extract_comment(line, extension)),
+                    _ => None,
+                };
+
+                templates.push((name_without_ext.to_string(), comment));
+            }
+        }
+    }
+
+    pb.finish_with_message("Successfully fetched templates");
+
     if templates.is_empty() {
         println!("No issue templates found.");
     } else {
+        println!("\x1b[32m✓\x1b[0m Available issue templates:");
         for (name, description_opt) in templates {
             match description_opt {
-                Some(description) => println!("> {:<12} {}", name, description),
-                None => println!("{}", name),
+                Some(description) => println!("  \x1b[32m>\x1b[0m {:<12} {}", name, description),
+                None => println!("  {}", name),
             }
         }
     }
@@ -39,5 +89,12 @@ pub fn list() -> anyhow::Result<()> {
 }
 
 pub fn preview(template: &str) -> anyhow::Result<()> {
-    crate::utils::remote::fetch_template_preview("issue", template, "yml")
+    let fetcher = Fetcher::new();
+    let url = format!("{}/issue-templates/{}.yml", GITHUB_RAW_BASE, template);
+
+    println!("\x1b[32m✓\x1b[0m Previewing issue template: {}", template);
+
+    let content = fetcher.fetch_content(&url)?;
+    pretty_print::print_highlighted("yml", &content);
+    Ok(())
 }

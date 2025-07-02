@@ -1,0 +1,122 @@
+name: Clean Issue Optional Fields
+
+# This workflow automatically cleans up issue bodies when they are created by
+# removing sections that contain "_No response_" (which appears in optional fields
+# when users don't fill them out). This helps keep issues looking clean and minimal.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  clean-optional-fields:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean issue body
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = context.issue.number;
+            const issueBody = context.payload.issue.body;
+            
+            if (!issueBody) {
+              console.log('No issue body to clean');
+              return;
+            }
+            
+            console.log('Original issue body:');
+            console.log(issueBody);
+            
+            // Clean the issue body by removing sections with "_No response_"
+            function cleanIssueBody(body) {
+              const lines = body.split('\n');
+              const cleanedLines = [];
+              let i = 0;
+              
+              while (i < lines.length) {
+                const line = lines[i];
+                
+                // Check if current line is a heading (starts with #)
+                if (line.match(/^#+\s+/)) {
+                  // Look ahead to see if the next non-empty line contains "_No response_"
+                  let nextContentIndex = i + 1;
+                  
+                  // Skip empty lines and find the next content line
+                  while (nextContentIndex < lines.length && 
+                         lines[nextContentIndex].trim() === '') {
+                    nextContentIndex++;
+                  }
+                  
+                  // If next content line contains "_No response_", skip this section
+                  if (nextContentIndex < lines.length && 
+                      lines[nextContentIndex].includes('_No response_')) {
+                    
+                    console.log(`Removing section: ${line.trim()}`);
+                    
+                    // Skip the heading line
+                    i++;
+                    
+                    // Skip all content until we reach the next heading or end of body
+                    while (i < lines.length && !lines[i].match(/^#+\s+/)) {
+                      i++;
+                    }
+                    
+                    continue;
+                  }
+                }
+                
+                // Keep this line
+                cleanedLines.push(line);
+                i++;
+              }
+              
+              // Clean up excessive empty lines
+              const finalLines = [];
+              let consecutiveEmptyLines = 0;
+              
+              for (let i = 0; i < cleanedLines.length; i++) {
+                const line = cleanedLines[i];
+                
+                if (line.trim() === '') {
+                  consecutiveEmptyLines++;
+                  // Allow at most 2 consecutive empty lines
+                  if (consecutiveEmptyLines <= 2) {
+                    finalLines.push(line);
+                  }
+                } else {
+                  consecutiveEmptyLines = 0;
+                  finalLines.push(line);
+                }
+              }
+              
+              // Remove trailing empty lines
+              while (finalLines.length > 0 && 
+                     finalLines[finalLines.length - 1].trim() === '') {
+                finalLines.pop();
+              }
+              
+              return finalLines.join('\n');
+            }
+            
+            const cleanedBody = cleanIssueBody(issueBody);
+            
+            // Only update if the body actually changed
+            if (cleanedBody !== issueBody) {
+              console.log('Cleaned issue body:');
+              console.log(cleanedBody);
+              
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: cleanedBody
+              });
+              
+              console.log('Issue body updated successfully');
+            } else {
+              console.log('No changes needed - issue body already clean');
+            }
