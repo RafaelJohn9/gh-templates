@@ -1,75 +1,7 @@
 use crate::utils::remote::Fetcher;
 use anyhow::anyhow;
-use indicatif::{ProgressBar, ProgressStyle};
-use std::path::Path;
-use std::time::Duration;
 
-const GITHUB_LICENSES_API: &str = "https://api.github.com/licenses";
-
-pub fn add(args: &[String]) -> anyhow::Result<()> {
-    if args.is_empty() {
-        return Err(anyhow!("At least one license ID is required"));
-    }
-
-    let fetcher = Fetcher::new();
-
-    for id in args {
-        let url = format!("{}/{}", GITHUB_LICENSES_API, id.to_lowercase());
-
-        let license_data = fetcher.fetch_json(&url)?;
-
-        let body = license_data
-            .get("body")
-            .and_then(|b| b.as_str())
-            .ok_or_else(|| anyhow!("License body not found for {}", id))?;
-
-        let filename = format!("LICENSE.{}", id.to_uppercase());
-        let dest_path = Path::new(&filename);
-
-        std::fs::write(dest_path, body)?;
-
-        println!(
-            "\x1b[32m✓\x1b[0m Downloaded and added license: {}",
-            dest_path.display()
-        );
-    }
-
-    Ok(())
-}
-
-pub fn list(_extra_args: &[String]) -> anyhow::Result<()> {
-    let fetcher = Fetcher::new();
-
-    let pb = ProgressBar::new_spinner();
-    pb.set_style(
-        ProgressStyle::default_spinner()
-            .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
-            .template("{spinner} {msg}")
-            .unwrap(),
-    );
-    pb.enable_steady_tick(Duration::from_millis(100));
-    pb.set_message("Fetching license list...");
-
-    let licenses = fetcher.fetch_json(GITHUB_LICENSES_API)?;
-
-    pb.finish_with_message("Successfully fetched licenses");
-
-    if let Some(array) = licenses.as_array() {
-        println!("\x1b[32m✓\x1b[0m Available licenses:");
-        for license in array {
-            if let (Some(key), Some(name)) = (
-                license.get("key").and_then(|k| k.as_str()),
-                license.get("name").and_then(|n| n.as_str()),
-            ) {
-                println!("  \x1b[32m>\x1b[0m {:<15} {}", key, name);
-            }
-        }
-    } else {
-        println!("No licenses found.");
-    }
-
-    Ok(())
-}
+use super::GITHUB_LICENSES_API;
 
 pub fn preview(id: &str, extra_args: &[String]) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
