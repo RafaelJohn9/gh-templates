@@ -15,10 +15,9 @@ enum Commands {
     Add {
         /// Template category (e.g., issue, pr, ci, license, gitignore)
         category: String,
-        /// Template name (e.g., bug, feature-request)
-        template: String,
+        /// Template name(s) (e.g., bug, feature-request)
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
-        extra_args: Vec<String>,
+        args: Vec<String>,
     },
 
     /// List available templates in a category
@@ -43,12 +42,8 @@ fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Add {
-            category,
-            template,
-            extra_args,
-        } => {
-            commands::dispatch_add(&category, &template, &extra_args)?;
+        Commands::Add { category, args } => {
+            commands::dispatch_add(&category, &args)?;
         }
 
         Commands::List {

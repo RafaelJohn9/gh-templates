@@ -6,26 +6,34 @@ use std::time::Duration;
 
 const GITHUB_LICENSES_API: &str = "https://api.github.com/licenses";
 
-pub fn add(id: &str, _extra_args: &[String]) -> anyhow::Result<()> {
+pub fn add(args: &[String]) -> anyhow::Result<()> {
+    if args.is_empty() {
+        return Err(anyhow!("At least one license ID is required"));
+    }
+
     let fetcher = Fetcher::new();
-    let url = format!("{}/{}", GITHUB_LICENSES_API, id.to_lowercase());
 
-    let license_data = fetcher.fetch_json(&url)?;
+    for id in args {
+        let url = format!("{}/{}", GITHUB_LICENSES_API, id.to_lowercase());
 
-    let body = license_data
-        .get("body")
-        .and_then(|b| b.as_str())
-        .ok_or_else(|| anyhow!("License body not found"))?;
+        let license_data = fetcher.fetch_json(&url)?;
 
-    let filename = format!("LICENSE.{}", id.to_uppercase());
-    let dest_path = Path::new(&filename);
+        let body = license_data
+            .get("body")
+            .and_then(|b| b.as_str())
+            .ok_or_else(|| anyhow!("License body not found for {}", id))?;
 
-    std::fs::write(dest_path, body)?;
+        let filename = format!("LICENSE.{}", id.to_uppercase());
+        let dest_path = Path::new(&filename);
 
-    println!(
-        "\x1b[32m✓\x1b[0m Downloaded and added license: {}",
-        dest_path.display()
-    );
+        std::fs::write(dest_path, body)?;
+
+        println!(
+            "\x1b[32m✓\x1b[0m Downloaded and added license: {}",
+            dest_path.display()
+        );
+    }
+
     Ok(())
 }
 

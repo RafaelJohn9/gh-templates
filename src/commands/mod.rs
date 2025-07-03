@@ -1,10 +1,10 @@
 pub mod issue;
 pub mod license;
 
-pub fn dispatch_add(category: &str, template: &str, extra_args: &[String]) -> anyhow::Result<()> {
+pub fn dispatch_add(category: &str, args: &[String]) -> anyhow::Result<()> {
     match category {
-        "issue" => issue::add(template, extra_args),
-        "license" => license::add(template, extra_args),
+        "issue" => issue::add(args),
+        "license" => license::add(args),
         _ => Err(anyhow::anyhow!("Unknown category: {}", category)),
     }
 }
