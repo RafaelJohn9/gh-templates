@@ -78,6 +78,7 @@ impl Fetcher {
     }
 
     /// Download binary content and save to file
+    #[allow(dead_code)]
     pub fn download_to_file(&self, url: &str, output_path: &Path) -> anyhow::Result<()> {
         let response = self
             .client
