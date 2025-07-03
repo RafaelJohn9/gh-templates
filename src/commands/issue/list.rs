@@ -1,36 +1,12 @@
-use std::path::Path;
 use std::time::Duration;
 
 use indicatif::{ProgressBar, ProgressStyle};
 
+use super::{GITHUB_API_BASE, GITHUB_RAW_BASE};
 use crate::utils::get_comment;
-use crate::utils::pretty_print;
 use crate::utils::remote::Fetcher;
 
-const OUTPUT_BASE_PATH: &str = ".github";
-const OUTPUT: &str = "ISSUE_TEMPLATE";
-const GITHUB_RAW_BASE: &str =
-    "https://raw.githubusercontent.com/rafaeljohn9/gh-templates/main/templates";
-const GITHUB_API_BASE: &str =
-    "https://api.github.com/repos/rafaeljohn9/gh-templates/contents/templates";
-
-pub fn add(template: &str) -> anyhow::Result<()> {
-    let fetcher = Fetcher::new();
-    let url = format!("{}/issue-templates/{}.yml", GITHUB_RAW_BASE, template);
-    let dest_path = Path::new(OUTPUT_BASE_PATH)
-        .join(OUTPUT)
-        .join(format!("{}.yml", template));
-
-    fetcher.fetch_to_file(&url, &dest_path)?;
-
-    println!(
-        "\x1b[32m✓\x1b[0m Downloaded and added issue template: {}",
-        dest_path.display()
-    );
-    Ok(())
-}
-
-pub fn list() -> anyhow::Result<()> {
+pub fn list(_extra_args: &[String]) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
 
     let pb = ProgressBar::new_spinner();
@@ -85,16 +61,5 @@ pub fn list() -> anyhow::Result<()> {
             }
         }
     }
-    Ok(())
-}
-
-pub fn preview(template: &str) -> anyhow::Result<()> {
-    let fetcher = Fetcher::new();
-    let url = format!("{}/issue-templates/{}.yml", GITHUB_RAW_BASE, template);
-
-    println!("\x1b[32m✓\x1b[0m Previewing issue template: {}", template);
-
-    let content = fetcher.fetch_content(&url)?;
-    pretty_print::print_highlighted("yml", &content);
     Ok(())
 }
