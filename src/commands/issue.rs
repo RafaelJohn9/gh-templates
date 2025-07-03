@@ -14,7 +14,7 @@ const GITHUB_RAW_BASE: &str =
 const GITHUB_API_BASE: &str =
     "https://api.github.com/repos/rafaeljohn9/gh-templates/contents/templates";
 
-pub fn add(template: &str) -> anyhow::Result<()> {
+pub fn add(template: &str, _extra_args: &[String]) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
     let url = format!("{}/issue-templates/{}.yml", GITHUB_RAW_BASE, template);
     let dest_path = Path::new(OUTPUT_BASE_PATH)
@@ -30,7 +30,7 @@ pub fn add(template: &str) -> anyhow::Result<()> {
     Ok(())
 }
 
-pub fn list() -> anyhow::Result<()> {
+pub fn list(_extra_args: &[String]) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
 
     let pb = ProgressBar::new_spinner();
@@ -88,7 +88,7 @@ pub fn list() -> anyhow::Result<()> {
     Ok(())
 }
 
-pub fn preview(template: &str) -> anyhow::Result<()> {
+pub fn preview(template: &str, _extra_args: &[String]) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
     let url = format!("{}/issue-templates/{}.yml", GITHUB_RAW_BASE, template);
 
