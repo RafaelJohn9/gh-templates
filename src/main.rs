@@ -17,12 +17,16 @@ enum Commands {
         category: String,
         /// Template name (e.g., bug, feature-request)
         template: String,
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        extra_args: Vec<String>,
     },
 
     /// List available templates in a category
     List {
         /// Category to list (e.g., issue, pr, ci, license, gitignore)
         category: String,
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        extra_args: Vec<String>,
     },
 
     /// Preview a template in a category
@@ -31,23 +35,35 @@ enum Commands {
         category: String,
         /// Template name to preview (e.g., bug, feature-request)
         template: String,
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        extra_args: Vec<String>,
     },
 }
-
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Add { category, template } => {
-            commands::dispatch_add(&category, &template)?;
+        Commands::Add {
+            category,
+            template,
+            extra_args,
+        } => {
+            commands::dispatch_add(&category, &template, &extra_args)?;
         }
 
-        Commands::List { category } => {
-            commands::dispatch_list(&category)?;
+        Commands::List {
+            category,
+            extra_args,
+        } => {
+            commands::dispatch_list(&category, &extra_args)?;
         }
 
-        Commands::Preview { category, template } => {
-            commands::dispatch_preview(&category, &template)?;
+        Commands::Preview {
+            category,
+            template,
+            extra_args,
+        } => {
+            commands::dispatch_preview(&category, &template, &extra_args)?;
         }
     }
 
