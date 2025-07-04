@@ -2,6 +2,8 @@ use crate::utils::remote::Fetcher;
 use anyhow::anyhow;
 use std::path::Path;
 
+use crate::utils::file;
+
 use super::GITHUB_LICENSES_API;
 
 pub fn add(args: &[String]) -> anyhow::Result<()> {
@@ -33,7 +35,7 @@ fn download_single_license(id: &str) -> anyhow::Result<()> {
     let filename = format!("LICENSE.{}", id.to_uppercase());
     let dest_path = Path::new(&filename);
 
-    std::fs::write(dest_path, body)?;
+    file::save_file(body, dest_path)?;
 
     println!(
         "\x1b[32m✓\x1b[0m Downloaded and added license: {}",
