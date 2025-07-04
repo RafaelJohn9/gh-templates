@@ -6,7 +6,6 @@ use super::GITHUB_LICENSES_API;
 pub fn preview(id: &str, extra_args: &[String]) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
     let url = format!("{}/{}", GITHUB_LICENSES_API, id.to_lowercase());
-
     let license_data = fetcher.fetch_json(&url)?;
 
     let name = license_data
@@ -16,95 +15,104 @@ pub fn preview(id: &str, extra_args: &[String]) -> anyhow::Result<()> {
 
     println!("\x1b[36mLicense Name:\x1b[0m {}\n", name);
 
-    // Parse extra arguments
-    let mut description = false;
-    let mut permissions = false;
-    let mut limitations = false;
-    let mut conditions = false;
-    let mut details = false;
+    if extra_args.is_empty() {
+        show_full_license(&license_data)?;
+        return Ok(());
+    }
 
     for arg in extra_args {
         let arg_str = arg.as_str();
         if arg_str.starts_with('-') && !arg_str.starts_with("--") {
-            // Handle combined short flags like -pdl
-            for c in arg_str.chars().skip(1) {
-                match c {
-                    'd' => description = true,
-                    'p' => permissions = true,
-                    'l' => limitations = true,
-                    'c' => conditions = true,
-                    'a' => details = true,
-                    _ => {
-                        return Err(anyhow!("Unknown flag: -{}", c));
-                    }
-                }
-            }
+            handle_combined_flags(&license_data, arg_str)?;
         } else {
             match arg_str {
-                "--description" | "-d" => description = true,
-                "--permissions" | "-p" => permissions = true,
-                "--limitations" | "-l" => limitations = true,
-                "--conditions" | "-c" => conditions = true,
-                "--details" | "-a" => details = true,
-                _ => {
-                    return Err(anyhow!("Unknown argument: {}", arg));
-                }
+                "--description" | "-d" => show_description(&license_data)?,
+                "--permissions" | "-p" => show_permissions(&license_data)?,
+                "--limitations" | "-l" => show_limitations(&license_data)?,
+                "--conditions" | "-c" => show_conditions(&license_data)?,
+                "--details" | "-a" => show_all_details(&license_data)?,
+                _ => return Err(anyhow!("Unknown argument: {}", arg)),
             }
         }
     }
 
-    if description {
-        if let Some(desc) = license_data.get("description").and_then(|d| d.as_str()) {
-            println!("\x1b[36mDescription:\x1b[0m");
-            println!("{}", desc);
-            println!();
+    Ok(())
+}
+
+fn handle_combined_flags(license_data: &serde_json::Value, arg: &str) -> anyhow::Result<()> {
+    for c in arg.chars().skip(1) {
+        match c {
+            'd' => show_description(license_data)?,
+            'p' => show_permissions(license_data)?,
+            'l' => show_limitations(license_data)?,
+            'c' => show_conditions(license_data)?,
+            'a' => show_all_details(license_data)?,
+            _ => return Err(anyhow!("Unknown flag: -{}", c)),
         }
     }
+    Ok(())
+}
 
-    if permissions || details {
-        if let Some(perms) = license_data.get("permissions").and_then(|p| p.as_array()) {
-            println!("\x1b[32mPermissions:\x1b[0m");
-            for perm in perms {
-                if let Some(perm_str) = perm.as_str() {
-                    println!("  ✓ {}", format_permission(perm_str));
-                }
+fn show_description(license_data: &serde_json::Value) -> anyhow::Result<()> {
+    if let Some(desc) = license_data.get("description").and_then(|d| d.as_str()) {
+        println!("\x1b[36mDescription:\x1b[0m");
+        println!("{}", desc);
+        println!();
+    }
+    Ok(())
+}
+
+fn show_permissions(license_data: &serde_json::Value) -> anyhow::Result<()> {
+    if let Some(perms) = license_data.get("permissions").and_then(|p| p.as_array()) {
+        println!("\x1b[32mPermissions:\x1b[0m");
+        for perm in perms {
+            if let Some(perm_str) = perm.as_str() {
+                println!("  ✓ {}", format_permission(perm_str));
             }
-            println!();
         }
+        println!();
     }
+    Ok(())
+}
 
-    if limitations || details {
-        if let Some(limits) = license_data.get("limitations").and_then(|l| l.as_array()) {
-            println!("\x1b[31mLimitations:\x1b[0m");
-            for limit in limits {
-                if let Some(limit_str) = limit.as_str() {
-                    println!("  ✗ {}", format_limitation(limit_str));
-                }
+fn show_limitations(license_data: &serde_json::Value) -> anyhow::Result<()> {
+    if let Some(limits) = license_data.get("limitations").and_then(|l| l.as_array()) {
+        println!("\x1b[31mLimitations:\x1b[0m");
+        for limit in limits {
+            if let Some(limit_str) = limit.as_str() {
+                println!("  ✗ {}", format_limitation(limit_str));
             }
-            println!();
         }
+        println!();
     }
+    Ok(())
+}
 
-    if conditions || details {
-        if let Some(conds) = license_data.get("conditions").and_then(|c| c.as_array()) {
-            println!("\x1b[33mConditions:\x1b[0m");
-            for condition in conds {
-                if let Some(cond_str) = condition.as_str() {
-                    println!("  ! {}", format_condition(cond_str));
-                }
+fn show_conditions(license_data: &serde_json::Value) -> anyhow::Result<()> {
+    if let Some(conds) = license_data.get("conditions").and_then(|c| c.as_array()) {
+        println!("\x1b[33mConditions:\x1b[0m");
+        for condition in conds {
+            if let Some(cond_str) = condition.as_str() {
+                println!("  ! {}", format_condition(cond_str));
             }
-            println!();
         }
+        println!();
     }
+    Ok(())
+}
 
-    // If no specific flags are set, show the full license text
-    if !permissions && !limitations && !conditions && !description && !details {
-        if let Some(body) = license_data.get("body").and_then(|b| b.as_str()) {
-            println!("\x1b[36mLicense Text:\x1b[0m");
-            println!("{}", body);
-        }
+fn show_all_details(license_data: &serde_json::Value) -> anyhow::Result<()> {
+    show_permissions(license_data)?;
+    show_limitations(license_data)?;
+    show_conditions(license_data)?;
+    Ok(())
+}
+
+fn show_full_license(license_data: &serde_json::Value) -> anyhow::Result<()> {
+    if let Some(body) = license_data.get("body").and_then(|b| b.as_str()) {
+        println!("\x1b[36mLicense Text:\x1b[0m");
+        println!("{}", body);
     }
-
     Ok(())
 }
 

@@ -6,7 +6,20 @@ use super::{GITHUB_API_BASE, GITHUB_RAW_BASE};
 use crate::utils::get_comment;
 use crate::utils::remote::Fetcher;
 
-pub fn list(_extra_args: &[String]) -> anyhow::Result<()> {
+pub fn list(args: &[String]) -> anyhow::Result<()> {
+    if args.is_empty() {
+        list_all_templates()
+    } else {
+        for arg in args {
+            match arg.as_str() {
+                _ => return Err(anyhow::anyhow!("Unknown option: {}", arg)),
+            }
+        }
+        Ok(())
+    }
+}
+
+fn list_all_templates() -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
 
     let pb = ProgressBar::new_spinner();
@@ -33,7 +46,6 @@ pub fn list(_extra_args: &[String]) -> anyhow::Result<()> {
 
                 pb.set_message(format!("Reading template: {}", name_without_ext));
 
-                // Fetch the template file to read the first line comment
                 let file_url = format!("{}/issue-templates/{}", GITHUB_RAW_BASE, name);
                 let comment = match fetcher.fetch_content(&file_url) {
                     Ok(text) => text
