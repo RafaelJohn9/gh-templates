@@ -1,17 +1,30 @@
+use anyhow::Result;
 use std::fs;
-use std::io::Result;
 use std::path::{Path, PathBuf};
 
 /// Save content to a file with path resolution middleware
 pub fn save_file(content: &str, filepath: &Path) -> Result<()> {
     let resolved_path = resolve_output_path(filepath)?;
 
-    // Create parent directories if they don't exist
-    if let Some(parent) = resolved_path.parent() {
-        fs::create_dir_all(parent)?;
+    // Create parent directories only if the path starts with .github
+    if filepath.starts_with(".github") {
+        if let Some(parent) = resolved_path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+    } else {
+        // Check if parent directory exists, error if it doesn't
+        if let Some(parent) = resolved_path.parent() {
+            if !parent.exists() {
+                return Err(anyhow::anyhow!(
+                    "Directory '{}/' does not exist. \nPlease run this command from within a git repository or create the missing dir.",
+                    parent.display()
+                ));
+            }
+        }
     }
 
-    fs::write(resolved_path, content)
+    fs::write(resolved_path, content)?;
+    Ok(())
 }
 
 /// Middleware function to resolve the output path
@@ -38,9 +51,8 @@ fn find_repo_root() -> Result<PathBuf> {
         match current_dir.parent() {
             Some(parent) => current_dir = parent.to_path_buf(),
             None => {
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::NotFound,
-                    "Not in a git repository.\nPlease specify an output directory using `--dir`  (To be supported soon) or run from within a git repository.",
+                return Err(anyhow::anyhow!(
+                    "Not in a git repository.\nPlease specify an output directory using `--dir` (To be supported soon) or run from within a git repository."
                 ));
             }
         }
