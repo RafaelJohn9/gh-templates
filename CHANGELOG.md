@@ -9,33 +9,19 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
-- update CHANGELOG [skip ci] (26b911d)
-
-- rename update_changelog.yml to update-changelog.yml for consistency (d6dda59)
+- update CHANGELOG [skip ci] (34e66fd)
 
 
-### Feat
+### Feature
 
-- add licenses (089d63b)
-
-- #30 allow multiple downloads (e3b0e51)
-
-
-### Fix
-
-- surpress dead code warning in remote.rs (dc062fd)
-
-
-### License
-
-- issue.rs to a dir (16655c5)
+- specification of dir to write output (a560a18)
 
 
 ### Refactor
 
-- issue.rs to a dir (e0feebf)
+- main functions in cmds  will be plugin managers (ed406a6)
 
-- rm issue.rs and license.rs (a4cf38e)
+- added util function save_file (20c5ed5)
 
 
 ## [v0.0.47]
