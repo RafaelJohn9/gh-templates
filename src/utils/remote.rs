@@ -1,10 +1,10 @@
-use std::fs::{File, create_dir_all};
-use std::io::Write;
 use std::path::Path;
 use std::time::Duration;
 
 use anyhow::anyhow;
 use reqwest::blocking::Client;
+
+use crate::utils::file;
 
 pub struct Fetcher {
     client: Client,
@@ -66,14 +66,7 @@ impl Fetcher {
     /// Fetch content from URL and save to file
     pub fn fetch_to_file(&self, url: &str, output_path: &Path) -> anyhow::Result<()> {
         let content = self.fetch_content(url)?;
-
-        if let Some(parent) = output_path.parent() {
-            create_dir_all(parent)?;
-        }
-
-        let mut file = File::create(output_path)?;
-        file.write_all(content.as_bytes())?;
-
+        file::save_file(&content, output_path)?;
         Ok(())
     }
 
@@ -94,16 +87,12 @@ impl Fetcher {
             ));
         }
 
-        if let Some(parent) = output_path.parent() {
-            create_dir_all(parent)?;
-        }
-
         let bytes = response
             .bytes()
             .map_err(|e| anyhow!("Failed to read response bytes: {}", e))?;
 
-        let mut file = File::create(output_path)?;
-        file.write_all(&bytes)?;
+        let content = String::from_utf8_lossy(&bytes);
+        file::save_file(&content, output_path)?;
 
         Ok(())
     }
