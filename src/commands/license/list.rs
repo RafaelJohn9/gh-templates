@@ -4,7 +4,23 @@ use std::time::Duration;
 
 use super::GITHUB_LICENSES_API;
 
-pub fn list(_extra_args: &[String]) -> anyhow::Result<()> {
+pub fn list(args: &[String]) -> anyhow::Result<()> {
+    if args.is_empty() {
+        return list_all_licenses();
+    }
+
+    for arg in args {
+        match arg.as_str() {
+            "--all" => list_all_licenses()?,
+            "--help" | "-h" => show_help()?,
+            _ => return Err(anyhow::anyhow!("Unknown argument: {}", arg)),
+        }
+    }
+
+    Ok(())
+}
+
+fn list_all_licenses() -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
 
     let pb = ProgressBar::new_spinner();
@@ -35,5 +51,14 @@ pub fn list(_extra_args: &[String]) -> anyhow::Result<()> {
         println!("No licenses found.");
     }
 
+    Ok(())
+}
+
+fn show_help() -> anyhow::Result<()> {
+    println!("Usage: license list [OPTIONS]");
+    println!();
+    println!("Options:");
+    println!("  --all       List all available licenses (default)");
+    println!("  -h, --help  Show this help message");
     Ok(())
 }
