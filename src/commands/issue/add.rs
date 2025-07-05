@@ -1,48 +1,36 @@
-use std::path::Path;
-use std::time::Duration;
-
-use indicatif::{ProgressBar, ProgressStyle};
-
 use super::{GITHUB_API_BASE, GITHUB_RAW_BASE};
+use crate::commands::add::AddTemplateRequest;
+use crate::utils::file;
+use crate::utils::progress;
 use crate::utils::remote::Fetcher;
-use crate::utils::template_args_parser::{TemplateArgs, parse_template_args};
+use std::path::{Path, PathBuf};
 
 const OUTPUT_BASE_PATH: &str = ".github";
 const OUTPUT: &str = "ISSUE_TEMPLATE";
 
-pub fn add(args: &[String]) -> anyhow::Result<()> {
-    let parsed: TemplateArgs = parse_template_args(args)?;
-
-    if parsed.all {
-        download_all_templates(parsed.dir.as_deref())?;
-    } else if parsed.names.is_empty() {
+pub fn add(request: AddTemplateRequest) -> anyhow::Result<()> {
+    if request.all {
+        download_all_templates(request.dir.as_ref(), request.force)?;
+    } else if request.templates.is_empty() {
         return Err(anyhow::anyhow!(
             "No issue template specified. Use `--all` or pass template names."
         ));
     } else {
-        for template_name in parsed.names {
-            download_single_template(&template_name, parsed.dir.as_deref())?;
+        for template_name in &request.templates {
+            download_single_template(template_name, request.dir.as_ref(), request.force)?;
         }
     }
 
     Ok(())
 }
-fn download_all_templates(dir_path: Option<&str>) -> anyhow::Result<()> {
+
+fn download_all_templates(dir_path: Option<&PathBuf>, force: bool) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
 
-    let pb = ProgressBar::new_spinner();
-    pb.set_style(
-        ProgressStyle::default_spinner()
-            .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
-            .template("{spinner} {msg}")
-            .unwrap(),
-    );
-    pb.enable_steady_tick(Duration::from_millis(100));
-    pb.set_message("Fetching all templates...");
+    println!("Fetching all templates...");
 
     let url = format!("{}/issue-templates", GITHUB_API_BASE);
     let entries = fetcher.fetch_json(&url)?;
-    let mut downloaded_templates = Vec::new();
 
     if let Some(array) = entries.as_array() {
         for entry in array {
@@ -52,53 +40,45 @@ fn download_all_templates(dir_path: Option<&str>) -> anyhow::Result<()> {
                     None => name,
                 };
 
-                pb.set_message(format!("Downloading template: {}", template_name));
-
-                let url = format!("{}/issue-templates/{}", GITHUB_RAW_BASE, name);
-                let default_path = Path::new(OUTPUT_BASE_PATH).join(OUTPUT);
-                let base_path = match dir_path {
-                    Some(path) => Path::new(path),
-                    None => &default_path,
-                };
-                let dest_path = base_path.join(name);
-
-                fetcher.fetch_to_file(&url, &dest_path)?;
-                downloaded_templates.push(format!("{}.yml", template_name));
+                download_single_template(template_name, dir_path, force)?;
             }
         }
     }
 
-    pb.finish_and_clear();
     let default_output = format!("{}/{}", OUTPUT_BASE_PATH, OUTPUT);
-    let output_location = dir_path.unwrap_or(&default_output);
+    let output_location = dir_path
+        .map(|p| p.display().to_string())
+        .unwrap_or(default_output);
     println!(
         "\x1b[32m✓\x1b[0m Downloaded all issue templates to {}",
         output_location
     );
-    for template in downloaded_templates {
-        println!("  \x1b[32m>\x1b[0m {}", template);
-    }
 
     Ok(())
 }
 
-fn download_single_template(template_name: &str, dir_path: Option<&str>) -> anyhow::Result<()> {
+fn download_single_template(
+    template_name: &str,
+    dir_path: Option<&PathBuf>,
+    force: bool,
+) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
 
     let url = format!("{}/issue-templates/{}.yml", GITHUB_RAW_BASE, template_name);
+
+    let msg = format!("Downloading issue template: {}", template_name);
+    let pb = progress::spinner(&msg);
+    let content = fetcher.fetch_content(&url)?;
+    pb.set_message("Download Complete");
+    pb.finish_and_clear();
+
     let default_path = Path::new(OUTPUT_BASE_PATH).join(OUTPUT);
-    let base_path = match dir_path {
-        Some(path) => Path::new(path),
-        None => &default_path,
-    };
+    let base_path = dir_path.map_or(default_path.as_path(), |p| p.as_path());
     let dest_path = base_path.join(format!("{}.yml", template_name));
 
-    fetcher.fetch_to_file(&url, &dest_path)?;
+    file::save_file(&content, &dest_path, force)?;
 
-    println!(
-        "\x1b[32m✓\x1b[0m Downloaded and added issue template: {}",
-        dest_path.display()
-    );
+    println!("\x1b[32m✓\x1b[0m Added template: {}", template_name);
 
     Ok(())
 }
