@@ -22,24 +22,11 @@ body:
       required: true
 
   - type: textarea
-    id: description
+    id: actual-behavior
     attributes:
-      label: Description
-      description: Please provide a clear and concise description of the issue.
-      placeholder: Describe the bug in detail.
-    validations:
-      required: true
-
-  - type: textarea
-    id: steps-to-reproduce
-    attributes:
-      label: Steps to Reproduce
-      description: List the steps to reproduce the behavior.
-      placeholder: |
-        1. Go to '...'
-        2. Click on '...'
-        3. Scroll down to '...'
-        4. See error
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: Describe what actually happened.
     validations:
       required: true
 
@@ -53,11 +40,15 @@ body:
       required: true
 
   - type: textarea
-    id: actual-behavior
+    id: steps-to-reproduce
     attributes:
-      label: Actual Behavior
-      description: What actually happened?
-      placeholder: Describe what actually happened.
+      label: Steps to Reproduce
+      description: List the steps to reproduce the behavior.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
     validations:
       required: true
 
