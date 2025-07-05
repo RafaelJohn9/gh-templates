@@ -3,6 +3,7 @@ pub mod base;
 pub mod issue;
 pub mod license;
 pub mod list;
+pub mod pr;
 pub mod preview;
 
 use add::Add;

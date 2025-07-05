@@ -1,8 +1,8 @@
-use clap::Args;
 use crate::commands::{
     base::{Runnable, TemplateCategory},
-    issue, license,
+    issue, license, pr,
 };
+use clap::Args;
 
 #[derive(Args)]
 pub struct Preview {
@@ -20,6 +20,7 @@ impl Runnable for Preview {
         match self.category {
             TemplateCategory::Issue => issue::preview(&self.template, &self.extra_args),
             TemplateCategory::License => license::preview(&self.template, &self.extra_args),
+            TemplateCategory::PR => pr::preview(&self.template, &self.extra_args),
         }
     }
 }

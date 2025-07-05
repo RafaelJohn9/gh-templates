@@ -16,12 +16,12 @@ pub fn add(request: AddTemplateRequest) -> anyhow::Result<()> {
 
     if request.all {
         download_all_licenses(Some(&dir), request.force)?;
-    } else if request.templates.is_empty() {
+    } else if request.args.is_empty() {
         return Err(anyhow!(
             "At least one license ID is required (or use --all)"
         ));
     } else {
-        for license_id in &request.templates {
+        for license_id in &request.args {
             download_single_license(license_id, Some(&dir), request.force)?;
         }
     }
