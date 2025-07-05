@@ -1,6 +1,4 @@
-<!-- Submit a new feature, bug fix, or improvement -->
 ---
-
 name: 🚀 Pull Request
 about: Submit a new feature, bug fix, or improvement
 title: "[PR] <short summary>"
