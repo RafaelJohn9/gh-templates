@@ -1,6 +1,6 @@
 use crate::commands::{
     base::{Runnable, TemplateCategory},
-    issue, license,
+    issue, license, pr,
 };
 use clap::Args;
 use std::path::PathBuf;
@@ -11,7 +11,7 @@ pub struct Add {
     pub category: TemplateCategory,
 
     #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
-    pub templates: Vec<String>,
+    pub args: Vec<String>,
 
     /// Directory to output template(s) to
     #[arg(short, long)]
@@ -30,7 +30,7 @@ impl Runnable for Add {
     fn run(&self) -> anyhow::Result<()> {
         let request = AddTemplateRequest {
             dir: self.dir.clone(),
-            templates: self.templates.clone(),
+            args: self.args.clone(),
             force: self.force,
             all: self.all,
         };
@@ -38,6 +38,7 @@ impl Runnable for Add {
         match self.category {
             TemplateCategory::Issue => issue::add(request),
             TemplateCategory::License => license::add(request),
+            TemplateCategory::PR => pr::add(request),
         }
     }
 }
@@ -45,7 +46,7 @@ impl Runnable for Add {
 #[derive(Debug, Clone)]
 pub struct AddTemplateRequest {
     pub dir: Option<PathBuf>,
-    pub templates: Vec<String>,
+    pub args: Vec<String>,
     pub force: bool,
     pub all: bool,
 }

@@ -4,6 +4,7 @@ use clap::ValueEnum;
 pub enum TemplateCategory {
     Issue,
     License,
+    PR, // pull request
 }
 
 pub trait Runnable {
