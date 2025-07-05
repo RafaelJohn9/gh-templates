@@ -1,5 +1,5 @@
 ---
-name: 🚀 Pull Request
+name: Pull Request
 about: Submit a new feature, bug fix, or improvement
 title: "[PR] <short summary>"
 labels: enhancement
@@ -12,7 +12,7 @@ labels: enhancement
 
 ---
 
-## 📝 Summary
+## Summary
 
 > Briefly describe **what** this PR changes and **why**.
 
@@ -21,7 +21,7 @@ labels: enhancement
 
 ---
 
-## 🧪 Testing
+## Testing
 
 How was this change tested? List test cases, manual steps, or CI checks.
 
