@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand};
+use clap::Parser;
 mod commands;
 mod utils;
 
@@ -7,60 +7,10 @@ mod utils;
 #[command(about = "📦 Scaffold GitHub templates easily", long_about = None)]
 struct Cli {
     #[command(subcommand)]
-    command: Commands,
+    command: commands::Command,
 }
 
-#[derive(Subcommand)]
-enum Commands {
-    Add {
-        /// Template category (e.g., issue, pr, ci, license, gitignore)
-        category: String,
-        /// Template name(s) (e.g., bug, feature-request)
-        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
-        args: Vec<String>,
-    },
-
-    /// List available templates in a category
-    List {
-        /// Category to list (e.g., issue, pr, ci, license, gitignore)
-        category: String,
-        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
-        extra_args: Vec<String>,
-    },
-
-    /// Preview a template in a category
-    Preview {
-        /// Category of the template (e.g., issue, pr, ci, license, gitignore)
-        category: String,
-        /// Template name to preview (e.g., bug, feature-request)
-        template: String,
-        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
-        extra_args: Vec<String>,
-    },
-}
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
-
-    match cli.command {
-        Commands::Add { category, args } => {
-            commands::dispatch_add(&category, &args)?;
-        }
-
-        Commands::List {
-            category,
-            extra_args,
-        } => {
-            commands::dispatch_list(&category, &extra_args)?;
-        }
-
-        Commands::Preview {
-            category,
-            template,
-            extra_args,
-        } => {
-            commands::dispatch_preview(&category, &template, &extra_args)?;
-        }
-    }
-
-    Ok(())
+    cli.command.execute()
 }

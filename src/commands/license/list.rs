@@ -1,6 +1,5 @@
+use crate::utils::progress;
 use crate::utils::remote::Fetcher;
-use indicatif::{ProgressBar, ProgressStyle};
-use std::time::Duration;
 
 use super::GITHUB_LICENSES_API;
 
@@ -11,8 +10,6 @@ pub fn list(args: &[String]) -> anyhow::Result<()> {
 
     for arg in args {
         match arg.as_str() {
-            "--all" => list_all_licenses()?,
-            "--help" | "-h" => show_help()?,
             _ => return Err(anyhow::anyhow!("Unknown argument: {}", arg)),
         }
     }
@@ -23,15 +20,7 @@ pub fn list(args: &[String]) -> anyhow::Result<()> {
 fn list_all_licenses() -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
 
-    let pb = ProgressBar::new_spinner();
-    pb.set_style(
-        ProgressStyle::default_spinner()
-            .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
-            .template("{spinner} {msg}")
-            .unwrap(),
-    );
-    pb.enable_steady_tick(Duration::from_millis(100));
-    pb.set_message("Fetching license list...");
+    let pb = progress::spinner("Fetching licenses list...");
 
     let licenses = fetcher.fetch_json(GITHUB_LICENSES_API)?;
 
@@ -51,14 +40,5 @@ fn list_all_licenses() -> anyhow::Result<()> {
         println!("No licenses found.");
     }
 
-    Ok(())
-}
-
-fn show_help() -> anyhow::Result<()> {
-    println!("Usage: license list [OPTIONS]");
-    println!();
-    println!("Options:");
-    println!("  --all       List all available licenses (default)");
-    println!("  -h, --help  Show this help message");
     Ok(())
 }

@@ -1,9 +1,6 @@
-use std::time::Duration;
-
-use indicatif::{ProgressBar, ProgressStyle};
-
 use super::{GITHUB_API_BASE, GITHUB_RAW_BASE};
 use crate::utils::get_comment;
+use crate::utils::progress;
 use crate::utils::remote::Fetcher;
 
 pub fn list(args: &[String]) -> anyhow::Result<()> {
@@ -22,14 +19,7 @@ pub fn list(args: &[String]) -> anyhow::Result<()> {
 fn list_all_templates() -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
 
-    let pb = ProgressBar::new_spinner();
-    pb.set_style(
-        ProgressStyle::default_spinner()
-            .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
-            .template("{spinner} {msg}")
-            .unwrap(),
-    );
-    pb.enable_steady_tick(Duration::from_millis(100));
+    let pb = progress::spinner("Fetching issue templates...");
     pb.set_message("Fetching template list...");
 
     let url = format!("{}/issue-templates", GITHUB_API_BASE);

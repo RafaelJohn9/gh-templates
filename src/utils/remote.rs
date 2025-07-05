@@ -1,10 +1,7 @@
-use std::path::Path;
 use std::time::Duration;
 
 use anyhow::anyhow;
 use reqwest::blocking::Client;
-
-use crate::utils::file;
 
 pub struct Fetcher {
     client: Client,
@@ -61,39 +58,5 @@ impl Fetcher {
         response
             .json()
             .map_err(|e| anyhow!("Failed to parse JSON: {}", e))
-    }
-
-    /// Fetch content from URL and save to file
-    pub fn fetch_to_file(&self, url: &str, output_path: &Path) -> anyhow::Result<()> {
-        let content = self.fetch_content(url)?;
-        file::save_file(&content, output_path)?;
-        Ok(())
-    }
-
-    /// Download binary content and save to file
-    #[allow(dead_code)]
-    pub fn download_to_file(&self, url: &str, output_path: &Path) -> anyhow::Result<()> {
-        let response = self
-            .client
-            .get(url)
-            .send()
-            .map_err(|e| anyhow!("Failed to download from {}: {}", url, e))?;
-
-        if !response.status().is_success() {
-            return Err(anyhow!(
-                "Download failed with status {}: {}",
-                response.status(),
-                url
-            ));
-        }
-
-        let bytes = response
-            .bytes()
-            .map_err(|e| anyhow!("Failed to read response bytes: {}", e))?;
-
-        let content = String::from_utf8_lossy(&bytes);
-        file::save_file(&content, output_path)?;
-
-        Ok(())
     }
 }

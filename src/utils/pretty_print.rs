@@ -1,7 +1,7 @@
 use syntect::easy::HighlightLines;
 use syntect::highlighting::{Style, ThemeSet};
 use syntect::parsing::SyntaxSet;
-use syntect::util::{as_24_bit_terminal_escaped, LinesWithEndings};
+use syntect::util::{LinesWithEndings, as_24_bit_terminal_escaped};
 
 /// Prints highlighted content to the terminal according to the file extension.
 ///
@@ -25,4 +25,5 @@ pub fn print_highlighted(ext: &str, content: &str) {
         let ranges: Vec<(Style, &str)> = h.highlight_line(line, &ps).unwrap();
         print!("{}", as_24_bit_terminal_escaped(&ranges[..], false));
     }
+    println!(); // Ensure the cursor moves to the next line after printing
 }
