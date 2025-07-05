@@ -7,23 +7,6 @@ All notable changes to this project will be documented in this file.
 
 
 
-### Chore
-
-- update CHANGELOG [skip ci] (1a35a2a)
-
-- update CHANGELOG [skip ci] (e858214)
-
-
-### Feat
-
-- added pr template integration (b4c60d0)
-
-
-### Refactor
-
-- Adopt Clap Subcommand Pattern for Clean and Extensible CLI Design (3d7df1b)
-
-
 ## [v0.0.49]
 
 
