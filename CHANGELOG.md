@@ -3,8 +3,27 @@
 All notable changes to this project will be documented in this file.
 
 
-## [Unreleased]
+## [v0.0.52]
 
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (4eaed24)
+
+
+### Fix
+
+- pull_request_template removed first line comment (68d570f)
+
+- PR template (4eea059)
+
+
+### Refactor
+
+- removed templates inside the repo (d646c49)
+
+- removed emojis in PR template (de759eb)
 
 
 ## [v0.0.49]
