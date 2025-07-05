@@ -6,10 +6,9 @@ labels: enhancement
 ---
 
 ## 🔗 Related Issue(s)
+<!-- > Link to the relevant issue(s). Create one if it doesn't exist. -->
 
 - Closes #<issue_number>
-
-> Link to the relevant issue(s). Create one if it doesn't exist.
 
 ---
 
@@ -17,8 +16,8 @@ labels: enhancement
 
 > Briefly describe **what** this PR changes and **why**.
 
-Example:
-> Added input validation to the registration form to improve user experience and prevent invalid data submission.
+<!-- Example:
+> Added input validation to the registration form to improve user experience and prevent invalid data submission. -->
 
 ---
 
