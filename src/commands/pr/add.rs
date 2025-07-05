@@ -6,14 +6,14 @@ use crate::utils::remote::Fetcher;
 use std::path::{Path, PathBuf};
 
 const OUTPUT_BASE_PATH: &str = ".github";
-const OUTPUT: &str = "ISSUE_TEMPLATE";
+const OUTPUT: &str = "PULL_REQUEST_TEMPLATE";
 
 pub fn add(request: AddTemplateRequest) -> anyhow::Result<()> {
     if request.all {
         download_all_templates(request.dir.as_ref(), request.force)?;
     } else if request.args.is_empty() {
         return Err(anyhow::anyhow!(
-            "No issue template specified. Use `--all` or pass template names."
+            "No pull request template specified. Use `--all` or pass template names."
         ));
     } else {
         for template_name in &request.args {
@@ -27,9 +27,9 @@ pub fn add(request: AddTemplateRequest) -> anyhow::Result<()> {
 fn download_all_templates(dir_path: Option<&PathBuf>, force: bool) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
 
-    println!("Fetching all templates...");
+    println!("Fetching all pull request templates...");
 
-    let url = format!("{}/issue-templates", GITHUB_API_BASE);
+    let url = format!("{}/pr-templates", GITHUB_API_BASE);
     let entries = fetcher.fetch_json(&url)?;
 
     if let Some(array) = entries.as_array() {
@@ -50,7 +50,7 @@ fn download_all_templates(dir_path: Option<&PathBuf>, force: bool) -> anyhow::Re
         .map(|p| p.display().to_string())
         .unwrap_or(default_output);
     println!(
-        "\x1b[32m✓\x1b[0m Downloaded all issue templates to {}",
+        "\x1b[32m✓\x1b[0m Downloaded all pull request templates to {}",
         output_location
     );
 
@@ -64,21 +64,25 @@ fn download_single_template(
 ) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
 
-    let url = format!("{}/issue-templates/{}.yml", GITHUB_RAW_BASE, template_name);
+    let url = format!("{}/pr-templates/{}.md", GITHUB_RAW_BASE, template_name);
 
-    let msg = format!("Downloading issue template: {}", template_name);
+    let msg = format!("Downloading pull request template: {}", template_name);
     let pb = progress::spinner(&msg);
     let content = fetcher.fetch_content(&url)?;
     pb.set_message("Download Complete");
     pb.finish_and_clear();
 
-    let default_path = Path::new(OUTPUT_BASE_PATH).join(OUTPUT);
-    let base_path = dir_path.map_or(default_path.as_path(), |p| p.as_path());
-    let dest_path = base_path.join(format!("{}.yml", template_name));
+    let dest_path = if template_name == "default" {
+        Path::new(OUTPUT_BASE_PATH).join("pull_request_template.md")
+    } else {
+        let default_path = Path::new(OUTPUT_BASE_PATH).join(OUTPUT);
+        let base_path = dir_path.map_or(default_path.as_path(), |p| p.as_path());
+        base_path.join(format!("{}.md", template_name))
+    };
 
     file::save_file(&content, &dest_path, force)?;
 
-    println!("\x1b[32m✓\x1b[0m Added template: {}", template_name);
+    println!("\x1b[32m✓\x1b[0m {} - has beed added.", dest_path.display());
 
     Ok(())
 }

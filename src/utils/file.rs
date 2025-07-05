@@ -3,7 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 /// Save content to a file with path resolution middleware
-pub fn save_file(content: &str, filepath: &Path) -> Result<()> {
+pub fn save_file(content: &str, filepath: &Path, force: bool) -> Result<()> {
     let resolved_path = resolve_output_path(filepath)?;
 
     // Create parent directories only if the path starts with .github
@@ -23,6 +23,13 @@ pub fn save_file(content: &str, filepath: &Path) -> Result<()> {
         }
     }
 
+    if resolved_path.exists() && !force {
+        return Err(anyhow::anyhow!(
+            "File '{}' already exists. Use --force to overwrite.",
+            resolved_path.display()
+        ));
+    }
+
     fs::write(resolved_path, content)?;
     Ok(())
 }
@@ -40,7 +47,7 @@ fn resolve_output_path(filepath: &Path) -> Result<PathBuf> {
 }
 
 /// Find the repository root by traversing up the directory tree
-fn find_repo_root() -> Result<PathBuf> {
+pub fn find_repo_root() -> Result<PathBuf> {
     let mut current_dir = std::env::current_dir()?;
 
     loop {

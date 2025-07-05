@@ -1,30 +1,30 @@
+pub mod add;
+pub mod base;
 pub mod issue;
 pub mod license;
+pub mod list;
+pub mod pr;
+pub mod preview;
 
-pub fn dispatch_add(category: &str, args: &[String]) -> anyhow::Result<()> {
-    match category {
-        "issue" => issue::add(args),
-        "license" => license::add(args),
-        _ => Err(anyhow::anyhow!("Unknown category: {}", category)),
-    }
+use add::Add;
+use base::Runnable;
+use clap::Subcommand;
+use list::List;
+use preview::Preview;
+
+#[derive(Subcommand)]
+pub enum Command {
+    Add(Add),
+    List(List),
+    Preview(Preview),
 }
 
-pub fn dispatch_list(category: &str, extra_args: &[String]) -> anyhow::Result<()> {
-    match category {
-        "issue" => issue::list(extra_args),
-        "license" => license::list(extra_args),
-        _ => Err(anyhow::anyhow!("Unknown category: {}", category)),
-    }
-}
-
-pub fn dispatch_preview(
-    category: &str,
-    template: &str,
-    extra_args: &[String],
-) -> anyhow::Result<()> {
-    match category {
-        "issue" => issue::preview(template, extra_args),
-        "license" => license::preview(template, extra_args),
-        _ => Err(anyhow::anyhow!("Unknown category: {}", category)),
+impl Command {
+    pub fn execute(&self) -> anyhow::Result<()> {
+        match self {
+            Command::Add(cmd) => cmd.run(),
+            Command::List(cmd) => cmd.run(),
+            Command::Preview(cmd) => cmd.run(),
+        }
     }
 }
