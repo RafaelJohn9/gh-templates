@@ -17,13 +17,14 @@ body:
     id: subcategory
     attributes:
       label: Subcategory
-      description: What type of support do you need?
+      description: What type of support do you need? If none apply, select "_No Response_".
       options:
         - how-to: User doesn’t know how to use feature
         - expected-behavior: Confused by what the app should do
         - support-needed: Setup or usage help
         - environment-help: Local dev env isn’t working
         - deprecated-feature-confusion: Unsure why something was removed
+        - _No Response_
       multiple: false
     validations:
       required: true
@@ -32,8 +33,8 @@ body:
     id: question
     attributes:
       label: Your Question
-      description: Please describe your question or the support you need in detail.
-      placeholder: "Describe your issue or question here..."
+      description: Please describe your question or the support you need in detail. If not applicable, write "_No Response_".
+      placeholder: "Describe your issue or question here...Or type _No Response_ if not applicable."
     validations:
       required: true
 
