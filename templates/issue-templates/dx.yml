@@ -17,12 +17,13 @@ body:
     id: subcategory
     attributes:
       label: Subcategory
-      description: Select the area most affected
+      description: Select the area most affected. If none apply, select "_No Response_".
       options:
         - setup-complexity - Project is hard to set up
         - env-vars-issue - Missing .env or unclear config
         - onboarding-gap - New devs face barriers to contributing
         - cli-issue - Internal tool, CLI issue
+        - _No Response_
     validations:
       required: true
 
@@ -30,8 +31,8 @@ body:
     id: description
     attributes:
       label: Describe the issue
-      description: Please provide a clear and concise description of the problem.
-      placeholder: What happened? What did you expect?
+      description: Please provide a clear and concise description of the problem. If not applicable, write "_No Response_".
+      placeholder: What happened? What did you expect? If not applicable, type "_No Response_".
     validations:
       required: true
 
