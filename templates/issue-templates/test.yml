@@ -17,12 +17,13 @@ body:
     id: subcategory
     attributes:
       label: Subcategory
-      description: Select the most relevant subcategory for your issue.
+      description: Select the most relevant subcategory for your issue. If none apply, select "_No Response_".
       options:
         - unit-test-failure - Unit test consistently fails
         - test-coverage - Request to add or improve tests
         - flaky-test - Test fails randomly
         - test-env-setup - Test environment config problem
+        - _No Response_
     validations:
       required: true
 
@@ -30,12 +31,12 @@ body:
     id: description
     attributes:
       label: Description
-      description: Please describe the issue in detail.
-      placeholder: Describe the problem, steps to reproduce, and any relevant logs or screenshots.
+      description: Please describe the issue in detail. If not applicable, write "_No Response_".
+      placeholder: Describe the problem, steps to reproduce, and any relevant logs or screenshots or type "_No Response_" if not applicable.
     validations:
       required: true
 
-  - type: textareahelp wanted
+  - type: textarea
     id: steps
     attributes:
       label: Steps to Reproduce

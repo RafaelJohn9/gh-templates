@@ -15,7 +15,7 @@ body:
     id: subcategory
     attributes:
       label: Subcategory
-      description: Select the most relevant subcategory for your issue.
+      description: Select the most relevant subcategory for your issue. If none apply, select "_No Response_".
       options:
         - missing-docs - Docs are completely absent
         - outdated-docs - Needs update to match current behavior
@@ -23,6 +23,7 @@ body:
         - new-docs-request - Suggesting a new section or tutorial
         - readme-improvement - Better structure or examples
         - api-docs-issue - Generated or manual API references
+        - _No Response_
     validations:
       required: true
 
@@ -30,8 +31,8 @@ body:
     id: description
     attributes:
       label: Description
-      description: Please describe the documentation issue or suggestion in detail.
-      placeholder: Tell us what needs to be fixed or improved.
+      description: Please describe the documentation issue or suggestion in detail. If not applicable, write "_No Response_".
+      placeholder: Tell us what needs to be fixed or improved or type "_No Response_" if not applicable.
     validations:
       required: true
 
