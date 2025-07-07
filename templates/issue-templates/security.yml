@@ -1,0 +1,63 @@
+# Security Issue Template 
+name: "🔒 Security Issue"
+description: "Report security vulnerabilities, data leaks, or authentication issues."
+labels:
+  - security
+  - vulnerability
+  - enhancement
+  - code-quality
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🔒 Security Issue
+        Please use this template to report security vulnerabilities, data leaks, or authentication issues.
+
+  - type: dropdown
+    id: security-category
+    attributes:
+      label: Security Category
+      description: Select the most relevant category for your security issue. If none apply, select "_No Response_".
+      options:
+        - Vulnerability (code or configuration flaw)
+        - Data Leak (exposed sensitive information)
+        - Authentication Issue (login, access control)
+        - Other
+        - _No Response_
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please describe the security issue in detail. If not applicable, write "_No Response_".
+      placeholder: "Describe the security issue, its impact, and any relevant context, or type '_No Response_' if not applicable."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: List the steps to reproduce the security issue.
+      placeholder: |
+        1. Go to ...
+        2. Click on ...
+        3. Observe ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-comments
+    attributes:
+      label: Additional Comments
+      description: Any additional comments or information related to the security issue.
