@@ -9,33 +9,12 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
-- update CHANGELOG [skip ci] (d75fe63)
+- update CHANGELOG [skip ci] (74cbd49)
 
 
 ### Fix
 
-- correct type for 'steps' field in testing issue template (6111dc5)
-
-- correct type for 'steps' field in testing issue template (9461ffe)
-
-- enhance bug report template descriptions to include "_No Response_" option (a57e1f4)
-
-- update community issue template to include "_No Response_" option in descriptions (f8edafa)
-
-- update documentation issue template to clarify "_No Response_" option in descriptions (d95fb79)
-
-- add "_No Response_" option to subcategory and description fields in DX feedback template (7501d50)
-
-- update feature request template to clarify "_No Response_" option in subcategory and description fields (10f27fc)
-
-- update support template to clarify "_No Response_" option in subcategory and question fields (e72155a)
-
-- update testing & QA template to clarify "_No Response_" option in subcategory and description fields (ec41568)
-
-
-### Refactor
-
-- deprecated description field in bug issue template (5510bea)
+- Pull request template: removed the non performative part of the syntax (c139f68)
 
 
 ## [v0.0.52]
