@@ -1,18 +1,17 @@
-use super::{GITHUB_API_BASE, GITHUB_RAW_BASE};
 use crate::utils::get_comment;
 use crate::utils::progress;
 use crate::utils::remote::Fetcher;
 
-pub fn list(args: &[String]) -> anyhow::Result<()> {
-    if args.is_empty() {
+use super::{GITHUB_API_BASE, GITHUB_RAW_BASE};
+
+#[derive(clap::Args)]
+pub struct ListArgs {
+    // You can add options here if needed in the future
+}
+
+impl super::Runnable for ListArgs {
+    fn run(&self) -> anyhow::Result<()> {
         list_all_pr_templates()
-    } else {
-        for arg in args {
-            match arg.as_str() {
-                _ => return Err(anyhow::anyhow!("Unknown option: {}", arg)),
-            }
-        }
-        Ok(())
     }
 }
 

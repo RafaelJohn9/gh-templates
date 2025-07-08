@@ -3,18 +3,25 @@ use crate::utils::remote::Fetcher;
 
 use super::GITHUB_LICENSES_API;
 
-pub fn list(args: &[String]) -> anyhow::Result<()> {
-    if args.is_empty() {
-        return list_all_licenses();
-    }
+#[derive(clap::Args)]
+pub struct ListArgs {
+    // You can add more options here if needed in the future
+    #[arg(allow_hyphen_values = true)]
+    pub args: Vec<String>,
+}
 
-    for arg in args {
-        match arg.as_str() {
-            _ => return Err(anyhow::anyhow!("Unknown argument: {}", arg)),
+impl super::Runnable for ListArgs {
+    fn run(&self) -> anyhow::Result<()> {
+        if self.args.is_empty() {
+            return list_all_licenses();
         }
-    }
 
-    Ok(())
+        for arg in &self.args {
+            return Err(anyhow::anyhow!("Unknown argument: {}", arg));
+        }
+
+        Ok(())
+    }
 }
 
 fn list_all_licenses() -> anyhow::Result<()> {

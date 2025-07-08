@@ -1,28 +1,79 @@
-use super::{GITHUB_API_BASE, GITHUB_RAW_BASE};
-use crate::commands::add::AddTemplateRequest;
+use std::path::{Path, PathBuf};
+
+use crate::commands::base;
 use crate::utils::file;
 use crate::utils::progress;
 use crate::utils::remote::Fetcher;
-use std::path::{Path, PathBuf};
+
+use super::{GITHUB_API_BASE, GITHUB_RAW_BASE};
 
 const OUTPUT_BASE_PATH: &str = ".github";
 const OUTPUT: &str = "ISSUE_TEMPLATE";
 
-pub fn add(request: AddTemplateRequest) -> anyhow::Result<()> {
-    if request.all {
-        download_all_templates(request.dir.as_ref(), request.force)?;
-    } else if request.args.is_empty() {
-        return Err(anyhow::anyhow!(
-            "No issue template specified. Use `--all` or pass template names."
-        ));
-    } else {
-        for template_name in &request.args {
-            download_single_template(template_name, request.dir.as_ref(), request.force)?;
+// Command to add issue templates
+
+#[derive(clap::Args, Debug)]
+pub struct AddArgs {
+    #[arg(allow_hyphen_values = true)]
+    pub args: Vec<String>,
+}
+
+impl super::Runnable for AddArgs {
+    fn run(&self) -> anyhow::Result<()> {
+        let parsed_args = parse_args(self.args.clone());
+
+        if parsed_args.common.all {
+            download_all_templates(parsed_args.common.dir.as_ref(), parsed_args.common.force)?;
+        } else if parsed_args.templates.is_empty() {
+            return Err(anyhow::anyhow!(
+                "No issue template specified. Use `--all` or pass template names."
+            ));
+        } else {
+            for template_name in &self.args {
+                download_single_template(
+                    template_name,
+                    parsed_args.common.dir.as_ref(),
+                    parsed_args.common.force,
+                )?;
+            }
+        }
+
+        Ok(())
+    }
+}
+
+// Arg parsing logic
+
+pub struct ParsedAddArgs {
+    pub common: base::CommonAddArgs,
+    pub templates: Vec<String>,
+}
+
+fn parse_args(args: Vec<String>) -> ParsedAddArgs {
+    let mut dir = None;
+    let mut force = false;
+    let mut all = false;
+    let mut templates = Vec::new();
+
+    for arg in &args {
+        if arg == "--all" {
+            all = true;
+        } else if arg.starts_with("--dir=") {
+            dir = Some(PathBuf::from(&arg[6..]));
+        } else if arg == "--force" {
+            force = true;
+        } else {
+            templates.push(arg.clone());
         }
     }
 
-    Ok(())
+    ParsedAddArgs {
+        common: base::CommonAddArgs { dir, force, all },
+        templates,
+    }
 }
+
+// Helper functions
 
 fn download_all_templates(dir_path: Option<&PathBuf>, force: bool) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
