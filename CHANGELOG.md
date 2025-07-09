@@ -7,16 +7,6 @@ All notable changes to this project will be documented in this file.
 
 
 
-### Chore
-
-- update CHANGELOG [skip ci] (74cbd49)
-
-
-### Fix
-
-- Pull request template: removed the non performative part of the syntax (c139f68)
-
-
 ## [v0.0.52]
 
 
