@@ -1,126 +1,94 @@
+use anyhow::Result;
 use std::path::{Path, PathBuf};
 
-use anyhow::Result;
-
-use crate::commands::base;
 use crate::utils::cache::{Cache, CacheManager};
 use crate::utils::file;
 use crate::utils::progress;
 use crate::utils::remote::Fetcher;
 
 use super::{
-    CACHE_MAX_AGE_SECONDS, GITHUB_API_BASE, GITHUB_RAW_BASE, GITIGNORE_CACHE_NAME, OUTPUT,
-    OUTPUT_BASE_PATH,
+    GITHUB_RAW_BASE, GITIGNORE_CACHE_NAME, OUTPUT, OUTPUT_BASE_PATH, ensure_gitignore_cache,
+    find_template_in_cache,
 };
-
-// Command to add gitignore templates
 
 #[derive(clap::Args, Debug)]
 pub struct AddArgs {
-    #[arg(allow_hyphen_values = true)]
-    pub args: Vec<String>,
+    /// Template names to add (e.g., rust, python, global/windows)
+    #[arg(value_name = "TEMPLATE")]
+    pub templates: Vec<String>,
+
+    /// Directory to save the .gitignore file
+    #[arg(long, value_name = "DIR")]
+    pub dir: Option<PathBuf>,
+
+    /// Force overwrite existing .gitignore file
+    #[arg(long)]
+    pub force: bool,
+
+    /// Download all available templates
+    #[arg(long)]
+    pub all: bool,
+
+    /// Update the gitignore cache
+    #[arg(long = "update-cache", default_value = "false")]
+    pub update_cache: bool,
 }
 
 impl super::Runnable for AddArgs {
     fn run(&self) -> anyhow::Result<()> {
-        let parsed_args = parse_args(self.args.clone());
-
         let mut cache_manager = CacheManager::new()?;
+
+        // If --update-cache is set, force update the cache before proceeding
+        if self.update_cache {
+            cache_manager.clear_cache(GITIGNORE_CACHE_NAME)?;
+        }
+
         let cache: Cache<String> = ensure_gitignore_cache(&mut cache_manager)?;
 
-        let dir = match &parsed_args.common.dir {
+        let dir = match &self.dir {
             Some(dir) => Some(dir.clone()),
             None => Some(file::find_repo_root()?),
         };
 
-        if parsed_args.common.all {
-            download_all_templates(dir.as_ref(), parsed_args.common.force, &cache)?;
-        } else if parsed_args.templates.is_empty() {
+        if self.all {
+            download_all_templates(dir.as_ref(), self.force, &cache)?;
+        } else if self.templates.is_empty() {
             return Err(anyhow::anyhow!(
                 "No gitignore template specified. Use `--all` or pass template names."
             ));
         } else {
-            download_templates(
-                &parsed_args.templates,
-                dir.as_ref(),
-                parsed_args.common.force,
-                &cache,
-            )?;
+            download_templates(&self.templates, dir.as_ref(), self.force, &cache)?;
         }
 
         Ok(())
     }
 }
 
-/// Arg parsing logic
-
-pub struct ParsedAddArgs {
-    pub common: base::CommonAddArgs,
-    pub templates: Vec<String>,
-}
-
-fn parse_args(args: Vec<String>) -> ParsedAddArgs {
-    let mut dir = None;
-    let mut force = false;
-    let mut all = false;
-    let mut templates = Vec::new();
-
-    for arg in &args {
-        if arg == "--all" {
-            all = true;
-        } else if arg.starts_with("--dir=") {
-            dir = Some(PathBuf::from(&arg[6..]));
-        } else if arg == "--force" {
-            force = true;
-        } else {
-            templates.push(arg.clone());
-        }
-    }
-
-    ParsedAddArgs {
-        common: base::CommonAddArgs { dir, force, all },
-        templates,
-    }
-}
-
-// Helper functions
-
 fn download_all_templates(
     dir_path: Option<&PathBuf>,
     force: bool,
     cache: &Cache<String>,
-) -> anyhow::Result<()> {
+) -> Result<()> {
     println!("Fetching all gitignore templates...");
 
     let mut merged_content = String::new();
 
-    for (key, _) in cache.entries.iter() {
-        let template_name = key;
-        let rel_url = cache.get(template_name).ok_or_else(|| {
-            anyhow::anyhow!(
-                "Template '{}' not found in cache. Try updating the cache.",
-                template_name
-            )
-        })?;
-
+    for (key, rel_path_entry) in cache.entries.iter() {
         let fetcher = Fetcher::new();
-        let url = format!("{}/{}", GITHUB_RAW_BASE, rel_url);
+        let url = format!("{}/{}", GITHUB_RAW_BASE, rel_path_entry.data);
 
-        let msg = format!("Downloading gitignore template: {}", template_name);
+        let msg = format!("Downloading gitignore template: {}", key);
         let pb = progress::spinner(&msg);
         let content = fetcher.fetch_content(&url)?;
         pb.set_message("Download Complete");
         pb.finish_and_clear();
 
-        merged_content.push_str(&format!(
-            "# ===== {}.gitignore =====\n{}\n\n",
-            template_name, content
-        ));
+        merged_content.push_str(&format!("# ===== {}.gitignore =====\n{}\n\n", key, content));
     }
 
-    let default_path = Path::new(OUTPUT_BASE_PATH).join(OUTPUT);
-    let base_path = dir_path.map_or(default_path.as_path(), |p| p.as_path());
-    let dest_path = base_path.join(".gitignore");
+    let dest_path = dir_path
+        .map(|p| p.join(".gitignore"))
+        .unwrap_or_else(|| Path::new(OUTPUT_BASE_PATH).join(OUTPUT).join(".gitignore"));
 
     file::save_file(&merged_content, &dest_path, force)?;
 
@@ -137,20 +105,15 @@ fn download_templates(
     dir_path: Option<&PathBuf>,
     force: bool,
     cache: &Cache<String>,
-) -> anyhow::Result<()> {
+) -> Result<()> {
     let mut merged_content = String::new();
 
     for template_name in templates {
-        let key = template_name.to_lowercase();
-        let rel_url = cache.get(&key).ok_or_else(|| {
-            anyhow::anyhow!(
-                "Template '{}' not found in cache. Try updating the cache.",
-                template_name
-            )
-        })?;
+        // Try to find the template in cache with different key formats
+        let template_path = find_template_in_cache(template_name, cache)?;
 
         let fetcher = Fetcher::new();
-        let url = format!("{}/{}", GITHUB_RAW_BASE, rel_url);
+        let url = format!("{}/{}", GITHUB_RAW_BASE, template_path);
 
         let msg = format!("Downloading gitignore template: {}", template_name);
         let pb = progress::spinner(&msg);
@@ -164,9 +127,9 @@ fn download_templates(
         ));
     }
 
-    let default_path = Path::new(OUTPUT_BASE_PATH).join(OUTPUT);
-    let base_path = dir_path.map_or(default_path.as_path(), |p| p.as_path());
-    let dest_path = base_path.join(".gitignore");
+    let dest_path = dir_path
+        .map(|p| p.join(".gitignore"))
+        .unwrap_or_else(|| Path::new(OUTPUT_BASE_PATH).join(OUTPUT).join(".gitignore"));
 
     file::save_file(&merged_content, &dest_path, force)?;
 
@@ -176,31 +139,4 @@ fn download_templates(
     );
 
     Ok(())
-}
-
-/// Ensures the gitignore cache exists and is up-to-date, returns it.
-fn ensure_gitignore_cache(cache_manager: &mut CacheManager) -> Result<Cache<String>> {
-    let should_update =
-        cache_manager.should_update_cache::<String>(GITIGNORE_CACHE_NAME, CACHE_MAX_AGE_SECONDS)?;
-    if !should_update {
-        return cache_manager.load_cache(GITIGNORE_CACHE_NAME);
-    }
-
-    let fetcher = Fetcher::new();
-    let url = format!("{}", GITHUB_API_BASE);
-    let entries = fetcher.fetch_json(&url)?;
-
-    let mut cache = Cache::new("1.0".to_string());
-    if let Some(array) = entries.as_array() {
-        for entry in array {
-            if let Some(name) = entry.get("name").and_then(|n| n.as_str()) {
-                if name.ends_with(".gitignore") {
-                    let key = name[..name.len() - ".gitignore".len()].to_lowercase();
-                    cache.insert(key, name.to_string());
-                }
-            }
-        }
-    }
-    cache_manager.save_cache(GITIGNORE_CACHE_NAME, &cache)?;
-    Ok(cache)
 }

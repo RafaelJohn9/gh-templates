@@ -2,7 +2,6 @@ use std::path::PathBuf;
 
 use anyhow::anyhow;
 
-use crate::commands::base::CommonAddArgs;
 use crate::utils::file;
 use crate::utils::progress;
 use crate::utils::remote::Fetcher;
@@ -13,63 +12,44 @@ use super::GITHUB_LICENSES_API;
 
 #[derive(clap::Args, Debug)]
 pub struct AddArgs {
-    #[arg(allow_hyphen_values = true)]
-    pub args: Vec<String>,
+    /// License IDs to add (e.g., mit, apache-2.0)
+    #[arg(value_name = "LICENSE")]
+    pub licenses: Vec<String>,
+
+    /// Directory to save the license file
+    #[arg(long, value_name = "DIR")]
+    pub dir: Option<PathBuf>,
+
+    /// Force overwrite existing license file
+    #[arg(long)]
+    pub force: bool,
+
+    /// Download all available licenses
+    #[arg(long)]
+    pub all: bool,
 }
 
 impl super::Runnable for AddArgs {
     fn run(&self) -> anyhow::Result<()> {
-        let parsed_args = parse_args(self.args.clone());
-
         // Determine the directory to use
-        let dir = match &parsed_args.common.dir {
+        let dir = match &self.dir {
             Some(d) => d.clone(),
             None => file::find_repo_root()?,
         };
 
-        if parsed_args.common.all {
-            download_all_licenses(Some(&dir), parsed_args.common.force)?;
-        } else if parsed_args.licenses.is_empty() {
+        if self.all {
+            download_all_licenses(Some(&dir), self.force)?;
+        } else if self.licenses.is_empty() {
             return Err(anyhow!(
                 "At least one license ID is required (or use --all)"
             ));
         } else {
-            for license_id in &parsed_args.licenses {
-                download_single_license(license_id, Some(&dir), parsed_args.common.force)?;
+            for license_id in &self.licenses {
+                download_single_license(license_id, Some(&dir), self.force)?;
             }
         }
 
         Ok(())
-    }
-}
-
-// Arg parsing logic
-pub struct ParsedAddArgs {
-    pub common: CommonAddArgs,
-    pub licenses: Vec<String>,
-}
-
-fn parse_args(args: Vec<String>) -> ParsedAddArgs {
-    let mut dir = None;
-    let mut force = false;
-    let mut all = false;
-    let mut licenses = Vec::new();
-
-    for arg in &args {
-        if arg == "--all" {
-            all = true;
-        } else if arg.starts_with("--dir=") {
-            dir = Some(PathBuf::from(&arg[6..]));
-        } else if arg == "--force" {
-            force = true;
-        } else {
-            licenses.push(arg.clone());
-        }
-    }
-
-    ParsedAddArgs {
-        common: CommonAddArgs { dir, force, all },
-        licenses,
     }
 }
 

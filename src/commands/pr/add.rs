@@ -1,6 +1,5 @@
 use std::path::{Path, PathBuf};
 
-use crate::commands::base::CommonAddArgs;
 use crate::utils::file;
 use crate::utils::progress;
 use crate::utils::remote::Fetcher;
@@ -14,61 +13,42 @@ const OUTPUT: &str = "PULL_REQUEST_TEMPLATE";
 
 #[derive(clap::Args, Debug)]
 pub struct AddArgs {
-    #[arg(allow_hyphen_values = true)]
-    pub args: Vec<String>,
+    /// Template names to add (e.g., rust, python, global/windows)
+    #[arg(value_name = "TEMPLATE")]
+    pub templates: Vec<String>,
+
+    /// Directory to save the pull request template file(s)
+    #[arg(long, value_name = "DIR")]
+    pub dir: Option<PathBuf>,
+
+    /// Force overwrite existing pull request template file(s)
+    #[arg(long)]
+    pub force: bool,
+
+    /// Download all available templates
+    #[arg(long)]
+    pub all: bool,
+
+    /// Update the pull request template cache
+    #[arg(long = "update-cache", default_value = "false")]
+    pub update_cache: bool,
 }
 
 impl super::Runnable for AddArgs {
     fn run(&self) -> anyhow::Result<()> {
-        let parsed_args = parse_args(self.args.clone());
-
-        if parsed_args.common.all {
-            download_all_templates(parsed_args.common.dir.as_ref(), parsed_args.common.force)?;
-        } else if parsed_args.templates.is_empty() {
+        if self.all {
+            download_all_templates(self.dir.as_ref(), self.force)?;
+        } else if self.templates.is_empty() {
             return Err(anyhow::anyhow!(
                 "No pull request template specified. Use `--all` or pass template names."
             ));
         } else {
-            for template_name in &parsed_args.templates {
-                download_single_template(
-                    template_name,
-                    parsed_args.common.dir.as_ref(),
-                    parsed_args.common.force,
-                )?;
+            for template_name in &self.templates {
+                download_single_template(template_name, self.dir.as_ref(), self.force)?;
             }
         }
 
         Ok(())
-    }
-}
-
-// Arg parsing logic
-pub struct ParsedAddArgs {
-    pub common: CommonAddArgs,
-    pub templates: Vec<String>,
-}
-
-fn parse_args(args: Vec<String>) -> ParsedAddArgs {
-    let mut dir = None;
-    let mut force = false;
-    let mut all = false;
-    let mut templates = Vec::new();
-
-    for arg in &args {
-        if arg == "--all" {
-            all = true;
-        } else if arg.starts_with("--dir=") {
-            dir = Some(PathBuf::from(&arg[6..]));
-        } else if arg == "--force" {
-            force = true;
-        } else {
-            templates.push(arg.clone());
-        }
-    }
-
-    ParsedAddArgs {
-        common: CommonAddArgs { dir, force, all },
-        templates,
     }
 }
 
