@@ -1,42 +1,55 @@
-use crate::utils::remote::Fetcher;
 use anyhow::anyhow;
+
+use crate::utils::remote::Fetcher;
 
 use super::GITHUB_LICENSES_API;
 
-pub fn preview(id: &str, extra_args: &[String]) -> anyhow::Result<()> {
-    let fetcher = Fetcher::new();
-    let url = format!("{}/{}", GITHUB_LICENSES_API, id.to_lowercase());
-    let license_data = fetcher.fetch_json(&url)?;
+#[derive(clap::Args)]
+pub struct PreviewArgs {
+    /// License ID (e.g. mit, apache-2.0)
+    pub id: String,
 
-    let name = license_data
-        .get("name")
-        .and_then(|n| n.as_str())
-        .unwrap_or("Unknown License");
+    /// Show description (-d), permissions (-p), limitations (-l), conditions (-c), all details (-a), or full license (default)
+    #[arg(allow_hyphen_values = true)]
+    pub args: Vec<String>,
+}
 
-    println!("\x1b[36mLicense Name:\x1b[0m {}\n", name);
+impl super::Runnable for PreviewArgs {
+    fn run(&self) -> anyhow::Result<()> {
+        let fetcher = Fetcher::new();
+        let url = format!("{}/{}", GITHUB_LICENSES_API, self.id.to_lowercase());
+        let license_data = fetcher.fetch_json(&url)?;
 
-    if extra_args.is_empty() {
-        show_full_license(&license_data)?;
-        return Ok(());
-    }
+        let name = license_data
+            .get("name")
+            .and_then(|n| n.as_str())
+            .unwrap_or("Unknown License");
 
-    for arg in extra_args {
-        let arg_str = arg.as_str();
-        if arg_str.starts_with('-') && !arg_str.starts_with("--") {
-            handle_combined_flags(&license_data, arg_str)?;
-        } else {
-            match arg_str {
-                "--description" | "-d" => show_description(&license_data)?,
-                "--permissions" | "-p" => show_permissions(&license_data)?,
-                "--limitations" | "-l" => show_limitations(&license_data)?,
-                "--conditions" | "-c" => show_conditions(&license_data)?,
-                "--details" | "-a" => show_all_details(&license_data)?,
-                _ => return Err(anyhow!("Unknown argument: {}", arg)),
+        println!("\x1b[36mLicense Name:\x1b[0m {}\n", name);
+
+        if self.args.is_empty() {
+            show_full_license(&license_data)?;
+            return Ok(());
+        }
+
+        for arg in &self.args {
+            let arg_str = arg.as_str();
+            if arg_str.starts_with('-') && !arg_str.starts_with("--") {
+                handle_combined_flags(&license_data, arg_str)?;
+            } else {
+                match arg_str {
+                    "--description" | "-d" => show_description(&license_data)?,
+                    "--permissions" | "-p" => show_permissions(&license_data)?,
+                    "--limitations" | "-l" => show_limitations(&license_data)?,
+                    "--conditions" | "-c" => show_conditions(&license_data)?,
+                    "--details" | "-a" => show_all_details(&license_data)?,
+                    _ => return Err(anyhow!("Unknown argument: {}", arg)),
+                }
             }
         }
-    }
 
-    Ok(())
+        Ok(())
+    }
 }
 
 fn handle_combined_flags(license_data: &serde_json::Value, arg: &str) -> anyhow::Result<()> {

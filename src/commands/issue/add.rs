@@ -1,28 +1,54 @@
-use super::{GITHUB_API_BASE, GITHUB_RAW_BASE};
-use crate::commands::add::AddTemplateRequest;
+use std::path::{Path, PathBuf};
+
 use crate::utils::file;
 use crate::utils::progress;
 use crate::utils::remote::Fetcher;
-use std::path::{Path, PathBuf};
+
+use super::{GITHUB_API_BASE, GITHUB_RAW_BASE};
 
 const OUTPUT_BASE_PATH: &str = ".github";
 const OUTPUT: &str = "ISSUE_TEMPLATE";
 
-pub fn add(request: AddTemplateRequest) -> anyhow::Result<()> {
-    if request.all {
-        download_all_templates(request.dir.as_ref(), request.force)?;
-    } else if request.args.is_empty() {
-        return Err(anyhow::anyhow!(
-            "No issue template specified. Use `--all` or pass template names."
-        ));
-    } else {
-        for template_name in &request.args {
-            download_single_template(template_name, request.dir.as_ref(), request.force)?;
-        }
-    }
+// Command to add issue templates
 
-    Ok(())
+#[derive(clap::Args, Debug)]
+pub struct AddArgs {
+    /// Template names to add (e.g., rust, python, global/windows)
+    #[arg(value_name = "TEMPLATE")]
+    pub templates: Vec<String>,
+
+    /// Directory to save the issue templates
+    #[arg(long, value_name = "DIR")]
+    pub dir: Option<PathBuf>,
+
+    /// Force overwrite existing issue template files
+    #[arg(long)]
+    pub force: bool,
+
+    /// Download all available templates
+    #[arg(long)]
+    pub all: bool,
 }
+
+impl super::Runnable for AddArgs {
+    fn run(&self) -> anyhow::Result<()> {
+        if self.all {
+            download_all_templates(self.dir.as_ref(), self.force)?;
+        } else if self.templates.is_empty() {
+            return Err(anyhow::anyhow!(
+                "No issue template specified. Use `--all` or pass template names."
+            ));
+        } else {
+            for template_name in &self.templates {
+                download_single_template(template_name, self.dir.as_ref(), self.force)?;
+            }
+        }
+
+        Ok(())
+    }
+}
+
+// Helper functions
 
 fn download_all_templates(dir_path: Option<&PathBuf>, force: bool) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();

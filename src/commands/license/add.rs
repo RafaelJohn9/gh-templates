@@ -1,33 +1,59 @@
-use crate::commands::add::AddTemplateRequest;
+use std::path::PathBuf;
+
+use anyhow::anyhow;
+
 use crate::utils::file;
 use crate::utils::progress;
 use crate::utils::remote::Fetcher;
-use anyhow::anyhow;
-use std::path::PathBuf;
 
 use super::GITHUB_LICENSES_API;
 
-pub fn add(request: AddTemplateRequest) -> anyhow::Result<()> {
-    // Determine the directory to use
-    let dir = match &request.dir {
-        Some(d) => d.clone(),
-        None => file::find_repo_root()?,
-    };
+// Command to add licenses
 
-    if request.all {
-        download_all_licenses(Some(&dir), request.force)?;
-    } else if request.args.is_empty() {
-        return Err(anyhow!(
-            "At least one license ID is required (or use --all)"
-        ));
-    } else {
-        for license_id in &request.args {
-            download_single_license(license_id, Some(&dir), request.force)?;
-        }
-    }
+#[derive(clap::Args, Debug)]
+pub struct AddArgs {
+    /// License IDs to add (e.g., mit, apache-2.0)
+    #[arg(value_name = "LICENSE")]
+    pub licenses: Vec<String>,
 
-    Ok(())
+    /// Directory to save the license file
+    #[arg(long, value_name = "DIR")]
+    pub dir: Option<PathBuf>,
+
+    /// Force overwrite existing license file
+    #[arg(long)]
+    pub force: bool,
+
+    /// Download all available licenses
+    #[arg(long)]
+    pub all: bool,
 }
+
+impl super::Runnable for AddArgs {
+    fn run(&self) -> anyhow::Result<()> {
+        // Determine the directory to use
+        let dir = match &self.dir {
+            Some(d) => d.clone(),
+            None => file::find_repo_root()?,
+        };
+
+        if self.all {
+            download_all_licenses(Some(&dir), self.force)?;
+        } else if self.licenses.is_empty() {
+            return Err(anyhow!(
+                "At least one license ID is required (or use --all)"
+            ));
+        } else {
+            for license_id in &self.licenses {
+                download_single_license(license_id, Some(&dir), self.force)?;
+            }
+        }
+
+        Ok(())
+    }
+}
+
+// Helper functions
 
 fn download_single_license(
     id: &str,

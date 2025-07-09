@@ -98,63 +98,78 @@ Below are some example commands for using `gh-templates` to add templates to you
 > It is recommended you use the labels from this repository by running:  
 > `gh label clone rafaeljohn9/gh-templates`
 
+### Issue Templates
+
 ```sh
 # Add an issue template
-gh-templates add issue bug
+gh-templates issue add bug
 
-# Add a PR template (not yet available)
-gh-templates add pr feature-request
+# Add multiple issues
+gh-templates issue add bug feature dx
 
-# Add a community PR template (not yet available)
-gh-templates add pr community-collaboration
+# Preview an issue template
+gh-templates issue preview bug
 
-# Add a CI workflow for Python code quality checks (not yet available)
-gh-templates add ci github python code_quality
+# List available issue templates
+gh-templates issue list
+```
 
-# Add a LICENSE file (MIT) (not yet available)
-gh-templates add license mit
+### Pull Request Templates
 
-# Add a LICENSE file (Apache 2.0) (not yet available)
-gh-templates add license apache-2.0
+```sh
+# Add a PR template
+gh-templates pr add default
 
-# Add a .gitignore for Rust (not yet available)
-gh-templates add gitignore Rust
+# Preview a PR template
+gh-templates pr preview default
 
-# Add a .gitignore for Node.js (not yet available)
-gh-templates add gitignore Node
+# List available PR templates
+gh-templates pr list
 
+# Add template and specify output location
+gh-templates pr add bug --output .github/pull_request_template.md
+```
+
+### License Files
+
+```sh
+# Add a LICENSE file (MIT)
+gh-templates license add mit
+
+# Add a LICENSE file (Apache 2.0)
+gh-templates license add apache-2.0
+
+# Preview a license file
+gh-templates license preview mit
+
+# List available license files
+gh-templates license list
+
+# Force overwrite existing file
+gh-templates license add mit --force
+```
+
+### .gitignore Files
+
+```sh
+# Add a .gitignore for Rust
+gh-templates gitignore add Rust
+
+# Add a .gitignore for Node.js
+gh-templates gitignore add Node
+
+# Preview a .gitignore file
+gh-templates gitignore preview Rust
+
+# List available .gitignore templates
+gh-templates gitignore list
+```
+
+### Code of Conduct (Coming Soon)
+
+```sh
 # Add a code of conduct file (not yet available)
-gh-templates add conduct default
-
-# Add template and specify output location (not yet available)
-gh-templates add pr bug --output .github/pull_request_template.md
-
-# Force overwrite existing file (not yet available)
-gh-templates add license mit --force
+gh-templates conduct add default
 ```
 
-> **Note:** Currently, only `issue` templates are supported. Support for PR, license, CI, .gitignore, and other templates will be added in future releases.
-
-### Listing Templates
-
-In the future, you will be able to preview templates before adding them:
-
-```sh
-# list templates
-gh-templates list issue 
-
-# Preview a license (planned)
-gh-templates preview license mit
-```
-
-### Previewing Templates
-
-In the future, you will be able to preview templates before adding them:
-
-```sh
-# Preview a PR template (planned)
-gh-templates preview pr feature-request
-
-# Preview a license (planned)
-gh-templates preview license mit
-```
+> **Note:** Currently, `issue`, `pr`, `license`, and `gitignore` templates are supported. Support for code of conduct and other templates will be added in future releases.

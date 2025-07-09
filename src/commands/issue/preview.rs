@@ -1,24 +1,29 @@
-use super::GITHUB_RAW_BASE;
 use crate::utils::pretty_print;
 use crate::utils::progress;
 use crate::utils::remote::Fetcher;
 
-pub fn preview(template: &str, extra_args: &[String]) -> anyhow::Result<()> {
-    if template.is_empty() && extra_args.is_empty() {
-        return Err(anyhow::anyhow!("No issue template specified."));
-    }
+use super::GITHUB_RAW_BASE;
 
-    if !template.is_empty() {
-        preview_single_template(template)?;
-    }
+#[derive(clap::Args)]
+pub struct PreviewArgs {
+    #[arg(allow_hyphen_values = true)]
+    pub templates: Vec<String>,
+}
 
-    for arg in extra_args {
-        match arg.as_str() {
-            template_name => preview_single_template(template_name)?,
+impl super::Runnable for PreviewArgs {
+    fn run(&self) -> anyhow::Result<()> {
+        if self.templates.is_empty() {
+            return Err(anyhow::anyhow!(
+                "No issue template specified. Pass template names as arguments."
+            ));
         }
-    }
 
-    Ok(())
+        for template_name in &self.templates {
+            preview_single_template(template_name)?;
+        }
+
+        Ok(())
+    }
 }
 
 fn preview_single_template(template: &str) -> anyhow::Result<()> {
