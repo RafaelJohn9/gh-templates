@@ -5,6 +5,7 @@ pub enum TemplateCategory {
     Issue,
     License,
     PR, // pull request
+    Gitignore,
 }
 
 pub trait Runnable {
