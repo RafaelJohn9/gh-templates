@@ -9,12 +9,19 @@ pub mod pr;
 #[derive(Subcommand)]
 pub enum CategoryCommand {
     #[command(subcommand)]
+    /// The `Issue` subcommand provides functionality related to managing issue templates.
     Issue(issue::Command),
+
     #[command(subcommand)]
+    /// The `License` subcommand provides functionality related to managing license templates.
     License(license::Command),
+
     #[command(subcommand)]
+    /// The `PR` subcommand provides functionality related to managing pull request templates.
     PR(pr::Command),
+
     #[command(subcommand)]
+    /// The `Gitignore` subcommand provides functionality related to managing `.gitignore` templates.
     Gitignore(gitignore::Command),
 }
 

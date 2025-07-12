@@ -6,7 +6,7 @@ use super::GITHUB_RAW_BASE;
 
 #[derive(clap::Args)]
 pub struct PreviewArgs {
-    #[arg(allow_hyphen_values = true, help = "PR template names to preview")]
+    #[arg(help = "PR template names to preview")]
     pub args: Vec<String>,
 }
 
