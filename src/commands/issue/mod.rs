@@ -14,8 +14,11 @@ const GITHUB_API_BASE: &str =
 
 #[derive(Subcommand)]
 pub enum Command {
+    /// Add one or more Issue templates to the repository
     Add(add::AddArgs),
+    /// List available Issue templates
     List(list::ListArgs),
+    /// Preview a specific Issue template
     Preview(preview::PreviewArgs),
 }
 

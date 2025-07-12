@@ -14,8 +14,11 @@ const GITHUB_API_BASE: &str =
 
 #[derive(Subcommand)]
 pub enum Command {
+    /// Add one or more PR templates to the repository
     Add(add::AddArgs),
+    /// List available PR templates
     List(list::ListArgs),
+    /// Preview a specific PR template
     Preview(preview::PreviewArgs),
 }
 
