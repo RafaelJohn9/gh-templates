@@ -1,0 +1,5 @@
+# Manifest file for PR templates
+
+type: pull_request
+templates:
+  default: default.md
