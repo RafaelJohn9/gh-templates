@@ -1,38 +1,10 @@
+use crate::utils::cache::{Cache, CacheManager};
+use crate::utils::pattern::filter_by_wildcard;
 use crate::utils::progress;
 use crate::utils::remote::Fetcher;
 
 // SPDX license list URL
-const SPDX_LICENSE_LIST_URL: &str =
-    "https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json";
-
-// Common licenses with descriptions for quick reference
-fn get_common_licenses() -> Vec<(&'static str, &'static str)> {
-    vec![
-        ("mit", "MIT License"),
-        ("apache-2.0", "Apache License 2.0"),
-        ("gpl-3.0", "GNU General Public License v3.0"),
-        ("gpl-2.0", "GNU General Public License v2.0"),
-        ("bsd-2-clause", "BSD 2-Clause \"Simplified\" License"),
-        (
-            "bsd-3-clause",
-            "BSD 3-Clause \"New\" or \"Revised\" License",
-        ),
-        ("lgpl-2.1", "GNU Lesser General Public License v2.1"),
-        ("lgpl-3.0", "GNU Lesser General Public License v3.0"),
-        ("mpl-2.0", "Mozilla Public License 2.0"),
-        ("unlicense", "The Unlicense"),
-        ("cc0-1.0", "Creative Commons Zero v1.0 Universal"),
-        ("agpl-3.0", "GNU Affero General Public License v3.0"),
-        ("isc", "ISC License"),
-        ("artistic-2.0", "Artistic License 2.0"),
-        ("eupl-1.2", "European Union Public License 1.2"),
-        ("bsl-1.0", "Boost Software License 1.0"),
-        ("ms-pl", "Microsoft Public License"),
-        ("ofl-1.1", "SIL Open Font License 1.1"),
-        ("wtfpl", "Do What The F*ck You Want To Public License"),
-        ("zlib", "zlib License"),
-    ]
-}
+use super::{SPDX_LICENSE_LIST_URL, ensure_github_api_license_cache};
 
 #[derive(clap::Args)]
 pub struct ListArgs {
@@ -44,16 +16,24 @@ pub struct ListArgs {
     #[arg(long, short)]
     pub search: Option<String>,
 
-    /// Show detailed information including descriptions
-    #[arg(long, short)]
-    pub detailed: bool,
-
     /// Show deprecated licenses as well
     #[arg(long)]
     pub include_deprecated: bool,
 
+    /// Update the license cache before listing
+    #[arg(long)]
+    pub update_cache: bool,
+
     #[arg(allow_hyphen_values = true)]
     pub args: Vec<String>,
+
+    /// Show only OSI-approved licenses
+    #[arg(long)]
+    pub osi_approved: bool,
+
+    /// Show only FSF libre-approved licenses
+    #[arg(long)]
+    pub fsf_libre: bool,
 }
 
 impl super::Runnable for ListArgs {
@@ -65,38 +45,101 @@ impl super::Runnable for ListArgs {
             }
         }
 
+        // License Args
+        let license_args = LicenseArgs {
+            update_cache: self.update_cache,
+            search: self.search.clone(),
+            include_deprecated: self.include_deprecated,
+            osi_approved: self.osi_approved,
+            fsf_libre: self.fsf_libre,
+        };
+
         if self.popular {
-            return list_popular_licenses();
+            return list_popular_licenses(license_args);
         }
 
-        list_all_licenses(
-            self.search.as_deref(),
-            self.detailed,
-            self.include_deprecated,
-        )
+        list_all_licenses(license_args)
+            .map_err(|e| anyhow::anyhow!("Failed to list licenses: {}", e))
     }
 }
 
-fn list_popular_licenses() -> anyhow::Result<()> {
-    println!("\x1b[32m✓\x1b[0m Popular open source licenses:");
-    println!();
+struct LicenseArgs {
+    update_cache: bool,
+    search: Option<String>,
+    include_deprecated: bool,
+    osi_approved: bool,
+    fsf_libre: bool,
+}
 
-    let common_licenses = get_common_licenses();
-    for (id, name) in common_licenses {
-        println!("  \x1b[32m>\x1b[0m {:<15} {}", id, name);
+fn list_popular_licenses(args: LicenseArgs) -> anyhow::Result<()> {
+    let mut cache_manager = CacheManager::new()?;
+
+    let cache: Cache<serde_json::Value> =
+        ensure_github_api_license_cache(&mut cache_manager, args.update_cache)?;
+
+    // If search parameter is passed, filter licenses by closest matches
+    if let Some(search) = &args.search {
+        let mut matches = Vec::new();
+
+        // Collect all IDs and names for wildcard filtering
+        let mut all_items = Vec::new();
+        for (id, entry) in &cache.entries {
+            all_items.push(id.clone());
+            if let Some(name) = entry.data.get("name").and_then(|n| n.as_str()) {
+                all_items.push(name.to_string());
+            }
+        }
+
+        // Use wildcard pattern matching
+        let filtered = filter_by_wildcard(search, &all_items);
+
+        for (id, entry) in &cache.entries {
+            let name = entry
+                .data
+                .get("name")
+                .and_then(|n| n.as_str())
+                .unwrap_or("");
+            if filtered.contains(id) || filtered.contains(&name.to_string()) {
+                matches.push((id, entry));
+            }
+        }
+
+        if matches.is_empty() {
+            println!("No popular licenses found matching '{}'", search);
+            return Ok(());
+        }
+
+        println!(
+            "\x1b[32m✓\x1b[0m Popular licenses matching '{}' ({} found):",
+            search,
+            matches.len()
+        );
+        println!();
+
+        for (id, entry) in matches {
+            if let Some(name) = entry.data.get("name").and_then(|n| n.as_str()) {
+                println!("  \x1b[32m>\x1b[0m {:<20} {}", id, name);
+            } else {
+                println!("{}", id);
+            }
+        }
+
+        return Ok(());
     }
 
-    println!();
-    println!("Use --detailed for more information or omit --popular to see all licenses.");
+    for (id, entry) in &cache.entries {
+        if let Some(name) = entry.data.get("name").and_then(|n| n.as_str()) {
+            println!("  \x1b[32m>\x1b[0m {:<20} {}", id, name);
+        } else {
+            println!("  \x1b[32m>\x1b[0m {:?}", entry.data);
+            println!("  \x1b[32m>\x1b[0m {}", id);
+        }
+    }
 
     Ok(())
 }
 
-fn list_all_licenses(
-    search_term: Option<&str>,
-    detailed: bool,
-    include_deprecated: bool,
-) -> anyhow::Result<()> {
+fn list_all_licenses(args: LicenseArgs) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
 
     let pb = progress::spinner("Fetching SPDX license list...");
@@ -110,7 +153,8 @@ fn list_all_licenses(
         .and_then(|l| l.as_array())
         .ok_or_else(|| anyhow::anyhow!("Failed to parse SPDX licenses list"))?;
 
-    pb.finish_with_message("Successfully fetched licenses");
+    pb.set_message("Successfully fetched licenses");
+    pb.finish_and_clear();
 
     // Filter and collect licenses
     let mut filtered_licenses = Vec::new();
@@ -132,17 +176,45 @@ fn list_all_licenses(
             .unwrap_or(false);
 
         // Skip deprecated licenses unless explicitly requested
-        if is_deprecated && !include_deprecated {
+        if is_deprecated && !args.include_deprecated {
             continue;
         }
 
-        // Apply search filter if provided
-        if let Some(search) = search_term {
-            let search_lower = search.to_lowercase();
-            let id_matches = license_id.to_lowercase().contains(&search_lower);
-            let name_matches = license_name.to_lowercase().contains(&search_lower);
+        // Apply search filter if provided, supporting wildcard patterns (case-insensitive)
+        if let Some(search) = &args.search {
+            let mut search_lower = search.to_lowercase();
+            // If the search does not end with '*' or '?', add a trailing '*'
+            if !search_lower.ends_with('*') && !search_lower.ends_with('?') {
+                search_lower.push('*');
+            }
+            let candidates = vec![license_id.to_lowercase(), license_name.to_lowercase()];
+            let filtered = filter_by_wildcard(&search_lower, &candidates);
 
-            if !id_matches && !name_matches {
+            if !filtered.contains(&license_id.to_lowercase())
+                && !filtered.contains(&license_name.to_lowercase())
+            {
+                continue;
+            }
+        }
+
+        // Filter by OSI-approved if requested
+        if args.osi_approved {
+            let osi_approved = license
+                .get("isOsiApproved")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false);
+            if !osi_approved {
+                continue;
+            }
+        }
+
+        // Filter by FSF libre if requested
+        if args.fsf_libre {
+            let fsf_libre = license
+                .get("isFsfLibre")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false);
+            if !fsf_libre {
                 continue;
             }
         }
@@ -155,7 +227,7 @@ fn list_all_licenses(
 
     // Display results
     if filtered_licenses.is_empty() {
-        if let Some(search) = search_term {
+        if let Some(search) = &args.search {
             println!("No licenses found matching '{}'", search);
         } else {
             println!("No licenses found");
@@ -163,7 +235,7 @@ fn list_all_licenses(
         return Ok(());
     }
 
-    let header = if let Some(search) = search_term {
+    let header = if let Some(search) = &args.search {
         format!("Licenses matching '{}'", search)
     } else {
         "Available SPDX licenses".to_string()
@@ -176,30 +248,10 @@ fn list_all_licenses(
     );
     println!();
 
-    if detailed {
-        display_detailed_licenses(&filtered_licenses)?;
-    } else {
-        display_simple_licenses(&filtered_licenses);
-    }
+    display_simple_licenses(&filtered_licenses);
 
-    if !include_deprecated {
-        let deprecated_count = licenses
-            .iter()
-            .filter(|license| {
-                license
-                    .get("isDeprecatedLicenseId")
-                    .and_then(|d| d.as_bool())
-                    .unwrap_or(false)
-            })
-            .count();
-
-        if deprecated_count > 0 {
-            println!();
-            println!(
-                "Note: {} deprecated licenses are hidden. Use --include-deprecated to show them.",
-                deprecated_count
-            );
-        }
+    if !args.include_deprecated {
+        println!("\nNote:  deprecated licenses are hidden. Use --include-deprecated to show them.");
     }
 
     Ok(())
@@ -213,38 +265,4 @@ fn display_simple_licenses(licenses: &[(&str, &str, bool, &serde_json::Value)]) 
             id, name, deprecated_marker
         );
     }
-}
-
-fn display_detailed_licenses(
-    licenses: &[(&str, &str, bool, &serde_json::Value)],
-) -> anyhow::Result<()> {
-    for (id, name, is_deprecated, license) in licenses {
-        println!("  \x1b[32m>\x1b[0m \x1b[1m{}\x1b[0m", id);
-        println!("    Name: {}", name);
-
-        if *is_deprecated {
-            println!("    \x1b[33mStatus: DEPRECATED\x1b[0m");
-        }
-
-        // Show additional details if available
-        if let Some(reference) = license.get("reference").and_then(|r| r.as_str()) {
-            println!("    URL: {}", reference);
-        }
-
-        if let Some(osi_approved) = license.get("isOsiApproved").and_then(|o| o.as_bool()) {
-            if osi_approved {
-                println!("    \x1b[32mOSI Approved\x1b[0m");
-            }
-        }
-
-        if let Some(fsf_libre) = license.get("isFsfLibre").and_then(|f| f.as_bool()) {
-            if fsf_libre {
-                println!("    \x1b[32mFSF Libre\x1b[0m");
-            }
-        }
-
-        println!();
-    }
-
-    Ok(())
 }
