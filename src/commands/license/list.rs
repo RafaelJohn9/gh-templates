@@ -4,13 +4,17 @@ use crate::utils::progress;
 use crate::utils::remote::Fetcher;
 
 // SPDX license list URL
-use super::{SPDX_LICENSE_LIST_URL, ensure_github_api_license_cache};
+use super::{SPDX_LICENSE_LIST_URL, ensure_github_api_license_cache, ensure_spdx_license_cache};
 
 #[derive(clap::Args)]
 pub struct ListArgs {
     /// Show only popular/common licenses
     #[arg(long, short)]
     pub popular: bool,
+
+    /// non-software licenses
+    #[arg(long, short)]
+    pub non_software: bool,
 
     /// Search for licenses containing this term
     #[arg(long, short)]
@@ -56,6 +60,8 @@ impl super::Runnable for ListArgs {
 
         if self.popular {
             return list_popular_licenses(license_args);
+        } else if self.non_software {
+            return list_non_software_licenses(self.update_cache);
         }
 
         list_all_licenses(license_args)
@@ -265,4 +271,81 @@ fn display_simple_licenses(licenses: &[(&str, &str, bool, &serde_json::Value)]) 
             id, name, deprecated_marker
         );
     }
+}
+
+/// Source: https://choosealicense.com/non-software/
+fn list_non_software_licenses(update_cache: bool) -> anyhow::Result<()> {
+    let mut cache_manager = CacheManager::new()?;
+
+    // License IDs relevant for non-software works
+    // let non_software_license_ids = [
+    //     "CC0-1.0",
+    //     "CC-BY-4.0",
+    //     "CC-BY-SA-4.0",
+    //     "OFL-1.1",
+    //     "CERN-OHL-P-2.0",
+    //     "CERN-OHL-W-2.0",
+    //     "CERN-OHL-S-2.0",
+    // ];
+
+    // Use SPDX cache for license info
+    let cache: Cache<serde_json::Value> =
+        ensure_spdx_license_cache(&mut cache_manager, update_cache)?;
+
+    println!("\x1b[32m✓\x1b[0m Non-Software Licenses:");
+    println!();
+
+    // Data, media, etc.
+    println!("\x1b[1mData, media, etc.\x1b[0m");
+    for id in &["CC0-1.0", "CC-BY-4.0", "CC-BY-SA-4.0"] {
+        if let Some(entry) = cache.entries.get(*id) {
+            let name = entry
+                .data
+                .get("name")
+                .and_then(|n| n.as_str())
+                .unwrap_or(id);
+            println!("  \x1b[32m>\x1b[0m {:<20} {}", id, name);
+        } else {
+            println!("  \x1b[31m!\x1b[0m {:<20} (not found in SPDX cache)", id);
+        }
+    }
+    println!(
+        "    Creative Commons licenses are for non-software material. Not recommended for software/hardware.\n"
+    );
+
+    // Fonts
+    println!("\x1b[1mFonts\x1b[0m");
+    if let Some(entry) = cache.entries.get("OFL-1.1") {
+        let name = entry
+            .data
+            .get("name")
+            .and_then(|n| n.as_str())
+            .unwrap_or("OFL-1.1");
+        println!("  \x1b[32m>\x1b[0m {:<20} {}\n", "OFL-1.1", name);
+    } else {
+        println!(
+            "   \x1b[31m!\x1b[0m {:<20} (not found in SPDX cache)",
+            "OFL-1.1"
+        );
+    }
+
+    // Hardware
+    println!("\x1b[1mHardware\x1b[0m");
+    for id in &["CERN-OHL-P-2.0", "CERN-OHL-W-2.0", "CERN-OHL-S-2.0"] {
+        if let Some(entry) = cache.entries.get(*id) {
+            let name = entry
+                .data
+                .get("name")
+                .and_then(|n| n.as_str())
+                .unwrap_or(id);
+            println!("  \x1b[32m>\x1b[0m {:<20} {}", id, name);
+        } else {
+            println!("  \x1b[31m!\x1b[0m {:<20} (not found in SPDX cache)", id);
+        }
+    }
+    println!();
+
+    println!("For more information, see: https://choosealicense.com/non-software/");
+
+    Ok(())
 }
