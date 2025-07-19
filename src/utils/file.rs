@@ -23,10 +23,25 @@ pub fn save_file(content: &str, filepath: &Path, force: bool) -> Result<()> {
         }
     }
 
+    // Display the resolved path relative to the repo root or current directory
+    let display_path = if let Ok(repo_root) = find_repo_root() {
+        match resolved_path.strip_prefix(&repo_root) {
+            Ok(rel_path) => rel_path.display().to_string(),
+            Err(_) => resolved_path.display().to_string(),
+        }
+    } else if let Ok(current_dir) = std::env::current_dir() {
+        match resolved_path.strip_prefix(&current_dir) {
+            Ok(rel_path) => rel_path.display().to_string(),
+            Err(_) => resolved_path.display().to_string(),
+        }
+    } else {
+        resolved_path.display().to_string()
+    };
+
     if resolved_path.exists() && !force {
         return Err(anyhow::anyhow!(
             "File '{}' already exists. Use --force to overwrite.",
-            resolved_path.display()
+            display_path
         ));
     }
 
