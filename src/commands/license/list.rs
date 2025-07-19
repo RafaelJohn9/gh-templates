@@ -62,10 +62,10 @@ impl super::Runnable for ListArgs {
             return list_popular_licenses(license_args);
         } else if self.non_software {
             return list_non_software_licenses(self.update_cache);
+        } else {
+            list_all_licenses(license_args)
+                .map_err(|e| anyhow::anyhow!("Failed to list licenses: {}", e))
         }
-
-        list_all_licenses(license_args)
-            .map_err(|e| anyhow::anyhow!("Failed to list licenses: {}", e))
     }
 }
 

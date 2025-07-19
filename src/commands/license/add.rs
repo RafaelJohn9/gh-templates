@@ -10,7 +10,10 @@ use crate::utils::file;
 use crate::utils::progress;
 use crate::utils::remote::Fetcher;
 
-use super::{SPDX_LICENSE_DETAILS_BASE_URL, SPDX_LICENSE_LIST_URL, ensure_license_cache};
+use super::{
+    SPDX_CACHE_NAME, SPDX_LICENSE_DETAILS_BASE_URL, SPDX_LICENSE_LIST_URL,
+    ensure_spdx_license_cache,
+};
 
 // Command to add licenses
 #[derive(clap::Args, Debug)]
@@ -35,6 +38,10 @@ pub struct AddArgs {
     #[arg(long, short = 'i')]
     pub interactive: bool,
 
+    /// update the cache
+    #[arg(long)]
+    pub update_cache: bool,
+
     /// Additional parameters for license placeholders (key=value format)
     #[arg(long = "param", value_name = "KEY=VALUE", num_args = 0.., action = clap::ArgAction::Append)]
     pub params: Vec<String>,
@@ -47,6 +54,12 @@ impl super::Runnable for AddArgs {
             Some(d) => d.clone(),
             None => file::find_repo_root().unwrap_or_else(|_| PathBuf::from(".")),
         };
+
+        // if update_cache is set, update the license cache
+        if self.update_cache {
+            let cache_manager = CacheManager::new()?;
+            cache_manager.clear_cache(SPDX_CACHE_NAME)?;
+        }
 
         // Parse parameters into a HashMap
         let mut placeholder_params = HashMap::new();
@@ -61,26 +74,23 @@ impl super::Runnable for AddArgs {
             }
         }
 
+        let config = LicenseDownloadConfig {
+            dir_path: Some(&dir),
+            force: self.force,
+            interactive: self.interactive,
+            placeholder_params: &placeholder_params,
+            update_cache: self.update_cache,
+        };
+
         if self.all {
-            download_all_licenses(
-                Some(&dir),
-                self.force,
-                self.interactive,
-                &placeholder_params,
-            )?;
+            download_all_licenses(&config)?;
         } else if self.licenses.is_empty() {
             return Err(anyhow!(
                 "At least one license ID is required (or use --all)"
             ));
         } else {
             for license_id in &self.licenses {
-                if let Err(e) = download_single_license(
-                    license_id,
-                    Some(&dir),
-                    self.force,
-                    self.interactive,
-                    &placeholder_params,
-                ) {
+                if let Err(e) = download_single_license(license_id, &config) {
                     eprintln!("\x1b[31mFailed to download {}: {}\x1b[0m", license_id, e);
                 }
             }
@@ -93,20 +103,21 @@ impl super::Runnable for AddArgs {
 // Helper functions
 
 // ------------ HANDLE DOWNLOADS ------------
-fn download_single_license(
-    id: &str,
-    dir_path: Option<&PathBuf>,
-    force: bool,
-    interactive: bool,
-    placeholder_params: &HashMap<String, String>,
-) -> Result<()> {
+pub struct LicenseDownloadConfig<'a> {
+    pub dir_path: Option<&'a PathBuf>,
+    pub force: bool,
+    pub interactive: bool,
+    pub placeholder_params: &'a HashMap<String, String>,
+    pub update_cache: bool,
+}
+
+fn download_single_license(id: &str, config: &LicenseDownloadConfig) -> Result<()> {
     let fetcher = Fetcher::new();
 
-    // Use cache for SPDX license ID normalization
     let mut cache_manager = CacheManager::new()?;
-    let license_cache = ensure_license_cache(&mut cache_manager)?;
 
-    // Try to normalize the license ID using the cache (case-insensitive)
+    let license_cache = ensure_spdx_license_cache(&mut cache_manager, config.update_cache)?;
+
     let normalized_id = {
         let id_lower = id.to_lowercase();
         license_cache
@@ -123,11 +134,8 @@ fn download_single_license(
     };
 
     let details_url = format!("{}/{}.json", SPDX_LICENSE_DETAILS_BASE_URL, normalized_id);
+    let pb = progress::spinner(&format!("Fetching license details: {}", id));
 
-    let msg = format!("Fetching license details: {}", id);
-    let pb = progress::spinner(&msg);
-
-    // Fetch the license details JSON
     let license_details = fetcher.fetch_json(&details_url).map_err(|e| {
         anyhow!(
             "Failed to fetch license '{}'. This might not be a valid SPDX license ID. Error: {}",
@@ -138,7 +146,6 @@ fn download_single_license(
 
     pb.set_message("Processing license text");
 
-    // Extract the license text from the JSON
     let license_text = license_details
         .get("licenseText")
         .and_then(|t| t.as_str())
@@ -146,17 +153,16 @@ fn download_single_license(
 
     pb.finish_and_clear();
 
-    // Process placeholders in the license text
-    let processed_text = process_placeholders(license_text, interactive, placeholder_params)?;
+    let processed_text =
+        process_placeholders(license_text, config.interactive, config.placeholder_params)?;
 
-    // Save with standard LICENSE filename
     let dest_filename = format!("LICENSE.{}", normalized_id);
-    let dest_path: PathBuf = match dir_path {
+    let dest_path: PathBuf = match config.dir_path {
         Some(dir) => dir.join(dest_filename),
         None => PathBuf::from(&dest_filename),
     };
 
-    file::save_file(&processed_text, &dest_path, force)?;
+    file::save_file(&processed_text, &dest_path, config.force)?;
 
     println!(
         "\x1b[32m✓\x1b[0m Downloaded and added license: {}",
@@ -166,17 +172,10 @@ fn download_single_license(
     Ok(())
 }
 
-fn download_all_licenses(
-    dir_path: Option<&PathBuf>,
-    force: bool,
-    interactive: bool,
-    placeholder_params: &HashMap<String, String>,
-) -> Result<()> {
+fn download_all_licenses(config: &LicenseDownloadConfig) -> Result<()> {
     let fetcher = Fetcher::new();
 
-    let msg = "Fetching SPDX license list...";
-    let pb = progress::spinner(msg);
-
+    let pb = progress::spinner("Fetching SPDX license list...");
     let licenses_data = fetcher.fetch_json(SPDX_LICENSE_LIST_URL)?;
     pb.set_message("Parsing license list...");
 
@@ -208,9 +207,7 @@ fn download_all_licenses(
             .and_then(|id| id.as_str())
             .ok_or_else(|| anyhow!("License ID not found"))?;
 
-        if let Err(e) =
-            download_single_license(license_id, dir_path, force, interactive, placeholder_params)
-        {
+        if let Err(e) = download_single_license(license_id, config) {
             eprintln!("⚠️  Failed to download {}: {}", license_id, e);
         }
     }
@@ -258,7 +255,7 @@ fn process_placeholders(
         return Ok(license_text.to_string());
     } else if !interactive && placeholder_params.is_empty() {
         println!(
-            "\u{001b}[33m  License contains placeholders. Use --interactive or --param to fill them.\u{001b}[0m"
+            "\u{001b}[33m  License contains placeholders. Use --interactive or --param PLACEHOLDER=VALUE to fill them.\u{001b}[0m"
         );
     }
 

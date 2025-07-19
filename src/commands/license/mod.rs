@@ -17,12 +17,11 @@ const SPDX_LICENSE_LIST_URL: &str =
     "https://raw.githubusercontent.com/spdx/license-list-data/main/json/licenses.json";
 const CHOOSEALICENSE_RAW_BASE_URL: &str =
     "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses";
-const CHOOSEALICENSE_GITHUB_URL: &str =
-    "https://github.com/github/choosealicense.com/tree/gh-pages/_licenses";
+
 const GITHUB_LICENSES_CACHE_NAME: &str = "github_licenses_cache";
 const GITHUB_LICENSE_API_URL: &str = "https://api.github.com/licenses";
 
-const CACHE_NAME: &str = "license_cache";
+const SPDX_CACHE_NAME: &str = "spdx_license_cache";
 
 #[derive(Subcommand)]
 pub enum Command {
@@ -47,13 +46,13 @@ impl Command {
 fn ensure_spdx_license_cache(
     cache_manager: &mut CacheManager,
     update_cache: bool,
-) -> Result<Cache<String>, anyhow::Error> {
+) -> Result<Cache<serde_json::Value>, anyhow::Error> {
     // Only print if we are updating the cache
-    let should_update =
-        cache_manager.should_update_cache::<String>(CACHE_NAME, CACHE_MAX_AGE_SECONDS)?;
+    let should_update = cache_manager
+        .should_update_cache::<serde_json::Value>(SPDX_CACHE_NAME, CACHE_MAX_AGE_SECONDS)?;
 
     if !should_update || update_cache {
-        let cache = cache_manager.load_cache(CACHE_NAME)?;
+        let cache = cache_manager.load_cache(SPDX_CACHE_NAME)?;
         // Only print if running in verbose/debug mode (not implemented here)
         // e.g., println!("Loaded license template cache ({} templates)", cache.entries.len());
         return Ok(cache);
@@ -69,12 +68,9 @@ fn ensure_spdx_license_cache(
 
     if let Some(licenses) = data.get("licenses").and_then(|v| v.as_array()) {
         for entry in licenses {
-            if let (Some(license_id), Some(name)) = (
-                entry.get("licenseId").and_then(|id| id.as_str()),
-                entry.get("name").and_then(|n| n.as_str()),
-            ) {
-                // Use the licenseId as the cache key, and name as the value
-                cache.insert(license_id.to_string(), name.to_string());
+            if let Some(license_id) = entry.get("licenseId").and_then(|id| id.as_str()) {
+                // Use the licenseId as the cache key, and the whole license entry as the value (as JSON string)
+                cache.insert(license_id.to_string(), entry.clone());
             }
         }
     }
@@ -85,7 +81,7 @@ fn ensure_spdx_license_cache(
         cache.entries.len()
     );
 
-    cache_manager.save_cache(CACHE_NAME, &cache)?;
+    cache_manager.save_cache(SPDX_CACHE_NAME, &cache)?;
     Ok(cache)
 }
 
