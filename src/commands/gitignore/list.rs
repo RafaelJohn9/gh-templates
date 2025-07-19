@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::utils::cache::{Cache, CacheManager};
 
-use super::{GITIGNORE_CACHE_NAME, ensure_gitignore_cache};
+use super::ensure_gitignore_cache;
 
 #[derive(clap::Args)]
 pub struct ListArgs {
@@ -27,12 +27,7 @@ impl super::Runnable for ListArgs {
     fn run(&self) -> anyhow::Result<()> {
         let mut cache_manager = CacheManager::new()?;
 
-        // If --update-cache is set, force update the cache before proceeding
-        if self.update_cache {
-            cache_manager.clear_cache(GITIGNORE_CACHE_NAME)?;
-        }
-
-        let cache: Cache<String> = ensure_gitignore_cache(&mut cache_manager)?;
+        let cache: Cache<String> = ensure_gitignore_cache(&mut cache_manager, self.update_cache)?;
 
         // Filter templates based on arguments
         let templates = filter_templates(&cache, self);
