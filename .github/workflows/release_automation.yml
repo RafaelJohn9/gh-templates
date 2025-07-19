@@ -1,8 +1,11 @@
-# .github/workflows/update-readme-version.yml
-name: Update README Version
+# .github/workflows/release-automation.yml
+name: Release Automation
 
 on:
+  workflow_dispatch: # Allows manual triggering of the workflow
   push:
+    branches:
+      - main
     tags:
       - 'v*'  # Triggers on any tag starting with 'v'
 
@@ -10,7 +13,7 @@ permissions:
   contents: write  # Required for pushing changes
 
 jobs:
-  update-readme:
+  update-docs:
     runs-on: ubuntu-latest
     
     steps:
@@ -23,9 +26,11 @@ jobs:
     
     - name: Get the version from tag
       id: get_version
+      if: github.ref_type == 'tag'
       run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
     
     - name: Update README.md
+      if: github.ref_type == 'tag'
       run: |
         VERSION=${{ steps.get_version.outputs.VERSION }}
 
@@ -35,12 +40,25 @@ jobs:
         # Update all GitHub release **download** links
         sed -E -i "s|https://github.com/RafaelJohn9/gh-templates/releases/download/v[0-9]+\.[0-9]+\.[0-9]+|https://github.com/RafaelJohn9/gh-templates/releases/download/$VERSION|g" README.md
 
-    
-    
-    - name: Check if README was modified
+    - name: Install git-cliff
+      uses: taiki-e/install-action@v2
+      with:
+        tool: git-cliff
+
+    - name: Update CHANGELOG
+      run: |
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          # On tag: Generate full history
+          git-cliff --output CHANGELOG.md
+        else
+          # On push to main: Only unreleased changes
+          git-cliff --unreleased --prepend CHANGELOG.md
+        fi
+
+    - name: Check if files were modified
       id: check_changes
       run: |
-        if git diff --quiet README.md; then
+        if git diff --quiet README.md CHANGELOG.md; then
           echo "changed=false" >> $GITHUB_OUTPUT
         else
           echo "changed=true" >> $GITHUB_OUTPUT
@@ -49,9 +67,21 @@ jobs:
     - name: Commit and push changes
       if: steps.check_changes.outputs.changed == 'true'
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add README.md
-        git commit -m "Update README version to ${{ steps.get_version.outputs.VERSION }}"
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        
+        # Add any modified files
+        git add README.md CHANGELOG.md
+        
+        # Create appropriate commit message based on trigger
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          git commit -m "chore: update documentation for ${{ steps.get_version.outputs.VERSION }} [skip ci]"
+        else
+          git commit -m "chore: update CHANGELOG [skip ci]"
+        fi
+        
+        # Pull and push changes
         git pull --rebase origin main
         git push origin main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
