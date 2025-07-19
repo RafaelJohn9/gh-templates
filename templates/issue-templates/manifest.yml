@@ -2,13 +2,13 @@
 
 type: issue
 templates:
-  bug:           bug.yml
-  chore:         chore.yml
-  community:     community.yml
-  docs:          docs.yml
-  dx:            dx.yml
-  feature:       feature.yml
-  refactor:      refactor.yml
-  support:       support.yml
-  technical-debt: technical-debt.yml
-  test:          test.yml
+  - bug.yml
+  - chore.yml
+  - community.yml
+  - docs.yml
+  - dx.yml
+  - feature.yml
+  - refactor.yml
+  - support.yml
+  - technical-debt.yml
+  - test.yml

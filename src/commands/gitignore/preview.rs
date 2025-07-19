@@ -7,8 +7,13 @@ use super::{GITHUB_RAW_BASE, ensure_gitignore_cache, find_template_in_cache};
 
 #[derive(clap::Args)]
 pub struct PreviewArgs {
-    #[arg(allow_hyphen_values = true)]
+    /// Template names to preview (e.g., rust, python, global/windows)
+    #[arg()]
     pub args: Vec<String>,
+
+    /// Update the gitignore cache
+    #[arg(long = "update-cache")]
+    pub update_cache: bool,
 }
 
 impl super::Runnable for PreviewArgs {
@@ -20,7 +25,7 @@ impl super::Runnable for PreviewArgs {
         }
 
         let mut cache_manager = CacheManager::new()?;
-        let cache = ensure_gitignore_cache(&mut cache_manager)?;
+        let cache = ensure_gitignore_cache(&mut cache_manager, self.update_cache)?;
 
         for template_name in &self.args {
             preview_single_template(template_name, &cache)?;
