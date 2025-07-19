@@ -28,6 +28,10 @@ pub struct AddArgs {
     #[arg(long)]
     pub all: bool,
 
+    /// Append to the existing .gitignore file instead of overwriting
+    #[arg(long, short = 'a')]
+    pub append: bool,
+
     /// Update the gitignore cache
     #[arg(long = "update-cache", default_value = "false")]
     pub update_cache: bool,
@@ -51,7 +55,13 @@ impl super::Runnable for AddArgs {
                 "No gitignore template specified. Use `--all` or pass template names."
             ));
         } else {
-            download_templates(&self.templates, dir.as_ref(), self.force, &cache)?;
+            download_templates(
+                &self.templates,
+                dir.as_ref(),
+                self.force,
+                &cache,
+                self.append,
+            )?;
         }
 
         Ok(())
@@ -65,7 +75,13 @@ fn download_all_templates(
 ) -> Result<()> {
     println!("Fetching all gitignore templates...");
 
-    let mut merged_content = String::new();
+    let dest_path = dir_path
+        .map(|p| p.join(".gitignore"))
+        .unwrap_or_else(|| Path::new(OUTPUT_BASE_PATH).join(OUTPUT).join(".gitignore"));
+
+    if force && dest_path.exists() {
+        std::fs::remove_file(&dest_path)?;
+    }
 
     for (key, rel_path_entry) in cache.entries.iter() {
         let fetcher = Fetcher::new();
@@ -77,14 +93,9 @@ fn download_all_templates(
         pb.set_message("Download Complete");
         pb.finish_and_clear();
 
-        merged_content.push_str(&format!("# ===== {}.gitignore =====\n{}\n\n", key, content));
+        let section = format!("# ===== {}.gitignore =====\n{}\n\n", key, content);
+        file::append_file(&section, &dest_path, None)?;
     }
-
-    let dest_path = dir_path
-        .map(|p| p.join(".gitignore"))
-        .unwrap_or_else(|| Path::new(OUTPUT_BASE_PATH).join(OUTPUT).join(".gitignore"));
-
-    file::save_file(&merged_content, &dest_path, force)?;
 
     println!(
         "\x1b[32m✓\x1b[0m Downloaded and merged all gitignore templates to {}",
@@ -99,6 +110,7 @@ fn download_templates(
     dir_path: Option<&PathBuf>,
     force: bool,
     cache: &Cache<String>,
+    append: bool,
 ) -> Result<()> {
     let mut merged_content = String::new();
 
@@ -125,7 +137,11 @@ fn download_templates(
         .map(|p| p.join(".gitignore"))
         .unwrap_or_else(|| Path::new(OUTPUT_BASE_PATH).join(OUTPUT).join(".gitignore"));
 
-    file::save_file(&merged_content, &dest_path, force)?;
+    if append {
+        file::append_file(&merged_content, &dest_path, None)?;
+    } else {
+        file::save_file(&merged_content, &dest_path, force)?;
+    }
 
     println!(
         "\x1b[32m✓\x1b[0m Added gitignore templates: {}",
