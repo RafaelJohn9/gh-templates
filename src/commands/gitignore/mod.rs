@@ -114,7 +114,7 @@ fn ensure_gitignore_cache(
         ("community", "community/"),
     ];
 
-    let mut cache = Cache::new("1.0".to_string());
+    let mut cache = Cache::new();
 
     for (folder, prefix) in folders {
         let url = if folder.is_empty() {

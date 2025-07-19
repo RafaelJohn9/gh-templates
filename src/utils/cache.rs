@@ -8,7 +8,6 @@ use std::time::{SystemTime, UNIX_EPOCH};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CacheMetadata {
     pub last_updated: u64,
-    pub version: String,
     pub total_entries: usize,
 }
 
@@ -27,11 +26,10 @@ pub struct Cache<T> {
 
 #[allow(dead_code)]
 impl<T> Cache<T> {
-    pub fn new(version: String) -> Self {
+    pub fn new() -> Self {
         Self {
             metadata: CacheMetadata {
                 last_updated: 0,
-                version,
                 total_entries: 0,
             },
             entries: HashMap::new(),
@@ -171,14 +169,19 @@ impl CacheManager {
         let cache_file = self.cache_dir.join(format!("{}.json", cache_name));
 
         if !cache_file.exists() {
-            return Ok(Cache::new("1.0".to_string()));
+            return Ok(Cache::new());
         }
 
         let content = fs::read_to_string(&cache_file)
             .with_context(|| format!("Failed to read cache file: {:?}", cache_file))?;
 
-        let cache: Cache<T> = serde_json::from_str(&content)
-            .with_context(|| format!("Failed to parse cache file: {:?}", cache_file))?;
+        let cache: Cache<T> = serde_json::from_str(&content).map_err(|e| {
+            anyhow::anyhow!(
+                "Failed to parse cache file: {:?}\n\nCaused by:\n    {}",
+                cache_file,
+                e
+            )
+        })?;
 
         Ok(cache)
     }
