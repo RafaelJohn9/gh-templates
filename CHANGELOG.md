@@ -7,56 +7,6 @@ All notable changes to this project will be documented in this file.
 
 
 
-### Chore
-
-- addded starter comment at manifest.yml (3436bd3)
-
-- Update dependencies (a7050e2)
-
-
-### Docs
-
-- added inline docs for `help` cmd (23377d0)
-
-
-### Feat
-
-- add refactor issue template for improved code requests (76c01d0)
-
-- add technical debt issue template for reporting and tracking (9cf2322)
-
-- add security issue template for reporting vulnerabilities and data leaks (a69f6c9)
-
-- add chore issue template for reporting tasks that need attention (7443507)
-
-- remove security issue template from issue templates (59e39c5)
-
-- added manifest.yml files to templates dir to correctly map the templates (a9764b4)
-
-- license:list added --non-software (75ce2ce)
-
-- added pattern matching util file (5197ac8)
-
-
-### Refactor
-
-- standardized python ci template structure to be replicable with other languages and frameworks (2201cfa)
-
-- license add subcommand (66fce40)
-
-- license list rs (f348f57)
-
-- list.rs  and cache logic (0d6e34d)
-
-- deprecated versioning in cache and increased verbosity in error handling of load_cache (b31e713)
-
-- removed to be supported soon in utils/file.rs (667c439)
-
-- improved licenses: used an alternative to Github API #107 (c420c7a)
-
-- removed version in cache (b99c0e5)
-
-
 ## [v0.0.52]
 
 
