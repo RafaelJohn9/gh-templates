@@ -7,8 +7,7 @@ use crate::utils::progress;
 use crate::utils::remote::Fetcher;
 
 use super::{
-    GITHUB_RAW_BASE, GITIGNORE_CACHE_NAME, OUTPUT, OUTPUT_BASE_PATH, ensure_gitignore_cache,
-    find_template_in_cache,
+    GITHUB_RAW_BASE, OUTPUT, OUTPUT_BASE_PATH, ensure_gitignore_cache, find_template_in_cache,
 };
 
 #[derive(clap::Args, Debug)]
@@ -38,12 +37,7 @@ impl super::Runnable for AddArgs {
     fn run(&self) -> anyhow::Result<()> {
         let mut cache_manager = CacheManager::new()?;
 
-        // If --update-cache is set, force update the cache before proceeding
-        if self.update_cache {
-            cache_manager.clear_cache(GITIGNORE_CACHE_NAME)?;
-        }
-
-        let cache: Cache<String> = ensure_gitignore_cache(&mut cache_manager)?;
+        let cache: Cache<String> = ensure_gitignore_cache(&mut cache_manager, self.update_cache)?;
 
         let dir = match &self.dir {
             Some(dir) => Some(dir.clone()),

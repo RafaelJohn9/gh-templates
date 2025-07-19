@@ -93,12 +93,13 @@ fn find_template_in_cache<'a>(
 /// Ensures the gitignore cache exists and is up-to-date
 fn ensure_gitignore_cache(
     cache_manager: &mut CacheManager,
+    update_cache: bool,
 ) -> Result<Cache<String>, anyhow::Error> {
     // Only print if we are updating the cache
     let should_update =
         cache_manager.should_update_cache::<String>(GITIGNORE_CACHE_NAME, CACHE_MAX_AGE_SECONDS)?;
 
-    if !should_update {
+    if !should_update && !update_cache {
         let cache = cache_manager.load_cache(GITIGNORE_CACHE_NAME)?;
         // Only print if running in verbose/debug mode (not implemented here)
         // e.g., println!("Loaded gitignore template cache ({} templates)", cache.entries.len());

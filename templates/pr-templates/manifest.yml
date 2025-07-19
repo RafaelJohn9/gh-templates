@@ -2,4 +2,4 @@
 
 type: pull_request
 templates:
-  default: default.md
+  - default.md
