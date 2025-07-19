@@ -24,16 +24,11 @@ jobs:
         with:
           tool: git-cliff
 
-      - name: Clean existing Unreleased section
-        run: |
-          # Always remove Unreleased section first
-          sed -i '/^## \[Unreleased\]/,/^## /{/^## \[Unreleased\]/d; /^## /!d}' CHANGELOG.md || echo "No Unreleased section found"
-
       - name: Update CHANGELOG
         run: |
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             # On tag: Generate full history
-            git-cliff --latest 0 --prepend CHANGELOG.md
+            git-cliff  --output  CHANGELOG.md
           else
             # On push: Only unreleased changes
             git-cliff --unreleased --prepend CHANGELOG.md
