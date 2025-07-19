@@ -1,0 +1,48 @@
+# Manifest file for Python CI templates
+
+type: python      
+templates:
+  build:
+    - poetry.yml
+    - setuptools.yml
+  cache:
+    - pip.yml
+    - poetry.yml
+  coverage-report:
+    - codecov-upload.yml
+    - coverage.yml
+  dependency:
+    - dependency-updates.yml
+    - pip-check.yml
+  docs:
+    - mkdocs.yml
+    - sphinx.yml
+  format:
+    - black.yml
+    - isort.yml
+  install:
+    - matrix-install.yml
+  lint:
+    - black.yml
+    - flake8.yml
+    - pylint.yml
+    - ruff.yml
+  lock-validation:
+    - poetry-lock.yml
+    - setuptools-lock.yml
+  pre-commit:
+    - pre-commit-hooks.yml
+  publish:
+    - pypi.yml
+    - testpypi.yml
+  security:
+    - bandit.yml
+    - pip-audit.yml
+    - safety.yml
+  test:
+    - nose.yml
+    - pytest.yml
+    - unittest.yml
+  typecheck:
+    - mypy.yml
+    - pyright.yml

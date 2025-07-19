@@ -59,7 +59,7 @@ pub fn find_repo_root() -> Result<PathBuf> {
             Some(parent) => current_dir = parent.to_path_buf(),
             None => {
                 return Err(anyhow::anyhow!(
-                    "Not in a git repository.\nPlease specify an output directory using `--dir` (To be supported soon) or run from within a git repository."
+                    "Not in a git repository.\nPlease specify an output directory using `--dir` or run from within a git repository."
                 ));
             }
         }

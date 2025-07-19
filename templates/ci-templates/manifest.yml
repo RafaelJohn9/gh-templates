@@ -1,0 +1,5 @@
+# Manifest file for CI templates
+
+type: ci
+templates:
+  python: python/
