@@ -1,6 +1,9 @@
+use reqwest::blocking::Client;
 use std::collections::HashMap;
 use std::error::Error;
 use std::fmt;
+
+use crate::utils::progress;
 
 // Custom error types
 #[derive(Debug)]
@@ -28,7 +31,7 @@ impl Error for ManifestError {}
 pub struct ManifestNavigator {
     url: String,
     base_url: String,
-    client: reqwest::blocking::Client,
+    client: Client,
 }
 
 #[derive(Debug, Clone)]
@@ -58,12 +61,14 @@ impl ManifestNavigator {
         Ok(Self {
             url: url.to_string(),
             base_url,
-            client: reqwest::blocking::Client::new(),
+            client: Client::new(),
         })
     }
 
     /// Fetch and parse the manifest.yml file
     pub fn fetch_manifest(&self) -> Result<HashMap<String, String>, ManifestError> {
+        let pb = progress::spinner("Fetching manifest...");
+
         let response = self
             .client
             .get(&self.url)
@@ -71,11 +76,14 @@ impl ManifestNavigator {
             .map_err(|e| ManifestError::HttpError(e.to_string()))?;
 
         if !response.status().is_success() {
+            pb.finish_and_clear();
             return Err(ManifestError::NotFound(format!(
                 "Manifest not found at: {}",
                 self.url
             )));
         }
+        pb.set_message("Manifest fetched successfully");
+        pb.finish_and_clear();
 
         let content = response
             .text()
