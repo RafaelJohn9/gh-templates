@@ -1,10 +1,11 @@
 use std::path::{Path, PathBuf};
 
 use crate::utils::file;
+use crate::utils::manifest_navigator::ManifestNavigator;
 use crate::utils::progress;
 use crate::utils::remote::Fetcher;
 
-use super::{GITHUB_API_BASE, GITHUB_RAW_BASE};
+use super::GITHUB_RAW_BASE;
 
 const OUTPUT_BASE_PATH: &str = ".github";
 const OUTPUT: &str = "PULL_REQUEST_TEMPLATE";
@@ -55,23 +56,25 @@ impl super::Runnable for AddArgs {
 // Helper functions
 
 fn download_all_templates(dir_path: Option<&PathBuf>, force: bool) -> anyhow::Result<()> {
-    let fetcher = Fetcher::new();
+    let manifest_url = format!("{}/pr-templates/manifest.yml", GITHUB_RAW_BASE);
+    let manifest_navigator = ManifestNavigator::new(&manifest_url)?;
+    let template_entries = manifest_navigator.list_entries()?;
 
-    println!("Fetching all pull request templates...");
+    let mut errors = Vec::new();
 
-    let url = format!("{}/pr-templates", GITHUB_API_BASE);
-    let entries = fetcher.fetch_json(&url)?;
+    for entry in template_entries {
+        // Remove extension from name for consistency
+        let template_name = match entry.name.rfind('.') {
+            Some(idx) => &entry.name[..idx],
+            None => &entry.name,
+        };
 
-    if let Some(array) = entries.as_array() {
-        for entry in array {
-            if let Some(name) = entry.get("name").and_then(|n| n.as_str()) {
-                let template_name = match name.rfind('.') {
-                    Some(idx) => &name[..idx],
-                    None => name,
-                };
-
-                download_single_template(template_name, dir_path, force)?;
-            }
+        if let Err(e) = download_single_template(template_name, dir_path, force) {
+            eprintln!(
+                "\x1b[31m✗\x1b[0m Failed to add template '{}': {}",
+                template_name, e
+            );
+            errors.push((template_name.to_string(), e));
         }
     }
 
@@ -79,10 +82,15 @@ fn download_all_templates(dir_path: Option<&PathBuf>, force: bool) -> anyhow::Re
     let output_location = dir_path
         .map(|p| p.display().to_string())
         .unwrap_or(default_output);
-    println!(
-        "\x1b[32m✓\x1b[0m Downloaded all pull request templates to {}",
-        output_location
-    );
+
+    if errors.is_empty() {
+        println!(
+            "\x1b[32m✓\x1b[0m Downloaded all pull request templates to {}",
+            output_location
+        );
+    } else {
+        println!("\x1b[33m⚠\x1b[0m Some templates failed to download. See errors above.");
+    }
 
     Ok(())
 }
