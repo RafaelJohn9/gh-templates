@@ -145,6 +145,12 @@ gh-templates license preview mit
 # List available license files
 gh-templates license list
 
+# List popular licenses
+gh-templates license list --popular
+
+# List non software licenses
+gh-templates license list --non-software
+
 # Force overwrite existing file
 gh-templates license add mit --force
 ```
