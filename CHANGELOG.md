@@ -9,6 +9,29 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update dependency (fdedbac)
+
+- update dependency (cabe808)
+
+
+### Feat
+
+- automatic versioning of the tool (bb365f0)
+
+- added checksum (--build-info) (bd39dc6)
+
+
+### Fix
+
+- auto version workflow - to correctly take the correct tag (c2c6a4f)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (7257aa7)
 
 
