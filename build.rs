@@ -1,9 +1,20 @@
 // build.rs
 use regex::Regex;
+use sha2::{Digest, Sha256};
 use std::env;
+use std::fs;
 use std::process::Command;
 
 fn main() {
+    // Generate checksum of this build.rs file
+    let build_rs_checksum = generate_build_rs_checksum().unwrap_or_else(|e| {
+        println!("cargo:warning=Failed to generate build.rs checksum: {}", e);
+        "unknown".to_string()
+    });
+
+    // Generate build time
+    let build_time = chrono::Utc::now().format("%Y-%m-%d").to_string();
+
     // Try multiple sources for version in order of preference
     let version = env::var("APP_VERSION")
         .or_else(|_| get_latest_semantic_git_tag())
@@ -11,9 +22,26 @@ fn main() {
         .unwrap_or_else(|_| env::var("CARGO_PKG_VERSION").unwrap_or("unknown".to_string()));
 
     println!("cargo:rustc-env=APP_VERSION={}", version);
+    println!("cargo:rustc-env=BUILD_RS_CHECKSUM={}", build_rs_checksum);
+    println!("cargo:rustc-env=BUILD_TIME={}", build_time);
     println!("cargo:rerun-if-env-changed=APP_VERSION");
+    println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=.git/HEAD");
     println!("cargo:rerun-if-changed=.git/refs/tags");
+}
+
+fn generate_build_rs_checksum() -> Result<String, Box<dyn std::error::Error>> {
+    // Read the contents of build.rs
+    let build_rs_path = "build.rs";
+    let contents = fs::read_to_string(build_rs_path)?;
+
+    // Create a SHA-256 hasher
+    let mut hasher = Sha256::new();
+    hasher.update(contents.as_bytes());
+    let result = hasher.finalize();
+
+    // Convert to hex string
+    Ok(format!("{:x}", result))
 }
 
 fn get_latest_semantic_git_tag() -> Result<String, Box<dyn std::error::Error>> {
