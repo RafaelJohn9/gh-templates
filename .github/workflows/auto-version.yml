@@ -36,21 +36,17 @@ jobs:
       - name: Get latest tag
         id: get_tag
         run: |
-          # Get the latest tag in v0.0.x format
-          echo "Fetching existing tags..."
-          git tag -l "v0.0.*" | sort -V
-          
-          latest_tag=$(git tag -l "v0.0.*" | sort -V | tail -1)
-          
+          # Get the latest tag matching v*.*.* (ignoring pre-releases and malformed tags)
+          echo "Fetching latest v*.*.* tag..."
+          latest_tag=$(git tag --list "v*.*.*" --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+
           if [ -z "$latest_tag" ]; then
-            # If no tags exist, start with v0.0.1
-            echo "No existing v0.0.* tags found, starting from v0.0.0"
+            echo "No existing v*.*.* tags found, starting from v0.0.0"
             latest_tag="v0.0.0"
           fi
-          
+
           echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
           echo "Latest tag found: $latest_tag"
-
       - name: Calculate new version
         id: new_version
         run: |
