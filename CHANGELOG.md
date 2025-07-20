@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (0e5b27a)
+
+
+## [v0.1.6]
+
+
+
+### Chore
+
 - updated readme with new commands (c31d307)
 
 - update CHANGELOG [skip ci] (3a9165b)
@@ -19,22 +28,15 @@ All notable changes to this project will be documented in this file.
 - added chore, refactor, technical debt isssue templates (e6c7153)
 
 
-## [Unreleased]
-
-
-
-### Chore
-
-- updated readme with new commands (c31d307)
-
-
-## [Unreleased]
+## [v0.1.5]
 
 
 
 ### Chore
 
 - update CHANGELOG [skip ci] (432707e)
+
+- update documentation for v0.1.2 [skip ci] (954f0d2)
 
 
 ## [v0.1.2]
