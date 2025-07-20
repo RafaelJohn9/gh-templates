@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- updated readme with new commands (c31d307)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (432707e)
 
 
