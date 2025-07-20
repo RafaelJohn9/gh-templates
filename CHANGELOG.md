@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (432707e)
+
+
+## [v0.1.2]
+
+
+
+### Chore
+
 - update dependency (fdedbac)
 
 - update dependency (cabe808)
@@ -26,13 +35,15 @@ All notable changes to this project will be documented in this file.
 - auto version workflow - to correctly take the correct tag (c2c6a4f)
 
 
-## [Unreleased]
+## [v0.1.1]
 
 
 
 ### Chore
 
 - update CHANGELOG [skip ci] (7257aa7)
+
+- update documentation for v0.0.58 [skip ci] (2417dec)
 
 
 ## [v0.0.58]
