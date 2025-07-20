@@ -11,6 +11,22 @@ All notable changes to this project will be documented in this file.
 
 - updated readme with new commands (c31d307)
 
+- update CHANGELOG [skip ci] (3a9165b)
+
+
+### Feat
+
+- added chore, refactor, technical debt isssue templates (e6c7153)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
+- updated readme with new commands (c31d307)
+
 
 ## [Unreleased]
 
