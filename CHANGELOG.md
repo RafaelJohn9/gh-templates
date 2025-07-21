@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (c48d4ff)
+
+
+## [v0.1.7]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (0e5b27a)
 
 - update documentation for v0.1.6 [skip ci] (b9c1bc6)
@@ -17,15 +26,6 @@ All notable changes to this project will be documented in this file.
 ### Refactor
 
 - Apache license instead (cd293e4)
-
-
-## [Unreleased]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (0e5b27a)
 
 
 ## [v0.1.6]
