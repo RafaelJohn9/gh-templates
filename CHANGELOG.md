@@ -11,6 +11,22 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (dd9b592)
 
+- update documentation for v0.1.8 [skip ci] (2cdb8dd)
+
+
+### Fix
+
+- delete LICENSE.Apache-2.0 (4b69eaf)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (dd9b592)
+
 
 ## [v0.1.8]
 
