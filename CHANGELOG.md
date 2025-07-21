@@ -7,13 +7,25 @@ All notable changes to this project will be documented in this file.
 
 
 
-## [Unreleased]
+### Chore
+
+- update CHANGELOG [skip ci] (dd9b592)
+
+
+## [v0.1.8]
 
 
 
 ### Chore
 
 - update CHANGELOG [skip ci] (c48d4ff)
+
+- update documentation for v0.1.7 [skip ci] (4c6f08f)
+
+
+### Rename
+
+- LICENSE.Apache-2.0 => LICENSE (8def485)
 
 
 ## [v0.1.7]
