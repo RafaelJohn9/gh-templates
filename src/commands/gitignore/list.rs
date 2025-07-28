@@ -1,3 +1,4 @@
+use colored::*;
 use std::collections::HashMap;
 
 use crate::utils::cache::{Cache, CacheManager};
@@ -95,7 +96,7 @@ fn display_templates(templates: Vec<GitIgnoreTemplate>) {
         return;
     }
 
-    println!("\x1b[32m✓\x1b[0m Available gitignore templates:");
+    println!("{}", "✓ Available gitignore templates:".green());
 
     // Group by category for better display
     let mut by_category: HashMap<String, Vec<&GitIgnoreTemplate>> = HashMap::new();
@@ -109,11 +110,13 @@ fn display_templates(templates: Vec<GitIgnoreTemplate>) {
     for (category, mut templates) in by_category {
         templates.sort_by(|a, b| a.name.cmp(&b.name));
 
-        println!("\n\x1b[1m{}:\x1b[0m", category.to_uppercase());
+        println!("\n{}", category.to_uppercase().bold());
         for template in templates {
             println!(
-                "  \x1b[32m>\x1b[0m {:<20} ({})",
-                template.name, template.path
+                "  {} {:<20} ({})",
+                ">".green(),
+                template.name,
+                template.path
             );
         }
     }

@@ -1,3 +1,5 @@
+use colored::*;
+
 use crate::utils::get_comment;
 use crate::utils::manifest_navigator::ManifestNavigator;
 use crate::utils::remote::Fetcher;
@@ -25,7 +27,7 @@ fn list_all_pr_templates() -> anyhow::Result<()> {
     if template_entries.is_empty() {
         println!("No pull request templates found.");
     } else {
-        println!("\x1b[32m✓\x1b[0m Available pull request templates:");
+        println!("{} Available pull request templates:", "✓".green());
         for entry in template_entries {
             let file_url = &entry.full_url;
             let extension = std::path::Path::new(file_url)
@@ -42,7 +44,7 @@ fn list_all_pr_templates() -> anyhow::Result<()> {
 
             match comment {
                 Some(description) => {
-                    println!("  \x1b[32m>\x1b[0m {:<12} - {}", entry.name, description)
+                    println!("  {} {:<12} - {}", ">".green(), entry.name, description)
                 }
                 None => println!("  {}", entry.name),
             }

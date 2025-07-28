@@ -1,3 +1,5 @@
+use colored::*;
+
 use crate::utils::get_comment;
 use crate::utils::manifest_navigator::ManifestNavigator;
 use crate::utils::remote::Fetcher;
@@ -37,7 +39,8 @@ fn list_all_templates() -> anyhow::Result<()> {
         };
 
         println!(
-            "\x1b[32m> \x1b[0m {} - {}",
+            "{} {} - {}",
+            ">".green(),
             entry.name,
             comment.unwrap_or_default()
         );
