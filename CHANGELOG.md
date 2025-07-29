@@ -9,6 +9,44 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- replaced pull request template with the new one (e1abdfa)
+
+- updated README with installation using installation scripts. (3203082)
+
+- update CHANGELOG [skip ci] (e80224f)
+
+- update documentation for v0.1.9 [skip ci] (54cb113)
+
+
+### Feat
+
+- added installation scripts (5f72244)
+
+
+### Fix
+
+- remove color encodings inside string to use 'colored' lib (b276bd8)
+
+- show all categories by default (6783745)
+
+- license:mod.rs : a logical error on updating cache (fc9da40)
+
+- pr:add:  correctly handled dir output on default template (88ddf51)
+
+- updated default pr templates to be more generic (fc5e5a0)
+
+
+### Tests
+
+- added CLI tests (b394f92)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (e80224f)
 
 
