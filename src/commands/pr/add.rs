@@ -117,12 +117,21 @@ fn download_single_template(
     pb.set_message("Download Complete");
     pb.finish_and_clear();
 
-    let dest_path = if template_name == "default" {
-        Path::new(OUTPUT_BASE_PATH).join("pull_request_template.md")
-    } else {
-        let default_path = Path::new(OUTPUT_BASE_PATH).join(OUTPUT);
-        let base_path = dir_path.map_or(default_path.as_path(), |p| p.as_path());
-        base_path.join(format!("{}.md", template_name))
+    // Determine destination path for the template file
+    let dest_path = {
+        let filename = if template_name == "default" {
+            "pull_request_template.md".to_string()
+        } else {
+            format!("{}.md", template_name)
+        };
+
+        if let Some(dir) = dir_path {
+            dir.join(&filename)
+        } else if template_name == "default" {
+            Path::new(OUTPUT_BASE_PATH).join(&filename)
+        } else {
+            Path::new(OUTPUT_BASE_PATH).join(OUTPUT).join(&filename)
+        }
     };
 
     file::save_file(&content, &dest_path, force)?;
