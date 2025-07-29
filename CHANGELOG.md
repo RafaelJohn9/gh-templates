@@ -3,6 +3,328 @@
 All notable changes to this project will be documented in this file.
 
 
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (e80224f)
+
+
+## [v0.1.9]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (dd9b592)
+
+- update documentation for v0.1.8 [skip ci] (2cdb8dd)
+
+
+### Fix
+
+- delete LICENSE.Apache-2.0 (4b69eaf)
+
+
+## [v0.1.8]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (c48d4ff)
+
+- update documentation for v0.1.7 [skip ci] (4c6f08f)
+
+
+### Rename
+
+- LICENSE.Apache-2.0 => LICENSE (8def485)
+
+
+## [v0.1.7]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (0e5b27a)
+
+- update documentation for v0.1.6 [skip ci] (b9c1bc6)
+
+
+### Refactor
+
+- Apache license instead (cd293e4)
+
+
+## [v0.1.6]
+
+
+
+### Chore
+
+- updated readme with new commands (c31d307)
+
+- update CHANGELOG [skip ci] (3a9165b)
+
+
+### Feat
+
+- added chore, refactor, technical debt isssue templates (e6c7153)
+
+
+## [v0.1.5]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (432707e)
+
+- update documentation for v0.1.2 [skip ci] (954f0d2)
+
+
+## [v0.1.2]
+
+
+
+### Chore
+
+- update dependency (fdedbac)
+
+- update dependency (cabe808)
+
+
+### Feat
+
+- automatic versioning of the tool (bb365f0)
+
+- added checksum (--build-info) (bd39dc6)
+
+
+### Fix
+
+- auto version workflow - to correctly take the correct tag (c2c6a4f)
+
+
+## [v0.1.1]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (7257aa7)
+
+- update documentation for v0.0.58 [skip ci] (2417dec)
+
+
+## [v0.0.58]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (bcca655)
+
+- prettify display output dir (189c74d)
+
+
+### Feat
+
+- added manifest_naviagator in utility mod.rs (1a046d0)
+
+- created append_file function (8157968)
+
+- added --append flag (673bea9)
+
+
+### Feature
+
+- added manifest navigator util file (5f49ee9)
+
+
+### Fix
+
+- fully update CHANGELOG instead of prepending (3713193)
+
+
+### Refactor
+
+- deprecated use of api to use manifest yml files (f919ae4)
+
+- use manifest.yml instead of using github api (22af63f)
+
+- download_all_templates fn to use manifest instead of Github api (bb10a8b)
+
+- combined update changelog and readme version to release automation (566303d)
+
+
+## [v0.0.57]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (5afc51d)
+
+
+### Refactor
+
+- updated ensure gitignore cache to support update cache parameter (abc6959)
+
+- manifest yml (c18924d)
+
+
+## [v0.0.56]
+
+
+
+### Chore
+
+- addded starter comment at manifest.yml (3436bd3)
+
+- Update dependencies (a7050e2)
+
+
+### Docs
+
+- added inline docs for `help` cmd (23377d0)
+
+
+### Feat
+
+- add refactor issue template for improved code requests (76c01d0)
+
+- add technical debt issue template for reporting and tracking (9cf2322)
+
+- add security issue template for reporting vulnerabilities and data leaks (a69f6c9)
+
+- add chore issue template for reporting tasks that need attention (7443507)
+
+- remove security issue template from issue templates (59e39c5)
+
+- added manifest.yml files to templates dir to correctly map the templates (a9764b4)
+
+- license:list added --non-software (75ce2ce)
+
+- added pattern matching util file (5197ac8)
+
+
+### Refactor
+
+- standardized python ci template structure to be replicable with other languages and frameworks (2201cfa)
+
+- license add subcommand (66fce40)
+
+- license list rs (f348f57)
+
+- list.rs  and cache logic (0d6e34d)
+
+- deprecated versioning in cache and increased verbosity in error handling of load_cache (b31e713)
+
+- removed to be supported soon in utils/file.rs (667c439)
+
+- improved licenses: used an alternative to Github API #107 (c420c7a)
+
+- removed version in cache (b99c0e5)
+
+
+## [v0.1.0]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (ed83d80)
+
+
+## [v0.0.55]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (04089ca)
+
+- update README with the refactored  CLI design (a3b7bee)
+
+
+### Feat
+
+- added cache gen utility (1c6b2b0)
+
+- added gitignore add subcmd (eaf1d37)
+
+- added gitignore (eda53fe)
+
+- Cargo.lock (33f8c90)
+
+- added list and preview subcommands in gitignore (aa7431f)
+
+
+### Refactor
+
+- maintainable cli design (62cb312)
+
+- removed the  custom parser (ebb0627)
+
+- removed commonAddArgs in base (c86eada)
+
+- gitignore::list removed complexities (serialization/deserialization) (82a160d)
+
+
+## [v0.0.54]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (74cbd49)
+
+
+### Fix
+
+- Pull request template: removed the non performative part of the syntax (c139f68)
+
+
+## [v0.0.53]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (d75fe63)
+
+
+### Fix
+
+- correct type for 'steps' field in testing issue template (6111dc5)
+
+- correct type for 'steps' field in testing issue template (9461ffe)
+
+- enhance bug report template descriptions to include "_No Response_" option (a57e1f4)
+
+- update community issue template to include "_No Response_" option in descriptions (f8edafa)
+
+- update documentation issue template to clarify "_No Response_" option in descriptions (d95fb79)
+
+- add "_No Response_" option to subcategory and description fields in DX feedback template (7501d50)
+
+- update feature request template to clarify "_No Response_" option in subcategory and description fields (10f27fc)
+
+- update support template to clarify "_No Response_" option in subcategory and question fields (e72155a)
+
+- update testing & QA template to clarify "_No Response_" option in subcategory and description fields (ec41568)
+
+
+### Refactor
+
+- deprecated description field in bug issue template (5510bea)
+
+
 ## [v0.0.52]
 
 
@@ -26,6 +348,41 @@ All notable changes to this project will be documented in this file.
 - removed emojis in PR template (de759eb)
 
 
+## [v0.0.51]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (0ecad29)
+
+
+### Feat
+
+- added pr_template in the repo workflow (96d8399)
+
+
+## [v0.0.50]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (1a35a2a)
+
+- update CHANGELOG [skip ci] (e858214)
+
+
+### Feat
+
+- added pr template integration (b4c60d0)
+
+
+### Refactor
+
+- Adopt Clap Subcommand Pattern for Clean and Extensible CLI Design (3d7df1b)
+
+
 ## [v0.0.49]
 
 
@@ -47,6 +404,41 @@ All notable changes to this project will be documented in this file.
 - added util function save_file (20c5ed5)
 
 
+## [v0.0.48]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (26b911d)
+
+- rename update_changelog.yml to update-changelog.yml for consistency (d6dda59)
+
+
+### Feat
+
+- add licenses (089d63b)
+
+- #30 allow multiple downloads (e3b0e51)
+
+
+### Fix
+
+- surpress dead code warning in remote.rs (dc062fd)
+
+
+### License
+
+- issue.rs to a dir (16655c5)
+
+
+### Refactor
+
+- issue.rs to a dir (e0feebf)
+
+- rm issue.rs and license.rs (a4cf38e)
+
+
 ## [v0.0.47]
 
 
@@ -61,6 +453,124 @@ All notable changes to this project will be documented in this file.
 - update  remote.rs to be standard (df9248c)
 
 
+## [v0.0.46]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (939628f)
+
+
+### Feat
+
+- add GitHub Actions workflow for publishing Python package to PyPI on release (9cf70d6)
+
+- add GitHub Actions workflow for publishing Python package to TestPyPI (770d0f6)
+
+- add GitHub Actions workflow to validate requirements.txt against lock files (4b9ab41)
+
+
+## [v0.0.45]
+
+
+
+### Restructure
+
+- Organize CI templates into group-specific subfolders (2aadf62)
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (7ef4982)
+
+- update CHANGELOG [skip ci] (fd876fa)
+
+
+### Feat
+
+- add Flake8 GitHub Actions workflow for PEP8 compliance (b9a503d)
+
+- add GitHub Actions workflow for Black code formatter (beb7f08)
+
+- add GitHub Actions workflow for Ruff code linter and formatter (6ec904b)
+
+- add GitHub Actions workflow for Pylint code quality check (c72c721)
+
+- add GitHub Actions workflow for Mypy static type checking (022f0f8)
+
+- add GitHub Actions workflow for Pyright type checking (52be534)
+
+- add GitHub Actions workflow for Pytest testing (8f532ca)
+
+- add GitHub Actions workflow for Unittest testing suite (fde7f81)
+
+- add GitHub Actions workflow for Nose2 test suite (afa17a0)
+
+- add GitHub Actions workflow for generating code coverage reports (528a5f1)
+
+- add GitHub Actions workflow for uploading coverage reports to Codecov (8eded48)
+
+- add GitHub Actions workflow for building Python packages with Poetry (f05362d)
+
+- add GitHub Actions workflow for building documentation with MkDocs (bf133db)
+
+- add GitHub Actions workflow for auto-formatting code with Black (6d04102)
+
+- add GitHub Actions workflow for sorting and grouping imports with isort (1d4a216)
+
+- add GitHub Actions workflow for building documentation with Sphinx (fabf852)
+
+- add GitHub Actions workflow for building documentation with MkDocs (b21a6a0)
+
+- add GitHub Actions workflow for Bandit security scan (150f405)
+
+- add GitHub Actions workflow for Safety security scan (a2aef6b)
+
+- add GitHub Actions workflow for pip-audit security scan (e3a8743)
+
+- add GitHub Actions workflow for checking dependency updates (4d039e2)
+
+- add GitHub Actions workflow for pip dependency check (8f32c28)
+
+- add GitHub Actions workflow for matrix installability check across multiple Python/OS versions (619dbcf)
+
+- add GitHub Actions workflow for running pre-commit hooks on Python files (e92382e)
+
+- add GitHub Actions workflow for caching Poetry dependencies (c68d07d)
+
+- add GitHub Actions workflow for caching pip dependencies (d894c1f)
+
+- add GitHub Actions workflow for validating poetry.lock against pyproject.toml (87be0fd)
+
+
+### Fix
+
+- correct comment formatting in coverage.yml (5e85372)
+
+- update Python version matrix to allow for flexible version specification (d3df8e3)
+
+- update Ruff command to explicitly check code quality (829c847)
+
+- update GitHub Actions workflow to build Python package using setuptools (d9f83d5)
+
+
+## [v0.0.44]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (ab2c33b)
+
+- update CHANGELOG [skip ci] (c2a3c27)
+
+
+### Fix
+
+- installation instructions: made it clearer (e29fd27)
+
+
 ## [v0.0.43]
 
 
@@ -68,6 +578,56 @@ All notable changes to this project will be documented in this file.
 ### Fix
 
 - syntax error in change log update workflow (8bf28b7)
+
+
+## [v0.0.42]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (5c4f775)
+
+
+### Fix
+
+- added rebase on changelog update workflow  and readme update workflow (34e6205)
+
+
+## [v0.0.41]
+
+
+
+### Fix
+
+- run: 16012346792 (fc00066)
+
+
+## [v0.0.40]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (3fda110)
+
+
+## [v0.0.39]
+
+
+
+### Feat
+
+- updated README:: piece of info to new contributors (0e2b1ae)
+
+
+### Fix
+
+- update README to read the latest version (add3290)
+
+- enforced semantic versioning in build yml, updated changelog yml logic (87c1b23)
+
+- run: 16012293293 (71d000c)
 
 
 ## [v0.0.38]
