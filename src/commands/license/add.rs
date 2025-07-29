@@ -3,6 +3,7 @@ use std::io::{self, Write};
 use std::path::PathBuf;
 
 use anyhow::{Result, anyhow};
+use colored::*;
 use regex::Regex;
 
 use crate::utils::cache::CacheManager;
@@ -91,7 +92,10 @@ impl super::Runnable for AddArgs {
         } else {
             for license_id in &self.licenses {
                 if let Err(e) = download_single_license(license_id, &config) {
-                    eprintln!("\x1b[31mFailed to download {}: {}\x1b[0m", license_id, e);
+                    eprintln!(
+                        "{}",
+                        format!("Failed to download {}: {}", license_id, e).red()
+                    );
                 }
             }
         }
@@ -165,7 +169,8 @@ fn download_single_license(id: &str, config: &LicenseDownloadConfig) -> Result<(
     file::save_file(&processed_text, &dest_path, config.force)?;
 
     println!(
-        "\x1b[32m✓\x1b[0m Downloaded and added license: {}",
+        "{} Downloaded and added license: {}",
+        "✓".green(),
         dest_path.display()
     );
 
@@ -208,7 +213,10 @@ fn download_all_licenses(config: &LicenseDownloadConfig) -> Result<()> {
             .ok_or_else(|| anyhow!("License ID not found"))?;
 
         if let Err(e) = download_single_license(license_id, config) {
-            eprintln!("⚠️  Failed to download {}: {}", license_id, e);
+            eprintln!(
+                "{}",
+                format!("⚠️  Failed to download {}: {}", license_id, e).red()
+            );
         }
     }
 
@@ -239,12 +247,13 @@ fn process_placeholders(
     }
 
     if placeholders.is_empty() {
-        println!("\x1b[32m✓\x1b[0m No placeholders found in license text.");
+        println!("{}", "✓ No placeholders found in license text.".green());
 
         // Warn about unused parameters when no placeholders exist
         if !placeholder_params.is_empty() {
             println!(
-                "\x1b[33m⚠\x1b[0m Warning: {} parameter(s) provided but no placeholders found:",
+                "{} {} parameter(s) provided but no placeholders found:",
+                "⚠".yellow(),
                 placeholder_params.len()
             );
             for (key, _) in placeholder_params {
@@ -255,7 +264,8 @@ fn process_placeholders(
         return Ok(license_text.to_string());
     } else if !interactive && placeholder_params.is_empty() {
         println!(
-            "\u{001b}[33m  License contains placeholders. Use --interactive or --param PLACEHOLDER=VALUE to fill them.\u{001b}[0m"
+            "{} License contains placeholders. Use --interactive or --param PLACEHOLDER=VALUE to fill them.",
+            "⚠".yellow()
         );
     }
 
@@ -317,7 +327,8 @@ fn process_placeholders(
 
     if !unused_params.is_empty() {
         println!(
-            "\x1b[33m⚠\x1b[0m Warning: {} unused parameter(s):",
+            "{} Warning: {} unused parameter(s):",
+            "⚠".yellow(),
             unused_params.len()
         );
         for param in unused_params {
@@ -329,7 +340,8 @@ fn process_placeholders(
     // Warning for unfilled placeholders
     if !unfilled_placeholders.is_empty() {
         println!(
-            "\x1b[33m⚠\x1b[0m Warning: {} placeholder(s) remain unfilled:",
+            "{} Warning: {} placeholder(s) remain unfilled:",
+            "⚠".yellow(),
             unfilled_placeholders.len()
         );
         for ph in &unfilled_placeholders {
@@ -342,12 +354,14 @@ fn process_placeholders(
     let filled_count = placeholders.len() - unfilled_placeholders.len();
     if filled_count > 0 {
         println!(
-            "\x1b[32m✓\x1b[0m Filled {} out of {} placeholder(s).",
+            "{} Filled {} out of {} placeholder(s).",
+            "✓".green(),
             filled_count,
             placeholders.len()
         );
         println!(
-            "\x1b[33m⚠ Please carefully review the license text above for any missed or incorrect placeholders.\x1b[0m"
+            "{} Please carefully review the license text above for any missed or incorrect placeholders.",
+            "⚠".yellow()
         );
     }
 

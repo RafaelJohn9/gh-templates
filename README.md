@@ -28,66 +28,94 @@ You can download the latest alpha release binaries for your platform from the `/
 
 To download, visit the [releases page](https://github.com/rafaeljohn9/gh-templates/releases) and select the appropriate binary for your OS and architecture. Verify the SHA256 checksum after downloading.
 
+---
+
 ## Installation
 
-Below are installation instructions for each supported platform. These commands will download the binary, rename it to `gh-templates`, make it executable, and move it to your local `~/.local/bin` (create the directory if it doesn't exist). Adjust the path if you prefer a different location.
+### Quick Install (Recommended)
 
-### Linux (x86_64, GNU)
+Install `gh-templates` automatically with a single command:
+
+#### Linux/macOS
+
+```bash
+curl -sSL https://raw.githubusercontent.com/RafaelJohn9/gh-templates/main/install/install.sh | bash
+```
+
+#### Windows (PowerShell)
+
+```powershell
+iwr -useb https://raw.githubusercontent.com/RafaelJohn9/gh-templates/main/install/install.ps1 | iex
+```
+
+The installer automatically:
+
+- Detects your OS and architecture
+- Downloads the latest version
+- Installs to the appropriate location (`~/.local/bin` on Linux/macOS, `~/bin` on Windows)
+- Makes the binary executable
+
+> **Note**: Make sure your install directory is in your `PATH`. On Linux/macOS, you may need to add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile.
+
+---
+
+### Manual Installation
+
+If you prefer to install manually, download the appropriate binary for your platform:
+
+#### Linux (x86_64, GNU)
 
 ```sh
-wget https://github.com/RafaelJohn9/gh-templates/releases/download/v0.1.9/gh-templates-x86_64-unknown-linux-gnu
+wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-x86_64-unknown-linux-gnu
 chmod +x gh-templates-x86_64-unknown-linux-gnu
 mkdir -p ~/.local/bin
 mv gh-templates-x86_64-unknown-linux-gnu ~/.local/bin/gh-templates
 ```
 
-### Linux (x86_64, musl)
+#### Linux (x86_64, musl)
 
 ```sh
-wget https://github.com/RafaelJohn9/gh-templates/releases/download/v0.1.9/gh-templates-x86_64-unknown-linux-musl
+wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-x86_64-unknown-linux-musl
 chmod +x gh-templates-x86_64-unknown-linux-musl
 mkdir -p ~/.local/bin
 mv gh-templates-x86_64-unknown-linux-musl ~/.local/bin/gh-templates
 ```
 
-### Linux (aarch64)
+#### Linux (aarch64)
 
 ```sh
-wget https://github.com/RafaelJohn9/gh-templates/releases/download/v0.1.9/gh-templates-aarch64-unknown-linux-gnu
+wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-aarch64-unknown-linux-gnu
 chmod +x gh-templates-aarch64-unknown-linux-gnu
 mkdir -p ~/.local/bin
 mv gh-templates-aarch64-unknown-linux-gnu ~/.local/bin/gh-templates
 ```
 
-### macOS (Apple Silicon)
+#### macOS (Apple Silicon)
 
 ```sh
-curl -LO https://github.com/RafaelJohn9/gh-templates/releases/download/v0.1.9/gh-templates-aarch64-apple-darwin
+curl -LO https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-aarch64-apple-darwin
 chmod +x gh-templates-aarch64-apple-darwin
 mkdir -p ~/.local/bin
 mv gh-templates-aarch64-apple-darwin ~/.local/bin/gh-templates
 ```
 
-### macOS (Intel)
+#### macOS (Intel)
 
 ```sh
-curl -LO https://github.com/RafaelJohn9/gh-templates/releases/download/v0.1.9/gh-templates-x86_64-apple-darwin
+curl -LO https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-x86_64-apple-darwin
 chmod +x gh-templates-x86_64-apple-darwin
 mkdir -p ~/.local/bin
 mv gh-templates-x86_64-apple-darwin ~/.local/bin/gh-templates
 ```
 
-### Windows (x86_64)
-
-Download the binary manually or use PowerShell:
+#### Windows (x86_64)
 
 ```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\bin"
-Invoke-WebRequest -Uri "https://github.com/RafaelJohn9/gh-templates/releases/download/v0.1.9/gh-templates-x86_64-pc-windows-gnu.exe" -OutFile "$env:USERPROFILE\bin\gh-templates.exe"
+Invoke-WebRequest -Uri "https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-x86_64-pc-windows-gnu.exe" -OutFile "$env:USERPROFILE\bin\gh-templates.exe"
 ```
 
-Make sure `$env:USERPROFILE\bin` is in your `PATH`.
-
+> **Note**: Make sure `$env:USERPROFILE\bin` is in your `PATH` environment variable.
 ---
 
 ## Example Usage

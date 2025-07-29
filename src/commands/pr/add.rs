@@ -1,3 +1,4 @@
+use colored::*;
 use std::path::{Path, PathBuf};
 
 use crate::utils::file;
@@ -71,8 +72,10 @@ fn download_all_templates(dir_path: Option<&PathBuf>, force: bool) -> anyhow::Re
 
         if let Err(e) = download_single_template(template_name, dir_path, force) {
             eprintln!(
-                "\x1b[31m✗\x1b[0m Failed to add template '{}': {}",
-                template_name, e
+                "{} Failed to add template '{}': {}",
+                "✗".red(),
+                template_name,
+                e
             );
             errors.push((template_name.to_string(), e));
         }
@@ -85,11 +88,15 @@ fn download_all_templates(dir_path: Option<&PathBuf>, force: bool) -> anyhow::Re
 
     if errors.is_empty() {
         println!(
-            "\x1b[32m✓\x1b[0m Downloaded all pull request templates to {}",
+            "{} Downloaded all pull request templates to {}",
+            "✓".green(),
             output_location
         );
     } else {
-        println!("\x1b[33m⚠\x1b[0m Some templates failed to download. See errors above.");
+        println!(
+            "{} Some templates failed to download. See errors above.",
+            "⚠".yellow()
+        );
     }
 
     Ok(())
@@ -110,17 +117,26 @@ fn download_single_template(
     pb.set_message("Download Complete");
     pb.finish_and_clear();
 
-    let dest_path = if template_name == "default" {
-        Path::new(OUTPUT_BASE_PATH).join("pull_request_template.md")
-    } else {
-        let default_path = Path::new(OUTPUT_BASE_PATH).join(OUTPUT);
-        let base_path = dir_path.map_or(default_path.as_path(), |p| p.as_path());
-        base_path.join(format!("{}.md", template_name))
+    // Determine destination path for the template file
+    let dest_path = {
+        let filename = if template_name == "default" {
+            "pull_request_template.md".to_string()
+        } else {
+            format!("{}.md", template_name)
+        };
+
+        if let Some(dir) = dir_path {
+            dir.join(&filename)
+        } else if template_name == "default" {
+            Path::new(OUTPUT_BASE_PATH).join(&filename)
+        } else {
+            Path::new(OUTPUT_BASE_PATH).join(OUTPUT).join(&filename)
+        }
     };
 
     file::save_file(&content, &dest_path, force)?;
 
-    println!("\x1b[32m✓\x1b[0m {} - has beed added.", dest_path.display());
+    println!("{} {} - has been added.", "✓".green(), dest_path.display());
 
     Ok(())
 }
