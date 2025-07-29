@@ -1,7 +1,10 @@
+use colored::*;
+
 use super::{
     CHOOSEALICENSE_RAW_BASE_URL, SPDX_LICENSE_DETAILS_BASE_URL, SPDX_LICENSE_LIST_URL,
     ensure_spdx_license_cache,
 };
+
 use crate::utils::cache::{Cache, CacheManager};
 use crate::utils::remote::Fetcher;
 use serde::{Deserialize, Serialize};
@@ -62,7 +65,8 @@ impl super::Runnable for PreviewArgs {
             .unwrap_or((normalized_id.clone(), serde_json::Value::Null));
 
         println!(
-            "\x1b[36mLicense:\x1b[0m {} ({})\n",
+            "{} {} ({})\n",
+            "License:".cyan(),
             license_json
                 .get("name")
                 .and_then(|n| n.as_str())
@@ -164,7 +168,7 @@ fn show_description(
 ) -> anyhow::Result<()> {
     // Show the license description from ChooseALicense if available,
     // otherwise fallback to SPDX metadata if present.
-    println!("\x1b[36mDescription:\x1b[0m");
+    println!("{}", "Description:".cyan());
 
     // Try ChooseALicense description first
     if let Some(meta) = choosealicense_meta {
@@ -197,7 +201,7 @@ fn show_permissions(
     license_metadata: Option<&serde_json::Value>,
     choosealicense: Option<&ChooseALicenseFile>,
 ) -> anyhow::Result<()> {
-    println!("\x1b[32mPermissions:\x1b[0m");
+    println!("{}", "Permissions:".green());
     if let Some(meta) = choosealicense {
         if let Some(perms) = &meta.meta.permissions {
             for perm in perms {
@@ -230,7 +234,7 @@ fn show_limitations(
     license_metadata: Option<&serde_json::Value>,
     choosealicense: Option<&ChooseALicenseFile>,
 ) -> anyhow::Result<()> {
-    println!("\x1b[31mLimitations:\x1b[0m");
+    println!("{}", "Limitations:".red());
     if let Some(meta) = choosealicense {
         if let Some(lims) = &meta.meta.limitations {
             for lim in lims {
@@ -263,7 +267,7 @@ fn show_conditions(
     license_metadata: Option<&serde_json::Value>,
     choosealicense: Option<&ChooseALicenseFile>,
 ) -> anyhow::Result<()> {
-    println!("\x1b[33mConditions:\x1b[0m");
+    println!("{}", "Conditions:".yellow());
     if let Some(meta) = choosealicense {
         if let Some(conds) = &meta.meta.conditions {
             for cond in conds {
@@ -293,7 +297,7 @@ fn show_conditions(
 }
 
 fn show_spdx_metadata(license_metadata: &serde_json::Value) -> anyhow::Result<()> {
-    println!("\x1b[36mSPDX Metadata:\x1b[0m");
+    println!("{}", "SPDX Metadata:".cyan());
 
     if let Some(license_id) = license_metadata.get("licenseId").and_then(|id| id.as_str()) {
         println!("  License ID: {}", license_id);
@@ -318,9 +322,9 @@ fn show_spdx_metadata(license_metadata: &serde_json::Value) -> anyhow::Result<()
         .and_then(|d| d.as_bool())
     {
         if deprecated {
-            println!("  \x1b[33mStatus: DEPRECATED\x1b[0m");
+            println!("  {}", "Status: DEPRECATED".yellow());
             if let Some(details_url) = license_metadata.get("detailsUrl").and_then(|d| d.as_str()) {
-                println!("      \x1b[33mSee details: {}\x1b[0m", details_url);
+                println!("      {}", format!("See details: {}", details_url).yellow());
             }
         }
     }
@@ -331,7 +335,7 @@ fn show_spdx_metadata(license_metadata: &serde_json::Value) -> anyhow::Result<()
 fn show_full_license(url: &str) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
 
-    println!("\x1b[36mLicense Text:\x1b[0m");
+    println!("{}", "License Text:".cyan());
     println!("{}", "─".repeat(80));
 
     match fetcher.fetch_json(url) {

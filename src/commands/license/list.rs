@@ -1,3 +1,5 @@
+use colored::*;
+
 use crate::utils::cache::{Cache, CacheManager};
 use crate::utils::pattern::filter_by_wildcard;
 use crate::utils::progress;
@@ -116,7 +118,8 @@ fn list_popular_licenses(args: LicenseArgs) -> anyhow::Result<()> {
         }
 
         println!(
-            "\x1b[32m✓\x1b[0m Popular licenses matching '{}' ({} found):",
+            "{} Popular licenses matching '{}' ({} found):",
+            "✓".green(),
             search,
             matches.len()
         );
@@ -124,7 +127,7 @@ fn list_popular_licenses(args: LicenseArgs) -> anyhow::Result<()> {
 
         for (id, entry) in matches {
             if let Some(name) = entry.data.get("name").and_then(|n| n.as_str()) {
-                println!("  \x1b[32m>\x1b[0m {:<20} {}", id, name);
+                println!("  {} {:<20} {}", ">".green(), id, name);
             } else {
                 println!("{}", id);
             }
@@ -135,10 +138,10 @@ fn list_popular_licenses(args: LicenseArgs) -> anyhow::Result<()> {
 
     for (id, entry) in &cache.entries {
         if let Some(name) = entry.data.get("name").and_then(|n| n.as_str()) {
-            println!("  \x1b[32m>\x1b[0m {:<20} {}", id, name);
+            println!("  {} {:<20} {}", ">".green(), id, name);
         } else {
-            println!("  \x1b[32m>\x1b[0m {:?}", entry.data);
-            println!("  \x1b[32m>\x1b[0m {}", id);
+            println!("  {} {:<20} {:?}", ">".green(), id, entry.data);
+            println!("  {} {}", ">".green(), id);
         }
     }
 
@@ -248,7 +251,8 @@ fn list_all_licenses(args: LicenseArgs) -> anyhow::Result<()> {
     };
 
     println!(
-        "\x1b[32m✓\x1b[0m {} ({} found):",
+        "{} {} ({} found):",
+        "✓".green(),
         header,
         filtered_licenses.len()
     );
@@ -267,8 +271,11 @@ fn display_simple_licenses(licenses: &[(&str, &str, bool, &serde_json::Value)]) 
     for (id, name, is_deprecated, _) in licenses {
         let deprecated_marker = if *is_deprecated { " (deprecated)" } else { "" };
         println!(
-            "  \x1b[32m>\x1b[0m {:<20} {}{}",
-            id, name, deprecated_marker
+            "  {} {:<20} {}{}",
+            ">".green(),
+            id,
+            name,
+            deprecated_marker.yellow()
         );
     }
 }
@@ -292,11 +299,11 @@ fn list_non_software_licenses(update_cache: bool) -> anyhow::Result<()> {
     let cache: Cache<serde_json::Value> =
         ensure_spdx_license_cache(&mut cache_manager, update_cache)?;
 
-    println!("\x1b[32m✓\x1b[0m Non-Software Licenses:");
+    println!("{}", "✓ Non-Software Licenses:".green());
     println!();
 
     // Data, media, etc.
-    println!("\x1b[1mData, media, etc.\x1b[0m");
+    println!("{}", "Data, media, etc.".bold());
     for id in &["CC0-1.0", "CC-BY-4.0", "CC-BY-SA-4.0"] {
         if let Some(entry) = cache.entries.get(*id) {
             let name = entry
@@ -304,9 +311,14 @@ fn list_non_software_licenses(update_cache: bool) -> anyhow::Result<()> {
                 .get("name")
                 .and_then(|n| n.as_str())
                 .unwrap_or(id);
-            println!("  \x1b[32m>\x1b[0m {:<20} {}", id, name);
+            println!("  {} {:<20} {}", ">".green(), id, name);
         } else {
-            println!("  \x1b[31m!\x1b[0m {:<20} (not found in SPDX cache)", id);
+            println!(
+                "  {} {:<20} {}",
+                "!".red(),
+                id,
+                "(not found in SPDX cache)".yellow()
+            );
         }
     }
     println!(
@@ -314,23 +326,25 @@ fn list_non_software_licenses(update_cache: bool) -> anyhow::Result<()> {
     );
 
     // Fonts
-    println!("\x1b[1mFonts\x1b[0m");
+    println!("{}", "Fonts".bold());
     if let Some(entry) = cache.entries.get("OFL-1.1") {
         let name = entry
             .data
             .get("name")
             .and_then(|n| n.as_str())
             .unwrap_or("OFL-1.1");
-        println!("  \x1b[32m>\x1b[0m {:<20} {}\n", "OFL-1.1", name);
+        println!("  {} {:<20} {}\n", ">".green(), "OFL-1.1", name);
     } else {
         println!(
-            "   \x1b[31m!\x1b[0m {:<20} (not found in SPDX cache)",
-            "OFL-1.1"
+            "  {} {:<20} {}",
+            "!".red(),
+            "OFL-1.1",
+            "(not found in SPDX cache)".yellow()
         );
     }
 
     // Hardware
-    println!("\x1b[1mHardware\x1b[0m");
+    println!("{}", "Hardware".bold());
     for id in &["CERN-OHL-P-2.0", "CERN-OHL-W-2.0", "CERN-OHL-S-2.0"] {
         if let Some(entry) = cache.entries.get(*id) {
             let name = entry
@@ -338,9 +352,14 @@ fn list_non_software_licenses(update_cache: bool) -> anyhow::Result<()> {
                 .get("name")
                 .and_then(|n| n.as_str())
                 .unwrap_or(id);
-            println!("  \x1b[32m>\x1b[0m {:<20} {}", id, name);
+            println!("  {} {:<20} {}", ">".green(), id, name);
         } else {
-            println!("  \x1b[31m!\x1b[0m {:<20} (not found in SPDX cache)", id);
+            println!(
+                "  {} {:<20} {}",
+                "!".red(),
+                id,
+                "(not found in SPDX cache)".yellow()
+            );
         }
     }
     println!();

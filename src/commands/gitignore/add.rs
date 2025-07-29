@@ -1,5 +1,7 @@
-use anyhow::Result;
 use std::path::{Path, PathBuf};
+
+use anyhow::Result;
+use colored::*;
 
 use crate::utils::cache::{Cache, CacheManager};
 use crate::utils::file;
@@ -98,7 +100,8 @@ fn download_all_templates(
     }
 
     println!(
-        "\x1b[32m✓\x1b[0m Downloaded and merged all gitignore templates to {}",
+        "{} Downloaded and merged all gitignore templates to {}",
+        "✓".green(),
         dest_path.display()
     );
 
@@ -144,7 +147,8 @@ fn download_templates(
     }
 
     println!(
-        "\x1b[32m✓\x1b[0m Added gitignore templates: {}",
+        "{} Added gitignore templates: {}",
+        "✓".green(),
         templates.join(", ")
     );
 

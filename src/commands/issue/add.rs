@@ -1,3 +1,4 @@
+use colored::*;
 use std::path::{Path, PathBuf};
 
 use crate::utils::file;
@@ -66,8 +67,10 @@ fn download_all_templates(dir_path: Option<&PathBuf>, force: bool) -> anyhow::Re
 
         if let Err(e) = download_single_template(template_name, dir_path, force) {
             eprintln!(
-                "\x1b[31m✗\x1b[0m Failed to add template '{}': {}",
-                template_name, e
+                "{} Failed to add template '{}': {}",
+                "✗".red(),
+                template_name,
+                e
             );
             errors.push((template_name.to_string(), e));
         }
@@ -80,11 +83,15 @@ fn download_all_templates(dir_path: Option<&PathBuf>, force: bool) -> anyhow::Re
 
     if errors.is_empty() {
         println!(
-            "\x1b[32m✓\x1b[0m Downloaded all issue templates to {}",
+            "{} Downloaded all issue templates to {}",
+            "✓".green(),
             output_location
         );
     } else {
-        println!("\x1b[33m⚠\x1b[0m Some templates failed to download. See errors above.");
+        println!(
+            "{} Some templates failed to download. See errors above.",
+            "⚠".yellow()
+        );
     }
 
     Ok(())
@@ -111,7 +118,7 @@ fn download_single_template(
 
     file::save_file(&content, &dest_path, force)?;
 
-    println!("\x1b[32m✓\x1b[0m Added template: {}", template_name);
+    println!("{} Added template: {}", "✓".green(), template_name);
 
     Ok(())
 }
