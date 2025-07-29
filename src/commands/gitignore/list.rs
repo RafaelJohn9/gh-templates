@@ -52,8 +52,8 @@ fn filter_templates(cache: &Cache<String>, args: &ListArgs) -> Vec<GitIgnoreTemp
 
     // Determine which categories to include
     let show_popular = args.popular || (!args.popular && !args.global && !args.community);
-    let show_global = args.global;
-    let show_community = args.community;
+    let show_global = args.global || (!args.popular && !args.global && !args.community);
+    let show_community = args.community || (!args.popular && !args.global && !args.community);
 
     for (key, entry) in &cache.entries {
         let path = &entry.data;
