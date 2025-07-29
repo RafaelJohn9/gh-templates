@@ -9,45 +9,18 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
-- replaced pull request template with the new one (e1abdfa)
-
-- updated README with installation using installation scripts. (3203082)
-
-- update CHANGELOG [skip ci] (e80224f)
-
-- update documentation for v0.1.9 [skip ci] (54cb113)
+- update CHANGELOG [skip ci] (10ff7f1)
 
 
-### Feat
-
-- added installation scripts (5f72244)
-
-
-### Fix
-
-- remove color encodings inside string to use 'colored' lib (b276bd8)
-
-- show all categories by default (6783745)
-
-- license:mod.rs : a logical error on updating cache (fc9da40)
-
-- pr:add:  correctly handled dir output on default template (88ddf51)
-
-- updated default pr templates to be more generic (fc5e5a0)
-
-
-### Tests
-
-- added CLI tests (b394f92)
-
-
-## [Unreleased]
+## [v0.1.10]
 
 
 
 ### Chore
 
 - update CHANGELOG [skip ci] (e80224f)
+
+- update documentation for v0.1.9 [skip ci] (54cb113)
 
 
 ## [v0.1.9]
@@ -104,14 +77,7 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
-- updated readme with new commands (c31d307)
-
 - update CHANGELOG [skip ci] (3a9165b)
-
-
-### Feat
-
-- added chore, refactor, technical debt isssue templates (e6c7153)
 
 
 ## [v0.1.5]
@@ -123,29 +89,6 @@ All notable changes to this project will be documented in this file.
 - update CHANGELOG [skip ci] (432707e)
 
 - update documentation for v0.1.2 [skip ci] (954f0d2)
-
-
-## [v0.1.2]
-
-
-
-### Chore
-
-- update dependency (fdedbac)
-
-- update dependency (cabe808)
-
-
-### Feat
-
-- automatic versioning of the tool (bb365f0)
-
-- added checksum (--build-info) (bd39dc6)
-
-
-### Fix
-
-- auto version workflow - to correctly take the correct tag (c2c6a4f)
 
 
 ## [v0.1.1]
@@ -167,38 +110,6 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (bcca655)
 
-- prettify display output dir (189c74d)
-
-
-### Feat
-
-- added manifest_naviagator in utility mod.rs (1a046d0)
-
-- created append_file function (8157968)
-
-- added --append flag (673bea9)
-
-
-### Feature
-
-- added manifest navigator util file (5f49ee9)
-
-
-### Fix
-
-- fully update CHANGELOG instead of prepending (3713193)
-
-
-### Refactor
-
-- deprecated use of api to use manifest yml files (f919ae4)
-
-- use manifest.yml instead of using github api (22af63f)
-
-- download_all_templates fn to use manifest instead of Github api (bb10a8b)
-
-- combined update changelog and readme version to release automation (566303d)
-
 
 ## [v0.0.57]
 
@@ -207,67 +118,6 @@ All notable changes to this project will be documented in this file.
 ### Chore
 
 - update CHANGELOG [skip ci] (5afc51d)
-
-
-### Refactor
-
-- updated ensure gitignore cache to support update cache parameter (abc6959)
-
-- manifest yml (c18924d)
-
-
-## [v0.0.56]
-
-
-
-### Chore
-
-- addded starter comment at manifest.yml (3436bd3)
-
-- Update dependencies (a7050e2)
-
-
-### Docs
-
-- added inline docs for `help` cmd (23377d0)
-
-
-### Feat
-
-- add refactor issue template for improved code requests (76c01d0)
-
-- add technical debt issue template for reporting and tracking (9cf2322)
-
-- add security issue template for reporting vulnerabilities and data leaks (a69f6c9)
-
-- add chore issue template for reporting tasks that need attention (7443507)
-
-- remove security issue template from issue templates (59e39c5)
-
-- added manifest.yml files to templates dir to correctly map the templates (a9764b4)
-
-- license:list added --non-software (75ce2ce)
-
-- added pattern matching util file (5197ac8)
-
-
-### Refactor
-
-- standardized python ci template structure to be replicable with other languages and frameworks (2201cfa)
-
-- license add subcommand (66fce40)
-
-- license list rs (f348f57)
-
-- list.rs  and cache logic (0d6e34d)
-
-- deprecated versioning in cache and increased verbosity in error handling of load_cache (b31e713)
-
-- removed to be supported soon in utils/file.rs (667c439)
-
-- improved licenses: used an alternative to Github API #107 (c420c7a)
-
-- removed version in cache (b99c0e5)
 
 
 ## [v0.1.0]
@@ -287,7 +137,46 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (04089ca)
 
+
+## [v0.0.54]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (74cbd49)
+
+
+## [v0.0.53]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (d75fe63)
+
 - update README with the refactored  CLI design (a3b7bee)
+
+- addded starter comment at manifest.yml (3436bd3)
+
+- Update dependencies (a7050e2)
+
+- prettify display output dir (189c74d)
+
+- update dependency (fdedbac)
+
+- update dependency (cabe808)
+
+- updated readme with new commands (c31d307)
+
+- replaced pull request template with the new one (e1abdfa)
+
+- updated README with installation using installation scripts. (3203082)
+
+
+### Docs
+
+- added inline docs for `help` cmd (23377d0)
 
 
 ### Feat
@@ -302,39 +191,40 @@ All notable changes to this project will be documented in this file.
 
 - added list and preview subcommands in gitignore (aa7431f)
 
+- add refactor issue template for improved code requests (76c01d0)
 
-### Refactor
+- add technical debt issue template for reporting and tracking (9cf2322)
 
-- maintainable cli design (62cb312)
+- add security issue template for reporting vulnerabilities and data leaks (a69f6c9)
 
-- removed the  custom parser (ebb0627)
+- add chore issue template for reporting tasks that need attention (7443507)
 
-- removed commonAddArgs in base (c86eada)
+- remove security issue template from issue templates (59e39c5)
 
-- gitignore::list removed complexities (serialization/deserialization) (82a160d)
+- added manifest.yml files to templates dir to correctly map the templates (a9764b4)
+
+- license:list added --non-software (75ce2ce)
+
+- added pattern matching util file (5197ac8)
+
+- added manifest_naviagator in utility mod.rs (1a046d0)
+
+- created append_file function (8157968)
+
+- added --append flag (673bea9)
+
+- automatic versioning of the tool (bb365f0)
+
+- added checksum (--build-info) (bd39dc6)
+
+- added chore, refactor, technical debt isssue templates (e6c7153)
+
+- added installation scripts (5f72244)
 
 
-## [v0.0.54]
+### Feature
 
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (74cbd49)
-
-
-### Fix
-
-- Pull request template: removed the non performative part of the syntax (c139f68)
-
-
-## [v0.0.53]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (d75fe63)
+- added manifest navigator util file (5f49ee9)
 
 
 ### Fix
@@ -357,10 +247,67 @@ All notable changes to this project will be documented in this file.
 
 - update testing & QA template to clarify "_No Response_" option in subcategory and description fields (ec41568)
 
+- Pull request template: removed the non performative part of the syntax (c139f68)
+
+- fully update CHANGELOG instead of prepending (3713193)
+
+- auto version workflow - to correctly take the correct tag (c2c6a4f)
+
+- remove color encodings inside string to use 'colored' lib (b276bd8)
+
+- show all categories by default (6783745)
+
+- license:mod.rs : a logical error on updating cache (fc9da40)
+
+- pr:add:  correctly handled dir output on default template (88ddf51)
+
+- updated default pr templates to be more generic (fc5e5a0)
+
 
 ### Refactor
 
 - deprecated description field in bug issue template (5510bea)
+
+- maintainable cli design (62cb312)
+
+- removed the  custom parser (ebb0627)
+
+- removed commonAddArgs in base (c86eada)
+
+- gitignore::list removed complexities (serialization/deserialization) (82a160d)
+
+- standardized python ci template structure to be replicable with other languages and frameworks (2201cfa)
+
+- license add subcommand (66fce40)
+
+- license list rs (f348f57)
+
+- list.rs  and cache logic (0d6e34d)
+
+- deprecated versioning in cache and increased verbosity in error handling of load_cache (b31e713)
+
+- removed to be supported soon in utils/file.rs (667c439)
+
+- improved licenses: used an alternative to Github API #107 (c420c7a)
+
+- removed version in cache (b99c0e5)
+
+- updated ensure gitignore cache to support update cache parameter (abc6959)
+
+- manifest yml (c18924d)
+
+- deprecated use of api to use manifest yml files (f919ae4)
+
+- use manifest.yml instead of using github api (22af63f)
+
+- download_all_templates fn to use manifest instead of Github api (bb10a8b)
+
+- combined update changelog and readme version to release automation (566303d)
+
+
+### Tests
+
+- added CLI tests (b394f92)
 
 
 ## [v0.0.52]
