@@ -11,6 +11,53 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (10ff7f1)
 
+- update documentation for v0.1.10 [skip ci] (f48203c)
+
+
+### Docs
+
+- updated license test doc (2868a36)
+
+
+### Feat
+
+- support using filename and custom name (b1710dc)
+
+- add output param (e79b7d4)
+
+- added output arg in license subcommand (044319e)
+
+- added output arg in pr subcommand (df22fe7)
+
+
+### Fix
+
+- added requires templates inside output arg (81dc582)
+
+- centralized saved file logging inside file::save_file (0031a56)
+
+
+### Test
+
+- test_gitignore_add_valid_and_invalid_template (639fcc2)
+
+- added tests to the output param (af9e48f)
+
+- added output argument tests (a405394)
+
+- added output arg license tests (a243e96)
+
+- added output arg pr tests (6464a74)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (10ff7f1)
+
 
 ## [v0.1.10]
 
