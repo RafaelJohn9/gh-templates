@@ -13,6 +13,19 @@ All notable changes to this project will be documented in this file.
 
 - update documentation for v0.1.11 [skip ci] (1b5025d)
 
+- update CHANGELOG [skip ci] (ac2cdba)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (240d83b)
+
+- update documentation for v0.1.11 [skip ci] (1b5025d)
+
 
 ## [Unreleased]
 
