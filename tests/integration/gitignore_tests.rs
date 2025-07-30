@@ -267,6 +267,54 @@ fn test_gitignore_add_valid_and_invalid_template() {
     assert!(!content.contains("not-a-template"));
 }
 
+#[test]
+fn test_gitignore_add_default_with_output() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    // Add rust template with output file .gitignore
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&["gitignore", "add", "rust", "-o", ".gitignore"])
+        .assert()
+        .success()
+        .stdout(
+            predicate::str::contains("Added gitignore templates").or(predicate::str::contains("✓")),
+        );
+
+    assert_file_exists(&temp_path.join(".gitignore"));
+    assert_file_contains(&temp_path.join(".gitignore"), "Rust");
+}
+
+#[test]
+fn test_gitignore_add_multiple_templates_uneven_output_files() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    // Pass 3 output files for 2 templates (should error)
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&[
+        "gitignore",
+        "add",
+        "python",
+        "rust",
+        "-o",
+        "Python.gitignore",
+        "Rust.gitignore",
+        "Ada.gitignore",
+    ])
+    .assert()
+    .failure()
+    .stderr(predicate::str::contains(
+        "Number of output files must be either 1 or match the number of templates when not using --use-remote-name",
+    ));
+}
+
 // --------     LIST COMMAND TESTS     --------
 
 #[test]
