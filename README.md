@@ -11,7 +11,7 @@ This repository provides a collection of reusable Git templates to streamline yo
 
 - [Contributing](#contributing)
 - [Features](#features)
-- [Alpha Release Downloads](#alpha-release-downloads)
+- [Beta Release Downloads](#beta-release-downloads)
 - [Installation](#installation)
   - [Quick Install (Recommended)](#quick-install-recommended)
   - [Manual Installation](#manual-installation)
@@ -24,7 +24,7 @@ This repository provides a collection of reusable Git templates to streamline yo
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions from everyone! Don’t worry if you’re not familiar with Rust—the project is primarily composed of YAML files (for workflows), Markdown files (for templates and documentation), and license files. Rust is only used for the CLI interface.
 
@@ -37,7 +37,7 @@ Your ideas and participation are valued, and we’re happy to support you as you
 
 ---
 
-## ✨ Features
+## Features
 
 - **Issue Templates**: Standardized templates for bug reports, feature requests, documentation, community collaboration, developer experience feedback, support questions, and tests.
 - **Pull Request Templates**: Easily add consistent PR templates to your repositories.
@@ -46,7 +46,7 @@ Your ideas and participation are valued, and we’re happy to support you as you
 
 ---
 
-## 🧪 Beta Release Downloads
+## Beta Release Downloads
 
 You can download the latest alpha release binaries for your platform from the `/releases/<tag>` directory. These are currently available as artifacts for different operating systems and architectures:
 
@@ -63,9 +63,9 @@ To download, visit the [releases page](https://github.com/rafaeljohn9/gh-templat
 
 ---
 
-## 🔧 Installation
+## Installation
 
-### 🚀 Quick Install (Recommended)
+### Quick Install (Recommended)
 
 Install `gh-templates` automatically with a single command:
 
@@ -91,7 +91,7 @@ iwr -useb https://raw.githubusercontent.com/RafaelJohn9/gh-templates/main/instal
 
 ---
 
-### 🛠️ Manual Installation
+### Manual Installation
 
 If you prefer to install manually, download the appropriate binary for your platform:
 
@@ -151,7 +151,7 @@ Invoke-WebRequest -Uri "https://github.com/RafaelJohn9/gh-templates/releases/lat
 
 ---
 
-## 🧪 Example Usage
+## Example Usage
 
 Below are some example commands for using `gh-templates` to add templates to your repository:
 
@@ -159,7 +159,7 @@ Below are some example commands for using `gh-templates` to add templates to you
 > It is recommended you use the labels from this repository by running:  
 > `gh label clone rafaeljohn9/gh-templates`
 
-### 🐛 Issue Templates
+### Issue Templates
 
 ```sh
 # Add an issue template
@@ -175,7 +175,7 @@ gh-templates issue preview bug
 gh-templates issue list
 ```
 
-### 🔄 Pull Request Templates
+### Pull Request Templates
 
 ```sh
 # Add a PR template
@@ -191,7 +191,7 @@ gh-templates pr list
 gh-templates pr add bug --output .github/pull_request_template.md
 ```
 
-### 📜 License Files
+### License Files
 
 ```sh
 # Add a LICENSE file (MIT)
@@ -216,7 +216,7 @@ gh-templates license list --non-software
 gh-templates license add mit --force
 ```
 
-### 🚫 Gitignore Files
+### Gitignore Files
 
 ```sh
 # Add a .gitignore for Rust
@@ -232,7 +232,7 @@ gh-templates gitignore preview Rust
 gh-templates gitignore list
 ```
 
-### 🧭 Code of Conduct (Coming Soon)
+### Code of Conduct (Coming Soon)
 
 ```sh
 # Add a code of conduct file (not yet available)
