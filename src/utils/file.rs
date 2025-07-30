@@ -1,8 +1,9 @@
-use anyhow::Result;
 use std::fs;
-use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::{Path, PathBuf};
+
+use anyhow::Result;
+use colored::*;
 
 /// Save content to a file with path resolution middleware
 pub fn save_file(content: &str, filepath: &Path, force: bool) -> Result<()> {
@@ -48,6 +49,8 @@ pub fn save_file(content: &str, filepath: &Path, force: bool) -> Result<()> {
     }
 
     fs::write(resolved_path, content)?;
+
+    println!("{} {} - has been added.", "✓".green(), display_path);
     Ok(())
 }
 
@@ -79,7 +82,7 @@ pub fn append_file(content: &str, filepath: &Path, line_position: Option<usize>)
     match line_position {
         None => {
             // Simple append at the end
-            let mut file = OpenOptions::new()
+            let mut file = fs::OpenOptions::new()
                 .create(true)
                 .append(true)
                 .open(&resolved_path)?;

@@ -241,8 +241,6 @@ fn test_gitignore_add_update_cache() {
 }
 
 #[test]
-#[ignore]
-// TODO we should support this case forcing a clear separation of adding templates
 fn test_gitignore_add_valid_and_invalid_template() {
     let temp_dir = setup_test_env();
     let temp_path = temp_dir.path().to_path_buf();

@@ -127,13 +127,6 @@ fn download_all_templates(
 
             let section = format!("# ===== {} =====\n{}\n\n", remote_filename, content);
             file::save_file(&section, &dest_path, force)?;
-
-            println!(
-                "{} Downloaded gitignore template: {} to {}",
-                "✓".green(),
-                remote_filename,
-                dest_path.display()
-            );
         }
     } else {
         // Merge all templates into a single .gitignore file
@@ -212,13 +205,6 @@ fn download_templates(
             } else {
                 file::save_file(&section, &dest_path, force)?;
             }
-
-            println!(
-                "{} Added gitignore template: {} to {}",
-                "✓".green(),
-                template_name,
-                dest_path.display()
-            );
         }
     } else if output.len() == templates.len() {
         // Save each template to its own file as specified in output
@@ -252,41 +238,57 @@ fn download_templates(
             );
         }
     } else if output.len() == 1 {
-        // Merge all templates into one file
+        // Merge all templates into one file, but skip invalid templates and collect errors
         let mut merged_content = String::new();
+        let mut errors = Vec::new();
 
         for template_name in templates {
-            let template_path = find_template_in_cache(template_name, cache)?;
-            let url = format!("{}/{}", GITHUB_RAW_BASE, template_path);
+            match find_template_in_cache(template_name, cache) {
+                Ok(template_path) => {
+                    let url = format!("{}/{}", GITHUB_RAW_BASE, template_path);
 
-            let msg = format!("Downloading gitignore template: {}", template_name);
-            let pb = progress::spinner(&msg);
-            let content = fetcher.fetch_content(&url)?;
-            pb.set_message("Download Complete");
-            pb.finish_and_clear();
-
-            merged_content.push_str(&format!(
-                "# ===== {}.gitignore =====\n{}\n\n",
-                template_name, content
-            ));
+                    let msg = format!("Downloading gitignore template: {}", template_name);
+                    let pb = progress::spinner(&msg);
+                    match fetcher.fetch_content(&url) {
+                        Ok(content) => {
+                            pb.set_message("Download Complete");
+                            pb.finish_and_clear();
+                            merged_content.push_str(&format!(
+                                "# ===== {}.gitignore =====\n{}\n\n",
+                                template_name, content
+                            ));
+                        }
+                        Err(e) => {
+                            pb.finish_and_clear();
+                            errors.push(format!(
+                                "Failed to fetch template '{}': {}",
+                                template_name, e
+                            ));
+                        }
+                    }
+                }
+                Err(e) => {
+                    errors.push(format!("Template '{}' not found: {}", template_name, e));
+                }
+            }
         }
 
         let dest_path = dir_path
             .map(|p| p.join(&output[0]))
             .unwrap_or_else(|| Path::new(OUTPUT_BASE_PATH).join(OUTPUT).join(&output[0]));
 
-        if append {
-            file::append_file(&merged_content, &dest_path, None)?;
-        } else {
-            file::save_file(&merged_content, &dest_path, force)?;
+        if !merged_content.is_empty() {
+            if append {
+                file::append_file(&merged_content, &dest_path, None)?;
+            } else {
+                file::save_file(&merged_content, &dest_path, force)?;
+            }
         }
 
-        println!(
-            "{} Added gitignore templates: {} to {}",
-            "✓".green(),
-            templates.join(", "),
-            dest_path.display()
-        );
+        // Print errors for invalid templates
+        for error in errors {
+            eprintln!("{}", error.red());
+        }
     } else {
         return Err(anyhow::anyhow!(
             "Number of output files must be either 1 or match the number of templates when not using --use-remote-name"

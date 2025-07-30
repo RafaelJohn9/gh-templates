@@ -165,7 +165,5 @@ fn download_single_template(
 
     file::save_file(&content, &dest_path, force)?;
 
-    println!("{} {} - has been added.", "✓".green(), dest_path.display());
-
     Ok(())
 }

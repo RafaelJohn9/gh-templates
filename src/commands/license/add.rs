@@ -195,12 +195,6 @@ fn download_single_license(
 
     file::save_file(&processed_text, &dest_path, config.force)?;
 
-    println!(
-        "{} Downloaded and added license: {}",
-        "✓".green(),
-        dest_path.display()
-    );
-
     Ok(())
 }
 
