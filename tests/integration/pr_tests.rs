@@ -11,6 +11,10 @@ This test suite covers the following scenarios:
 - `test_pr_add_force_overwrite`: Tests that an existing PR template file is not overwritten unless the `--force` flag is used.
 - `test_pr_add_invalid_type`: Confirms that an unknown PR template type returns an appropriate error.
 - `test_pr_add_unknown_argument`: Checks that an unknown argument results in an error.
+- `test_pr_add_valid_and_invalid_template`: Tests adding both a valid and an invalid PR template in one command, ensuring the valid template is still created.
+- `test_pr_add_default_with_output_without_ext`: Tests adding a default PR template with an output name that does not have an extension.
+- `test_pr_add_default_with_output_with_ext`: Tests adding a default PR template with an output name that has an extension.
+- `test_pr_add_uneven_templates_and_outputs`: Ensures that an error is raised when the number of templates does not match the number of output file names.
 - `test_pr_list`: Ensures the list command displays available PR templates.
 - `test_pr_preview_single`: Validates that the preview command displays the content of a PR template.
 - `test_pr_preview_invalid_id`: Ensures that an invalid PR template ID results in an error.
@@ -21,9 +25,7 @@ Each test uses a temporary directory to avoid side effects and leverages `assert
 use predicates::prelude::*;
 
 // Import utility functions
-use crate::common::test_utils::{
-    assert_file_contains, assert_file_exists, create_git_repo, setup_test_env,
-};
+use crate::common::test_utils::{assert_file_exists, create_git_repo, setup_test_env};
 
 // --------     ADD COMMAND TESTS     --------
 
@@ -126,6 +128,74 @@ fn test_pr_add_unknown_argument() {
         ));
 }
 
+#[test]
+fn test_pr_add_valid_and_invalid_template() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    // Add both a valid and an invalid template in a single command
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&["pr", "add", "default", "invalid-template"])
+        .assert()
+        .failure()
+        .stderr(
+            predicate::str::contains("Not Found").or(predicate::str::contains("invalid-template")),
+        );
+
+    // The valid template should still be added
+    assert_file_exists(&temp_path.join(".github/pull_request_template.md"));
+}
+
+#[test]
+fn test_pr_add_default_with_output_without_ext() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&["pr", "add", "default", "-o", "default"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("default.md - has been added."));
+}
+
+#[test]
+fn test_pr_add_default_with_output_with_ext() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&["pr", "add", "default", "-o", "default.md"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("default.md - has been added."));
+}
+
+#[test]
+fn test_pr_add_uneven_templates_and_outputs() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    // Provide two templates but only one output file name
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&["pr", "add", "default", "default", "-o", "file1.md"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains(
+            "The number of templates and output file names must match.",
+        ));
+}
 // --------     LIST COMMAND TESTS     --------
 
 #[test]

@@ -34,6 +34,10 @@ pub struct AddArgs {
     /// Update the pull request template cache
     #[arg(long = "update-cache", default_value = "false")]
     pub update_cache: bool,
+
+    /// Output file names for the templates (in order of templates)
+    #[arg(short = 'o', long, value_name = "OUTPUT", num_args = 1.., requires = "templates")]
+    pub output: Vec<String>,
 }
 
 impl super::Runnable for AddArgs {
@@ -45,8 +49,24 @@ impl super::Runnable for AddArgs {
                 "No pull request template specified. Use `--all` or pass template names."
             ));
         } else {
-            for template_name in &self.templates {
-                download_single_template(template_name, self.dir.as_ref(), self.force)?;
+            if !self.output.is_empty() {
+                if self.output.len() != self.templates.len() {
+                    return Err(anyhow::anyhow!(
+                        "The number of templates and output file names must match."
+                    ));
+                }
+                for (template_name, output_name) in self.templates.iter().zip(self.output.iter()) {
+                    download_single_template(
+                        template_name,
+                        self.dir.as_ref(),
+                        self.force,
+                        Some(output_name.clone()),
+                    )?;
+                }
+            } else {
+                for template_name in &self.templates {
+                    download_single_template(template_name, self.dir.as_ref(), self.force, None)?;
+                }
             }
         }
 
@@ -70,7 +90,7 @@ fn download_all_templates(dir_path: Option<&PathBuf>, force: bool) -> anyhow::Re
             None => &entry.name,
         };
 
-        if let Err(e) = download_single_template(template_name, dir_path, force) {
+        if let Err(e) = download_single_template(template_name, dir_path, force, None) {
             eprintln!(
                 "{} Failed to add template '{}': {}",
                 "✗".red(),
@@ -106,6 +126,7 @@ fn download_single_template(
     template_name: &str,
     dir_path: Option<&PathBuf>,
     force: bool,
+    output: Option<String>,
 ) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
 
@@ -119,7 +140,15 @@ fn download_single_template(
 
     // Determine destination path for the template file
     let dest_path = {
-        let filename = if template_name == "default" {
+        let filename = if let Some(ref output_name) = output {
+            // If output does not have an extension, add .md
+            // Technical debt: This approach reduces flexibility by assuming .md extension if not specified.
+            if Path::new(output_name).extension().is_none() {
+                format!("{}.md", output_name)
+            } else {
+                output_name.clone()
+            }
+        } else if template_name == "default" {
             "pull_request_template.md".to_string()
         } else {
             format!("{}.md", template_name)
@@ -135,8 +164,6 @@ fn download_single_template(
     };
 
     file::save_file(&content, &dest_path, force)?;
-
-    println!("{} {} - has been added.", "✓".green(), dest_path.display());
 
     Ok(())
 }
