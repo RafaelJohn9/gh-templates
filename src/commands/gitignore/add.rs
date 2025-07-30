@@ -37,6 +37,20 @@ pub struct AddArgs {
     /// Update the gitignore cache
     #[arg(long = "update-cache", default_value = "false")]
     pub update_cache: bool,
+
+    /// Use the remote template file name as the output file name
+    #[arg(long = "use-remote-name", short = 'n', default_value_t = false)]
+    pub use_remote_name: bool,
+
+    /// Output file name (default: .gitignore)
+    #[arg(
+        long = "output",
+        short = 'o',
+        value_name = "FILENAME",
+        num_args = 1.., // Accepts one or more values
+        default_value = ".gitignore"
+    )]
+    pub output: Vec<String>,
 }
 
 impl super::Runnable for AddArgs {
@@ -51,7 +65,7 @@ impl super::Runnable for AddArgs {
         };
 
         if self.all {
-            download_all_templates(dir.as_ref(), self.force, &cache)?;
+            download_all_templates(dir.as_ref(), self.force, &cache, self.use_remote_name)?;
         } else if self.templates.is_empty() {
             return Err(anyhow::anyhow!(
                 "No gitignore template specified. Use `--all` or pass template names."
@@ -60,9 +74,11 @@ impl super::Runnable for AddArgs {
             download_templates(
                 &self.templates,
                 dir.as_ref(),
+                &self.output,
                 self.force,
                 &cache,
                 self.append,
+                self.use_remote_name,
             )?;
         }
 
@@ -74,36 +90,79 @@ fn download_all_templates(
     dir_path: Option<&PathBuf>,
     force: bool,
     cache: &Cache<String>,
+    use_remote_name: bool,
 ) -> Result<()> {
     println!("Fetching all gitignore templates...");
+    let fetcher = Fetcher::new();
 
-    let dest_path = dir_path
-        .map(|p| p.join(".gitignore"))
-        .unwrap_or_else(|| Path::new(OUTPUT_BASE_PATH).join(OUTPUT).join(".gitignore"));
+    if use_remote_name {
+        // Save each template as its remote filename (e.g., Python.gitignore)
+        for (_key, rel_path_entry) in cache.entries.iter() {
+            let url = format!("{}/{}", GITHUB_RAW_BASE, rel_path_entry.data);
 
-    if force && dest_path.exists() {
-        std::fs::remove_file(&dest_path)?;
+            // Extract remote filename from rel_path_entry.data
+            let remote_filename = Path::new(&rel_path_entry.data)
+                .file_name()
+                .and_then(|s| s.to_str())
+                .ok_or_else(|| anyhow::anyhow!("Invalid template path: {}", rel_path_entry.data))?;
+
+            let dest_path = dir_path
+                .map(|p| p.join(remote_filename))
+                .unwrap_or_else(|| {
+                    Path::new(OUTPUT_BASE_PATH)
+                        .join(OUTPUT)
+                        .join(remote_filename)
+                });
+
+            if force && dest_path.exists() {
+                std::fs::remove_file(&dest_path)?;
+            }
+
+            let msg = format!("Downloading gitignore template: {}", remote_filename);
+            let pb = progress::spinner(&msg);
+            let content = fetcher.fetch_content(&url)?;
+            pb.set_message("Download Complete");
+            pb.finish_and_clear();
+
+            let section = format!("# ===== {} =====\n{}\n\n", remote_filename, content);
+            file::save_file(&section, &dest_path, force)?;
+
+            println!(
+                "{} Downloaded gitignore template: {} to {}",
+                "✓".green(),
+                remote_filename,
+                dest_path.display()
+            );
+        }
+    } else {
+        // Merge all templates into a single .gitignore file
+        let dest_path = dir_path
+            .map(|p| p.join(".gitignore"))
+            .unwrap_or_else(|| Path::new(OUTPUT_BASE_PATH).join(OUTPUT).join(".gitignore"));
+
+        if force && dest_path.exists() {
+            std::fs::remove_file(&dest_path)?;
+        }
+
+        for (key, rel_path_entry) in cache.entries.iter() {
+            let url = format!("{}/{}", GITHUB_RAW_BASE, rel_path_entry.data);
+
+            let msg = format!("Downloading gitignore template: {}", key);
+            let pb = progress::spinner(&msg);
+            let content = fetcher.fetch_content(&url)?;
+            pb.set_message("Download Complete");
+            pb.finish_and_clear();
+
+            let section = format!("# ===== {}.gitignore =====\n{}\n\n", key, content);
+            file::append_file(&section, &dest_path, None)?;
+        }
+
+        println!(
+            "{} Downloaded and merged all gitignore templates to {}",
+            "✓".green(),
+            dest_path.display()
+        );
     }
-
-    for (key, rel_path_entry) in cache.entries.iter() {
-        let fetcher = Fetcher::new();
-        let url = format!("{}/{}", GITHUB_RAW_BASE, rel_path_entry.data);
-
-        let msg = format!("Downloading gitignore template: {}", key);
-        let pb = progress::spinner(&msg);
-        let content = fetcher.fetch_content(&url)?;
-        pb.set_message("Download Complete");
-        pb.finish_and_clear();
-
-        let section = format!("# ===== {}.gitignore =====\n{}\n\n", key, content);
-        file::append_file(&section, &dest_path, None)?;
-    }
-
-    println!(
-        "{} Downloaded and merged all gitignore templates to {}",
-        "✓".green(),
-        dest_path.display()
-    );
 
     Ok(())
 }
@@ -111,46 +170,127 @@ fn download_all_templates(
 fn download_templates(
     templates: &[String],
     dir_path: Option<&PathBuf>,
+    output: &[String],
     force: bool,
     cache: &Cache<String>,
     append: bool,
+    use_remote_name: bool,
 ) -> Result<()> {
-    let mut merged_content = String::new();
+    let fetcher = Fetcher::new(); // Create once, reuse
 
-    for template_name in templates {
-        // Try to find the template in cache with different key formats
-        let template_path = find_template_in_cache(template_name, cache)?;
+    if use_remote_name {
+        // Each template is saved using its remote filename (e.g., Python.gitignore)
+        for template_name in templates {
+            let template_path = find_template_in_cache(template_name, cache)?;
+            let url = format!("{}/{}", GITHUB_RAW_BASE, template_path);
 
-        let fetcher = Fetcher::new();
-        let url = format!("{}/{}", GITHUB_RAW_BASE, template_path);
+            // Extract filename from template_path (e.g., "Python.gitignore")
+            let remote_filename = Path::new(&template_path)
+                .file_name()
+                .and_then(|s| s.to_str())
+                .ok_or_else(|| anyhow::anyhow!("Invalid template path: {}", template_path))?;
 
-        let msg = format!("Downloading gitignore template: {}", template_name);
-        let pb = progress::spinner(&msg);
-        let content = fetcher.fetch_content(&url)?;
-        pb.set_message("Download Complete");
-        pb.finish_and_clear();
+            let msg = format!("Downloading gitignore template: {}", template_name);
+            let pb = progress::spinner(&msg);
+            let content = fetcher.fetch_content(&url)?;
+            pb.set_message("Download Complete");
+            pb.finish_and_clear();
 
-        merged_content.push_str(&format!(
-            "# ===== {}.gitignore =====\n{}\n\n",
-            template_name, content
+            let section = format!("# ===== {} =====\n{}\n\n", remote_filename, content);
+
+            let dest_path = dir_path
+                .map(|p| p.join(remote_filename))
+                .unwrap_or_else(|| {
+                    Path::new(OUTPUT_BASE_PATH)
+                        .join(OUTPUT)
+                        .join(remote_filename)
+                });
+
+            if append {
+                file::append_file(&section, &dest_path, None)?;
+            } else {
+                file::save_file(&section, &dest_path, force)?;
+            }
+
+            println!(
+                "{} Added gitignore template: {} to {}",
+                "✓".green(),
+                template_name,
+                dest_path.display()
+            );
+        }
+    } else if output.len() == templates.len() {
+        // Save each template to its own file as specified in output
+        for (template_name, output_file) in templates.iter().zip(output.iter()) {
+            let template_path = find_template_in_cache(template_name, cache)?;
+            let url = format!("{}/{}", GITHUB_RAW_BASE, template_path);
+
+            let msg = format!("Downloading gitignore template: {}", template_name);
+            let pb = progress::spinner(&msg);
+            let content = fetcher.fetch_content(&url)?;
+            pb.set_message("Download Complete");
+            pb.finish_and_clear();
+
+            let section = format!("# ===== {}.gitignore =====\n{}\n\n", template_name, content);
+
+            let dest_path = dir_path
+                .map(|p| p.join(output_file))
+                .unwrap_or_else(|| Path::new(OUTPUT_BASE_PATH).join(OUTPUT).join(output_file));
+
+            if append {
+                file::append_file(&section, &dest_path, None)?;
+            } else {
+                file::save_file(&section, &dest_path, force)?;
+            }
+
+            println!(
+                "{} Added gitignore template: {} to {}",
+                "✓".green(),
+                template_name,
+                dest_path.display()
+            );
+        }
+    } else if output.len() == 1 {
+        // Merge all templates into one file
+        let mut merged_content = String::new();
+
+        for template_name in templates {
+            let template_path = find_template_in_cache(template_name, cache)?;
+            let url = format!("{}/{}", GITHUB_RAW_BASE, template_path);
+
+            let msg = format!("Downloading gitignore template: {}", template_name);
+            let pb = progress::spinner(&msg);
+            let content = fetcher.fetch_content(&url)?;
+            pb.set_message("Download Complete");
+            pb.finish_and_clear();
+
+            merged_content.push_str(&format!(
+                "# ===== {}.gitignore =====\n{}\n\n",
+                template_name, content
+            ));
+        }
+
+        let dest_path = dir_path
+            .map(|p| p.join(&output[0]))
+            .unwrap_or_else(|| Path::new(OUTPUT_BASE_PATH).join(OUTPUT).join(&output[0]));
+
+        if append {
+            file::append_file(&merged_content, &dest_path, None)?;
+        } else {
+            file::save_file(&merged_content, &dest_path, force)?;
+        }
+
+        println!(
+            "{} Added gitignore templates: {} to {}",
+            "✓".green(),
+            templates.join(", "),
+            dest_path.display()
+        );
+    } else {
+        return Err(anyhow::anyhow!(
+            "Number of output files must be either 1 or match the number of templates when not using --use-remote-name"
         ));
     }
-
-    let dest_path = dir_path
-        .map(|p| p.join(".gitignore"))
-        .unwrap_or_else(|| Path::new(OUTPUT_BASE_PATH).join(OUTPUT).join(".gitignore"));
-
-    if append {
-        file::append_file(&merged_content, &dest_path, None)?;
-    } else {
-        file::save_file(&merged_content, &dest_path, force)?;
-    }
-
-    println!(
-        "{} Added gitignore templates: {}",
-        "✓".green(),
-        templates.join(", ")
-    );
 
     Ok(())
 }
