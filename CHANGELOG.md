@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (240d83b)
+
+
+## [v0.1.11]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (10ff7f1)
 
 - update documentation for v0.1.10 [skip ci] (f48203c)
@@ -48,15 +57,6 @@ All notable changes to this project will be documented in this file.
 - added output arg license tests (a243e96)
 
 - added output arg pr tests (6464a74)
-
-
-## [Unreleased]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (10ff7f1)
 
 
 ## [v0.1.10]
