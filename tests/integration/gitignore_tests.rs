@@ -19,12 +19,13 @@ use crate::common::test_utils::{
 - `test_gitignore_add_all`: Tests the addition of all available gitignore templates.
 - `test_gitignore_add_invalid_template`: Confirms that an unknown template returns an appropriate error.
 - `test_gitignore_add_no_template`: Ensures that running add without templates or --all returns an error.
+- `test_gitignore_add_update_cache`: Ensures that the add command with --update-cache refreshes the cache.
+- `test_gitignore_add_valid_and_invalid_template`: Tests adding a valid template alongside an invalid one, ensuring the valid template is added while the invalid one is reported.
 - `test_gitignore_list_default`: Ensures the list command displays popular templates.
 - `test_gitignore_list_popular`: Ensures the list command with --popular displays popular templates.
 - `test_gitignore_list_global`: Ensures the list command with --global displays global templates.
 - `test_gitignore_list_community`: Ensures the list command with --community displays community templates.
 - `test_gitignore_list_update_cache`: Ensures the list command with --update-cache refreshes the cache.
-- `test_gitignore_add_update_cache`: Ensures the add command with --update-cache refreshes the cache.
 - `test_gitignore_preview_single_template`: Tests previewing a single gitignore template.
 - `test_gitignore_preview_multiple_templates`: Tests previewing multiple gitignore templates.
 - `test_gitignore_preview_update_cache`: Tests previewing a template with cache update.
@@ -237,6 +238,81 @@ fn test_gitignore_add_update_cache() {
         .stdout(
             predicate::str::contains("Added gitignore templates").or(predicate::str::contains("✓")),
         );
+}
+
+#[test]
+#[ignore]
+// TODO we should support this case forcing a clear separation of adding templates
+fn test_gitignore_add_valid_and_invalid_template() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    // Try to add one valid and one invalid template
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&["gitignore", "add", "rust", "not-a-template"])
+        .assert()
+        .success()
+        .stdout(
+            predicate::str::contains("Added gitignore templates").or(predicate::str::contains("✓")),
+        )
+        .stderr(predicate::str::contains("not found").or(predicate::str::contains("Unknown")));
+
+    // The .gitignore file should be created and contain the valid template's content
+    assert_file_exists(&temp_path.join(".gitignore"));
+    assert_file_contains(&temp_path.join(".gitignore"), "Rust");
+    let content = fs::read_to_string(temp_path.join(".gitignore")).unwrap();
+    assert!(!content.contains("not-a-template"));
+}
+
+#[test]
+fn test_gitignore_add_default_with_output() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    // Add rust template with output file .gitignore
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&["gitignore", "add", "rust", "-o", ".gitignore"])
+        .assert()
+        .success()
+        .stdout(
+            predicate::str::contains("Added gitignore templates").or(predicate::str::contains("✓")),
+        );
+
+    assert_file_exists(&temp_path.join(".gitignore"));
+    assert_file_contains(&temp_path.join(".gitignore"), "Rust");
+}
+
+#[test]
+fn test_gitignore_add_multiple_templates_uneven_output_files() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    // Pass 3 output files for 2 templates (should error)
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&[
+        "gitignore",
+        "add",
+        "python",
+        "rust",
+        "-o",
+        "Python.gitignore",
+        "Rust.gitignore",
+        "Ada.gitignore",
+    ])
+    .assert()
+    .failure()
+    .stderr(predicate::str::contains(
+        "Number of output files must be either 1 or match the number of templates when not using --use-remote-name",
+    ));
 }
 
 // --------     LIST COMMAND TESTS     --------

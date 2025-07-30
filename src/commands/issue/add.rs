@@ -30,6 +30,10 @@ pub struct AddArgs {
     /// Download all available templates
     #[arg(long)]
     pub all: bool,
+
+    /// Output file names for the templates (in order of templates)
+    #[arg(short='o', long, value_name = "OUTPUT", num_args = 1.., requires = "templates")]
+    pub output: Vec<String>,
 }
 
 impl super::Runnable for AddArgs {
@@ -41,8 +45,24 @@ impl super::Runnable for AddArgs {
                 "No issue template specified. Use `--all` or pass template names."
             ));
         } else {
-            for template_name in &self.templates {
-                download_single_template(template_name, self.dir.as_ref(), self.force)?;
+            if !self.output.is_empty() {
+                if self.templates.len() != self.output.len() {
+                    return Err(anyhow::anyhow!(
+                        "The number of templates and output file names must match."
+                    ));
+                }
+                for (template_name, output_name) in self.templates.iter().zip(self.output.iter()) {
+                    download_single_template(
+                        template_name,
+                        self.dir.as_ref(),
+                        self.force,
+                        Some(output_name.clone()),
+                    )?;
+                }
+            } else {
+                for template_name in &self.templates {
+                    download_single_template(template_name, self.dir.as_ref(), self.force, None)?;
+                }
             }
         }
 
@@ -65,7 +85,7 @@ fn download_all_templates(dir_path: Option<&PathBuf>, force: bool) -> anyhow::Re
             None => &entry.name,
         };
 
-        if let Err(e) = download_single_template(template_name, dir_path, force) {
+        if let Err(e) = download_single_template(template_name, dir_path, force, None) {
             eprintln!(
                 "{} Failed to add template '{}': {}",
                 "✗".red(),
@@ -101,9 +121,9 @@ fn download_single_template(
     template_name: &str,
     dir_path: Option<&PathBuf>,
     force: bool,
+    output: Option<String>,
 ) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
-
     let url = format!("{}/issue-templates/{}.yml", GITHUB_RAW_BASE, template_name);
 
     let msg = format!("Downloading issue template: {}", template_name);
@@ -112,13 +132,31 @@ fn download_single_template(
     pb.set_message("Download Complete");
     pb.finish_and_clear();
 
-    let default_path = Path::new(OUTPUT_BASE_PATH).join(OUTPUT);
-    let base_path = dir_path.map_or(default_path.as_path(), |p| p.as_path());
-    let dest_path = base_path.join(format!("{}.yml", template_name));
+    // Determine output path logic
+    let dest_path = if let Some(mut output_file) = output {
+        // Technical Debt: Add .yml extension if not present. Not flexible for other formats.
+        if Path::new(&output_file).extension().is_none() {
+            output_file.push_str(".yml");
+        }
+        dir_path
+            .map(|p| p.join(&output_file))
+            .unwrap_or_else(|| Path::new(OUTPUT_BASE_PATH).join(OUTPUT).join(&output_file))
+    } else {
+        // Default: .github/ISSUE_TEMPLATE/<template_name>.yml
+        let default_path = Path::new(OUTPUT_BASE_PATH).join(OUTPUT);
+        dir_path
+            .map(|p| p.join(format!("{}.yml", template_name)))
+            .unwrap_or_else(|| default_path.join(format!("{}.yml", template_name)))
+    };
 
     file::save_file(&content, &dest_path, force)?;
 
-    println!("{} Added template: {}", "✓".green(), template_name);
+    println!(
+        "{} Added template: {} to {}",
+        "✓".green(),
+        template_name,
+        dest_path.display()
+    );
 
     Ok(())
 }
