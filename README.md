@@ -1,19 +1,52 @@
-# Gh Templates
+# 📁 Gh Templates
 
 This repository provides a collection of reusable Git templates to streamline your workflow across multiple repositories. It includes fully supported **Issue Templates**, **Pull Request Templates**, and more.
 
-## Contributing
+[![GitHub Release](https://img.shields.io/github/v/release/rafaeljohn9/gh-templates)](https://github.com/rafaeljohn9/gh-templates/releases)
+[![License](https://img.shields.io/github/license/rafaeljohn9/gh-templates)](LICENSE)
 
-We welcome contributions from everyone! Don’t worry if you’re not familiar with Rust—the project is primarily composed of YAML files (for workflows), Markdown files (for templates and documentation), and license files. Rust is only used for the CLI interface. You can help by opening issues, suggesting new GitHub templates, or sharing feedback to improve the project. Your ideas and participation are valued, and we’re happy to support you as you get involved.
+---
 
-## Features
+## 📚 Table of Contents
+
+- [Contributing](#contributing)
+- [Features](#features)
+- [Alpha Release Downloads](#alpha-release-downloads)
+- [Installation](#installation)
+  - [Quick Install (Recommended)](#quick-install-recommended)
+  - [Manual Installation](#manual-installation)
+- [Example Usage](#example-usage)
+  - [Issue Templates](#issue-templates)
+  - [Pull Request Templates](#pull-request-templates)
+  - [License Files](#license-files)
+  - [Gitignore Files](#gitignore-files)
+  - [Code of Conduct (Coming Soon)](#code-of-conduct-coming-soon)
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from everyone! Don’t worry if you’re not familiar with Rust—the project is primarily composed of YAML files (for workflows), Markdown files (for templates and documentation), and license files. Rust is only used for the CLI interface.
+
+You can help by:
+- Opening issues
+- Suggesting new GitHub templates
+- Sharing feedback to improve the project
+
+Your ideas and participation are valued, and we’re happy to support you as you get involved.
+
+---
+
+## ✨ Features
 
 - **Issue Templates**: Standardized templates for bug reports, feature requests, documentation, community collaboration, developer experience feedback, support questions, and tests.
 - **Pull Request Templates**: Easily add consistent PR templates to your repositories.
 - **Easy Installation**: Quickly set up templates using a provided installation script.
 - **Customizable**: All templates can be tailored to fit your project's needs.
 
-## Alpha Release Downloads
+---
+
+## 🧪 Beta Release Downloads
 
 You can download the latest alpha release binaries for your platform from the `/releases/<tag>` directory. These are currently available as artifacts for different operating systems and architectures:
 
@@ -30,9 +63,9 @@ To download, visit the [releases page](https://github.com/rafaeljohn9/gh-templat
 
 ---
 
-## Installation
+## 🔧 Installation
 
-### Quick Install (Recommended)
+### 🚀 Quick Install (Recommended)
 
 Install `gh-templates` automatically with a single command:
 
@@ -48,18 +81,17 @@ curl -sSL https://raw.githubusercontent.com/RafaelJohn9/gh-templates/main/instal
 iwr -useb https://raw.githubusercontent.com/RafaelJohn9/gh-templates/main/install/install.ps1 | iex
 ```
 
-The installer automatically:
+> ✅ The installer automatically:
+> - Detects your OS and architecture
+> - Downloads the latest version
+> - Installs to the appropriate location (`~/.local/bin` on Linux/macOS, `~/bin` on Windows)
+> - Makes the binary executable
 
-- Detects your OS and architecture
-- Downloads the latest version
-- Installs to the appropriate location (`~/.local/bin` on Linux/macOS, `~/bin` on Windows)
-- Makes the binary executable
-
-> **Note**: Make sure your install directory is in your `PATH`. On Linux/macOS, you may need to add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile.
+> ⚠️ **Note**: Make sure your install directory is in your `PATH`. On Linux/macOS, you may need to add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile.
 
 ---
 
-### Manual Installation
+### 🛠️ Manual Installation
 
 If you prefer to install manually, download the appropriate binary for your platform:
 
@@ -115,18 +147,19 @@ New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\bin"
 Invoke-WebRequest -Uri "https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-x86_64-pc-windows-gnu.exe" -OutFile "$env:USERPROFILE\bin\gh-templates.exe"
 ```
 
-> **Note**: Make sure `$env:USERPROFILE\bin` is in your `PATH` environment variable.
+> ⚠️ **Note**: Make sure `$env:USERPROFILE\bin` is in your `PATH` environment variable.
+
 ---
 
-## Example Usage
+## 🧪 Example Usage
 
 Below are some example commands for using `gh-templates` to add templates to your repository:
 
-> **Note:**  
+> 💡 **Tip:**  
 > It is recommended you use the labels from this repository by running:  
 > `gh label clone rafaeljohn9/gh-templates`
 
-### Issue Templates
+### 🐛 Issue Templates
 
 ```sh
 # Add an issue template
@@ -142,7 +175,7 @@ gh-templates issue preview bug
 gh-templates issue list
 ```
 
-### Pull Request Templates
+### 🔄 Pull Request Templates
 
 ```sh
 # Add a PR template
@@ -158,7 +191,7 @@ gh-templates pr list
 gh-templates pr add bug --output .github/pull_request_template.md
 ```
 
-### License Files
+### 📜 License Files
 
 ```sh
 # Add a LICENSE file (MIT)
@@ -176,14 +209,14 @@ gh-templates license list
 # List popular licenses
 gh-templates license list --popular
 
-# List non software licenses
+# List non-software licenses
 gh-templates license list --non-software
 
 # Force overwrite existing file
 gh-templates license add mit --force
 ```
 
-### .gitignore Files
+### 🚫 Gitignore Files
 
 ```sh
 # Add a .gitignore for Rust
@@ -199,11 +232,11 @@ gh-templates gitignore preview Rust
 gh-templates gitignore list
 ```
 
-### Code of Conduct (Coming Soon)
+### 🧭 Code of Conduct (Coming Soon)
 
 ```sh
 # Add a code of conduct file (not yet available)
 gh-templates conduct add default
 ```
 
-> **Note:** Currently, `issue`, `pr`, `license`, and `gitignore` templates are supported. Support for code of conduct and other templates will be added in future releases.
+> 📌 **Note:** Currently, `issue`, `pr`, `license`, and `gitignore` templates are supported. Support for code of conduct and other templates will be added in future releases.
