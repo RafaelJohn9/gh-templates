@@ -45,7 +45,7 @@ fn test_license_add_with_params() {
         "add",
         "mit",
         "--param",
-        "year=2024",
+        "year=2025",
         "--param",
         "copyright-holders=John Doe",
     ])
@@ -54,8 +54,8 @@ fn test_license_add_with_params() {
     .stdout(predicate::str::contains("added license"))
     .stdout(predicate::str::contains("Filled"));
 
-    let content = fs::read_to_string(temp_path.join("LICENSE.MIT")).unwrap();
-    assert!(content.contains("2024"));
+    let content = fs::read_to_string(temp_path.join("LICENSE")).unwrap();
+    assert!(content.contains("2025"));
     assert!(content.contains("John Doe"));
 }
 
@@ -73,7 +73,7 @@ fn test_license_add_with_unused_param_warning() {
         .success()
         .stdout(predicate::str::contains("unused parameter"));
 
-    let license_path = temp_path.join("LICENSE.MIT");
+    let license_path = temp_path.join("LICENSE");
 
     assert_file_exists(&license_path);
     let content = fs::read_to_string(license_path).unwrap();
@@ -91,14 +91,14 @@ fn test_license_add_interactive_mode() {
     let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
     cmd.current_dir(&temp_path);
     cmd.args(&["license", "add", "mit", "--interactive"])
-        .write_stdin("2024\nJohn Doe\n")
+        .write_stdin("2025\nJohn Doe\n")
         .assert()
         .success()
         .stdout(predicate::str::contains("Filled"))
         .stdout(predicate::str::contains("Enter value"));
 
-    let content = fs::read_to_string(temp_path.join("LICENSE.MIT")).unwrap();
-    assert!(content.contains("2024"));
+    let content = fs::read_to_string(temp_path.join("LICENSE")).unwrap();
+    assert!(content.contains("2025"));
     assert!(content.contains("John Doe"));
 }
 
@@ -117,7 +117,104 @@ fn test_license_add_update_cache_flag() {
         .success()
         .stdout(predicate::str::contains("added license"));
 
-    assert_file_exists(&temp_path.join("LICENSE.MIT"));
+    assert_file_exists(&temp_path.join("LICENSE"));
+}
+
+#[test]
+fn test_license_add_multiple_licenses_with_output_files() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    let mit_path = temp_path.join("LICENSE-MIT");
+    let apache_path = temp_path.join("LICENSE-APACHE2-0");
+
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&[
+        "license",
+        "add",
+        "mit",
+        "apache-2.0",
+        "-o",
+        "LICENSE-MIT",
+        "LICENSE-APACHE2-0",
+    ])
+    .assert()
+    .success()
+    .stdout(predicate::str::contains("added license"))
+    .stdout(predicate::str::contains("MIT"))
+    .stdout(predicate::str::contains("APACHE2-0"));
+
+    assert_file_exists(&mit_path);
+    assert_file_exists(&apache_path);
+
+    let mit_content = fs::read_to_string(&mit_path).unwrap();
+    let apache_content = fs::read_to_string(&apache_path).unwrap();
+
+    assert!(mit_content.contains("MIT License"));
+    assert!(apache_content.contains("Apache License"));
+}
+
+#[test]
+fn test_license_add_multiple_licenses_with_output_files_mismatched_count() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    // Only one output file for two licenses
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&["license", "add", "mit", "apache-2.0", "-o", "LICENSE-MIT"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains(
+            "Number of output files must match number of licenses",
+        ));
+}
+
+#[test]
+fn test_license_add_multiple_licenses_with_params_and_output_files() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    let mit_path = temp_path.join("LICENSE-MIT");
+    let apache_path = temp_path.join("LICENSE-APACHE2-0");
+
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&[
+        "license",
+        "add",
+        "mit",
+        "apache-2.0",
+        "-o",
+        "LICENSE-MIT",
+        "LICENSE-APACHE2-0",
+        "--param",
+        "year=2025",
+        "--param",
+        "copyright-holders=Jane Doe",
+        "--param",
+        "yyyy=2025",
+        "--param",
+        "name-of-copyright-owner=Jane Doe",
+    ])
+    .assert()
+    .success()
+    .stdout(predicate::str::contains("added license"));
+
+    let mit_content = fs::read_to_string(&mit_path).unwrap();
+    let apache_content = fs::read_to_string(&apache_path).unwrap();
+
+    assert!(mit_content.contains("2025"));
+    assert!(mit_content.contains("Jane Doe"));
+    assert!(apache_content.contains("2025"));
+    assert!(apache_content.contains("Jane Doe"));
 }
 
 // --------     LIST COMMAND TESTS     --------
