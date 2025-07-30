@@ -14,6 +14,8 @@ This test suite covers the following scenarios:
 - `test_license_add_with_unused_param_warning`: Checks that unused parameters trigger a warning but do not prevent license creation.
 - `test_license_add_interactive_mode`: Ensures that interactive mode prompts for required parameters and fills them in the license file.
 - `test_license_add_update_cache_flag`: Tests that the `--update-cache` flag works when adding a license.
+- `test_license_add_multiple_licenses_with_output_files`: Validates that multiple licenses can be added with specified output files.
+- `test_license_add_multiple_licenses_with_output_files_mismatched_count`: Ensures that an error is raised when the number of licenses does not match the number of output files.
 - `test_license_list_popular`: Ensures the list command displays popular licenses such as "mit" and "apache-2.0".
 - `test_license_list_non_software`: Checks that non-software licenses are listed when the appropriate flag is used.
 - `test_license_list_search_wildcard`: Validates that searching for a license by name returns matching results.
