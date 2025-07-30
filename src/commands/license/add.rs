@@ -46,6 +46,10 @@ pub struct AddArgs {
     /// Additional parameters for license placeholders (key=value format)
     #[arg(long = "param", value_name = "KEY=VALUE", num_args = 0.., action = clap::ArgAction::Append)]
     pub params: Vec<String>,
+
+    /// Output file names for the licenses (in order of licenses)
+    #[arg(short = 'o', long, value_name = "OUTPUT", num_args = 1.., requires = "licenses")]
+    pub output: Vec<String>,
 }
 
 impl super::Runnable for AddArgs {
@@ -90,12 +94,31 @@ impl super::Runnable for AddArgs {
                 "At least one license ID is required (or use --all)"
             ));
         } else {
-            for license_id in &self.licenses {
-                if let Err(e) = download_single_license(license_id, &config) {
-                    eprintln!(
-                        "{}",
-                        format!("Failed to download {}: {}", license_id, e).red()
-                    );
+            if !self.output.is_empty() {
+                if self.output.len() != self.licenses.len() {
+                    return Err(anyhow!(
+                        "Number of output files must match number of licenses"
+                    ));
+                }
+
+                for (license_id, output_name) in self.licenses.iter().zip(self.output.iter()) {
+                    if let Err(e) =
+                        download_single_license(license_id, &config, Some(output_name.clone()))
+                    {
+                        eprintln!(
+                            "{}",
+                            format!("Failed to download {}: {}", license_id, e).red()
+                        );
+                    }
+                }
+            } else {
+                for license_id in &self.licenses {
+                    if let Err(e) = download_single_license(license_id, &config, None) {
+                        eprintln!(
+                            "{}",
+                            format!("Failed to download {}: {}", license_id, e).red()
+                        );
+                    }
                 }
             }
         }
@@ -115,7 +138,11 @@ pub struct LicenseDownloadConfig<'a> {
     pub update_cache: bool,
 }
 
-fn download_single_license(id: &str, config: &LicenseDownloadConfig) -> Result<()> {
+fn download_single_license(
+    id: &str,
+    config: &LicenseDownloadConfig,
+    output_filename: Option<String>,
+) -> Result<()> {
     let fetcher = Fetcher::new();
 
     let mut cache_manager = CacheManager::new()?;
@@ -160,7 +187,7 @@ fn download_single_license(id: &str, config: &LicenseDownloadConfig) -> Result<(
     let processed_text =
         process_placeholders(license_text, config.interactive, config.placeholder_params)?;
 
-    let dest_filename = format!("LICENSE.{}", normalized_id);
+    let dest_filename = output_filename.unwrap_or_else(|| "LICENSE".to_string());
     let dest_path: PathBuf = match config.dir_path {
         Some(dir) => dir.join(dest_filename),
         None => PathBuf::from(&dest_filename),
@@ -212,7 +239,7 @@ fn download_all_licenses(config: &LicenseDownloadConfig) -> Result<()> {
             .and_then(|id| id.as_str())
             .ok_or_else(|| anyhow!("License ID not found"))?;
 
-        if let Err(e) = download_single_license(license_id, config) {
+        if let Err(e) = download_single_license(license_id, config, None) {
             eprintln!(
                 "{}",
                 format!("⚠️  Failed to download {}: {}", license_id, e).red()
