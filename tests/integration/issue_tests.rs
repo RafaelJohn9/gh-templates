@@ -13,6 +13,11 @@ This test suite covers the following scenarios:
 - `test_issue_add_force_overwrite`: Tests that an existing issue template file is not overwritten unless the `--force` flag is used.
 - `test_issue_add_invalid_type`: Confirms that an unknown issue template returns an appropriate error.
 - `test_issue_add_unknown_argument`: Checks that an unknown argument results in an error.
+- `test_issue_add_no_template`: Ensures that running the command without specifying a template results in an error.
+- `test_issue_add_valid_and_invalid_templates`: Tests adding both valid and invalid templates in one command, ensuring the valid template is still created.
+- `test_issue_add_default_with_output_without_ext`: Tests adding a default issue template with an output name that does not have an extension.
+- `test_issue_add_default_with_output_with_ext`: Tests adding a default issue template with an output name that has an extension.
+- `test_issue_add_uneven_templates_and_outputs`: Ensures that an error is raised when the number of templates does not match the number of output file names
 - `test_issue_list`: Ensures the list command displays available issue templates.
 - `test_issue_preview_bug`: Validates that the preview command displays the content of the "bug" issue template.
 - `test_issue_preview_multiple`: Validates that the preview command displays the content of multiple issue templates.
@@ -159,6 +164,97 @@ fn test_issue_add_unknown_argument() {
         .failure()
         .stderr(predicate::str::contains(
             "unexpected argument '--unknown' found",
+        ));
+}
+
+#[test]
+fn test_issue_add_valid_and_invalid_templates() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    // Attempt to add both a valid ("bug") and invalid ("not-a-template") template in one command
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&["issue", "add", "bug", "not-a-template"])
+        .assert()
+        .failure()
+        .stderr(
+            predicate::str::contains("Request failed")
+                .or(predicate::str::contains("not found"))
+                .or(predicate::str::contains("not-a-template")),
+        );
+
+    // Ensure the valid template file ("bug") was still created
+    assert_file_exists(&temp_path.join(".github/ISSUE_TEMPLATE/bug.yml"));
+    assert_file_contains(
+        &temp_path.join(".github/ISSUE_TEMPLATE/bug.yml"),
+        "Bug Report",
+    );
+}
+
+#[test]
+fn test_issue_add_default_with_output_without_ext() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    // Add "feature" template and specify output file without extension
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&["issue", "add", "feature", "-o", "feat"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Added issue template").or(predicate::str::contains("✓")));
+
+    // Should create ".github/ISSUE_TEMPLATE/feat.yml"
+    assert_file_exists(&temp_path.join(".github/ISSUE_TEMPLATE/feat.yml"));
+    assert_file_contains(
+        &temp_path.join(".github/ISSUE_TEMPLATE/feat.yml"),
+        "Feature Request",
+    );
+}
+
+#[test]
+fn test_issue_add_default_with_output_with_ext() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    // Add "feature" template and specify output file with extension
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&["issue", "add", "feature", "-o", "feat.yml"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Added issue template").or(predicate::str::contains("✓")));
+
+    // Should create ".github/ISSUE_TEMPLATE/feat.yml"
+    assert_file_exists(&temp_path.join(".github/ISSUE_TEMPLATE/feat.yml"));
+    assert_file_contains(
+        &temp_path.join(".github/ISSUE_TEMPLATE/feat.yml"),
+        "Feature Request",
+    );
+}
+
+#[test]
+fn test_issue_add_uneven_templates_and_outputs() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    // Pass two templates but only one output file
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&["issue", "add", "feature", "bug", "-o", "feat"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains(
+            "The number of templates and output file names must match.",
         ));
 }
 
