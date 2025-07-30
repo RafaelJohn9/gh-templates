@@ -53,7 +53,7 @@ fn test_license_add_with_params() {
     ])
     .assert()
     .success()
-    .stdout(predicate::str::contains("added license"))
+    .stdout(predicate::str::contains("has been added."))
     .stdout(predicate::str::contains("Filled"));
 
     let content = fs::read_to_string(temp_path.join("LICENSE")).unwrap();
@@ -145,7 +145,7 @@ fn test_license_add_multiple_licenses_with_output_files() {
     ])
     .assert()
     .success()
-    .stdout(predicate::str::contains("added license"))
+    .stdout(predicate::str::contains("has been added."))
     .stdout(predicate::str::contains("MIT"))
     .stdout(predicate::str::contains("APACHE2-0"));
 
@@ -208,7 +208,7 @@ fn test_license_add_multiple_licenses_with_params_and_output_files() {
     ])
     .assert()
     .success()
-    .stdout(predicate::str::contains("added license"));
+    .stdout(predicate::str::contains("has been added."));
 
     let mit_content = fs::read_to_string(&mit_path).unwrap();
     let apache_content = fs::read_to_string(&apache_path).unwrap();

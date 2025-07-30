@@ -151,12 +151,5 @@ fn download_single_template(
 
     file::save_file(&content, &dest_path, force)?;
 
-    println!(
-        "{} Added template: {} to {}",
-        "✓".green(),
-        template_name,
-        dest_path.display()
-    );
-
     Ok(())
 }
