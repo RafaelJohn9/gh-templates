@@ -48,7 +48,8 @@ pub struct AddArgs {
         short = 'o',
         value_name = "FILENAME",
         num_args = 1.., // Accepts one or more values
-        default_value = ".gitignore"
+        default_value = ".gitignore",
+        requires = "templates"
     )]
     pub output: Vec<String>,
 }
