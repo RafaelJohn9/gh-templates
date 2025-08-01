@@ -11,6 +11,19 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (5275894)
 
+- update documentation for v0.1.15 [skip ci] (32d0ec6)
+
+- bump version to 0.1.16 (be6b4d5)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (5275894)
+
 
 ## [v0.1.15]
 
