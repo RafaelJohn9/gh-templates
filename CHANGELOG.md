@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 
-## [Unreleased]
+## [v0.1.12]
 
 
 
@@ -19,25 +19,12 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (ac2cdba)
 
-
-## [Unreleased]
-
+- update CHANGELOG [skip ci] (0949f5e)
 
 
-### Chore
+### Feat
 
-- update CHANGELOG [skip ci] (240d83b)
-
-- update documentation for v0.1.11 [skip ci] (1b5025d)
-
-
-## [Unreleased]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (240d83b)
+- updated build yml to support publishing to different platforms (749598f)
 
 
 ## [v0.1.11]
