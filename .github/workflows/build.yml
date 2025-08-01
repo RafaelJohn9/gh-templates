@@ -3,94 +3,190 @@ name: Release
 on:
   push:
     tags:
-      - v[0-9]+.[0-9]+.[0-9]+  # Matches semantic version tags
+      - v[0-9]+.[0-9]+.[0-9]+
 
 permissions:
   contents: write
 
 jobs:
-  # === Linux + Windows builds using `cross` ===
-  build-and-release-linux-windows:
+  publish-cargo:
+    name: Publish to Cargo
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Publish to crates.io
+        run: cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+  publish-binaries:
+    name: Publish binaries
+    runs-on: ${{ matrix.build.os }}
+    needs: publish-cargo
     strategy:
+      fail-fast: false
       matrix:
-        target:
-          - x86_64-unknown-linux-gnu
-          - x86_64-unknown-linux-musl
-          - x86_64-pc-windows-gnu
-          - aarch64-unknown-linux-gnu
+        build:
+          - { NAME: linux-x64-glibc, OS: ubuntu-22.04, TARGET: x86_64-unknown-linux-gnu }
+          - { NAME: linux-x64-musl, OS: ubuntu-22.04, TARGET: x86_64-unknown-linux-musl }
+          - { NAME: linux-arm64-glibc, OS: ubuntu-22.04, TARGET: aarch64-unknown-linux-gnu }
+          - { NAME: win32-x64-msvc, OS: windows-latest, TARGET: x86_64-pc-windows-msvc }
+          - { NAME: darwin-x64, OS: macos-15, TARGET: x86_64-apple-darwin }
+          - { NAME: darwin-arm64, OS: macos-15, TARGET: aarch64-apple-darwin }
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Rust
+      - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          override: true
+          target: ${{ matrix.build.TARGET }}
 
       - name: Install cross
+        if: runner.os == 'Linux'
         run: cargo install cross --git https://github.com/cross-rs/cross
 
-      - name: Build with cross
-        run: cross build --release --target ${{ matrix.target }}
-        env:
-          OPENSSL_NO_VENDOR: "0"
-          OPENSSL_STATIC: "1"
-
-      - name: Rename binary
+      - name: Build and prepare
         run: |
-          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
-            cp target/${{ matrix.target }}/release/gh-templates.exe gh-templates-${{ matrix.target }}.exe
+          VERSION=$(echo "${{ github.ref_name }}" | sed 's/^v//')
+          
+          # Build
+          if [[ "${{ runner.os }}" == "Linux" ]]; then
+            cross build --release --target ${{ matrix.build.TARGET }}
           else
-            cp target/${{ matrix.target }}/release/gh-templates gh-templates-${{ matrix.target }}
+            cargo build --release --target ${{ matrix.build.TARGET }}
           fi
+          
+          # Copy binary
+          if [[ "${{ matrix.build.TARGET }}" == *"windows"* ]]; then
+            BINARY="gh-templates.exe"
+            cp target/${{ matrix.build.TARGET }}/release/$BINARY .
+          else
+            BINARY="gh-templates"
+            cp target/${{ matrix.build.TARGET }}/release/$BINARY .
+            chmod +x $BINARY
+          fi
+          
+          # Create npm package
+          mkdir -p npm/bin python/gh_templates_bin
+          cp $BINARY npm/bin/
+          cp $BINARY python/gh_templates_bin/
+          
+          # npm package.json
+          cat > npm/package.json << EOF
+          {
+            "name": "@rafaeljohn9/gh-templates-${{ matrix.build.NAME }}",
+            "version": "$VERSION",
+            "bin": { "gh-templates": "./bin/$BINARY" },
+            "files": ["bin/"],
+            "license": "APACHE-2.0",
+          }
+          EOF
+          
+          # Python setup.py
+          cat > python/setup.py << EOF
+          from setuptools import setup
+          setup(
+              name='gh-templates-${{ matrix.build.NAME }}',
+              version='$VERSION',
+              packages=['gh_templates_bin'],
+              package_data={'gh_templates_bin': ['*']},
+              entry_points={'console_scripts': ['gh-templates=gh_templates_bin:main']},
+              license='APACHE-2.0",'
+          )
+          EOF
+          
+          # Python __init__.py
+          cat > python/gh_templates_bin/__init__.py << 'EOF'
+          import os, sys, subprocess
+          def main():
+              binary = os.path.join(os.path.dirname(__file__), '$BINARY')
+              sys.exit(subprocess.run([binary] + sys.argv[1:]).returncode)
+          EOF
 
-      - name: Upload asset to GitHub Release
+      - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: gh-templates-${{ matrix.target }}
-          tag_name: ${{ github.ref_name }}
-          files: gh-templates-${{ matrix.target }}*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: gh-templates*
 
-  # === macOS builds using native cargo ===
-  build-and-release-macos:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        target:
-          - x86_64-apple-darwin
-          - aarch64-apple-darwin
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: ${{ matrix.target }}
-          override: true
-
-      - name: Build with cargo
-        run: cargo build --release --target ${{ matrix.target }}
-        env:
-          OPENSSL_NO_VENDOR: "0"
-          OPENSSL_STATIC: "1"
-
-      - name: Rename binary
+      - name: Publish to npm
+        if: matrix.build.NAME != 'linux-x64-musl'
         run: |
-          cp target/${{ matrix.target }}/release/gh-templates gh-templates-${{ matrix.target }}
+          cd npm
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          npm publish --access public
 
-      - name: Upload asset to GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: gh-templates-${{ matrix.target }}
-          tag_name: ${{ github.ref_name }}
-          files: gh-templates-${{ matrix.target }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish to PyPI
+        run: |
+          cd python
+          pip install twine
+          python setup.py sdist bdist_wheel
+          echo -e "[pypi]\nusername = __token__\npassword = ${{ secrets.PYPI_API_TOKEN }}" > ~/.pypirc
+          twine upload dist/* --skip-existing
 
-  
+  publish-homebrew:
+    name: Update Homebrew formula
+    runs-on: macos-latest
+    needs: publish-binaries
+    steps:
+      - name: Update Homebrew formula
+        run: |
+          VERSION=$(echo "${{ github.ref_name }}" | sed 's/^v//')
+          
+          # Get release assets
+          LINUX_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/gh-templates-linux-x64-glibc"
+          DARWIN_ARM_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/gh-templates-darwin-arm64"
+          DARWIN_X64_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/gh-templates-darwin-x64"
+          
+          # Calculate checksums
+          wget -q $LINUX_URL -O linux-binary
+          wget -q $DARWIN_ARM_URL -O darwin-arm-binary
+          wget -q $DARWIN_X64_URL -O darwin-x64-binary
+          
+          LINUX_SHA=$(shasum -a 256 linux-binary | cut -d' ' -f1)
+          DARWIN_ARM_SHA=$(shasum -a 256 darwin-arm-binary | cut -d' ' -f1)
+          DARWIN_X64_SHA=$(shasum -a 256 darwin-x64-binary | cut -d' ' -f1)
+          
+          # Clone homebrew tap (replace with your tap)
+          git clone https://github.com/rafaeljohn9/homebrew-tap.git
+          cd homebrew-tap
+          
+          # Create/update formula
+          cat > Formula/gh-templates.rb << EOF
+          class GhTemplates < Formula
+            desc "GitHub Templates CLI tool"
+            homepage "https://github.com/${{ github.repository }}"
+            version "$VERSION"
+            
+            on_macos do
+              if Hardware::CPU.arm?
+                url "$DARWIN_ARM_URL"
+                sha256 "$DARWIN_ARM_SHA"
+              else
+                url "$DARWIN_X64_URL"
+                sha256 "$DARWIN_X64_SHA"
+              end
+            end
+            
+            on_linux do
+              url "$LINUX_URL"
+              sha256 "$LINUX_SHA"
+            end
+            
+            def install
+              bin.install "gh-templates-darwin-arm64" => "gh-templates" if Hardware::CPU.arm?
+              bin.install "gh-templates-darwin-x64" => "gh-templates" if Hardware::CPU.intel?
+              bin.install "gh-templates-linux-x64-glibc" => "gh-templates" if OS.linux?
+            end
+          end
+          EOF
+          
+          # ComAPACHE-2.0", and push
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/gh-templates.rb
+          git comAPACHE-2.0", -m "Update gh-templates to $VERSION"
+          git push https://x-access-token:${{ secrets.HOMEBREW_GITHUB_TOKEN }}@github.com/rafaeljohn9/homebrew-tap.git
