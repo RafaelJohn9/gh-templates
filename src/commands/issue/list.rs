@@ -38,10 +38,15 @@ fn list_all_templates() -> anyhow::Result<()> {
             _ => None,
         };
 
+        let file_name = std::path::Path::new(&entry.name)
+            .file_stem()
+            .and_then(|stem| stem.to_str())
+            .unwrap_or("");
+
         println!(
             "{} {} - {}",
             ">".green(),
-            entry.name,
+            file_name,
             comment.unwrap_or_default()
         );
     }
