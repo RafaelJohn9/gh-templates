@@ -1,8 +1,12 @@
 [package]
 
 name = "gh-templates"
-version = "0.0.1"
-edition = "2024"
+version = "0.1.1"
+edition = "2021"
+authors = ["John Kagunda rafaeljohb@gmail.com"]
+description = "A template project for GitHub-related utilities."
+license = "APACHE-2.0"
+
 
 [dependencies]
 anyhow = "1.0.98"
