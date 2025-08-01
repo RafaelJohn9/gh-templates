@@ -7,13 +7,25 @@ All notable changes to this project will be documented in this file.
 
 
 
-## [Unreleased]
+### Chore
+
+- update CHANGELOG [skip ci] (5c8b2c2)
+
+
+## [v0.1.14]
 
 
 
 ### Chore
 
 - update CHANGELOG [skip ci] (2b9729d)
+
+- update documentation for v0.1.13 [skip ci] (4f8b638)
+
+
+### Feat
+
+- updated license name with the correct spdx id (e54a7e5)
 
 
 ## [v0.1.13]
