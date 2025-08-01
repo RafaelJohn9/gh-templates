@@ -48,6 +48,7 @@ fn preview_single_template(template: &str, cache: &super::Cache<String>) -> anyh
     pb.set_message(msg);
     pb.finish_and_clear();
 
+    println!("\n        === Preview: {} === \n", template);
     pretty_print::print_highlighted("gitignore", &content);
     Ok(())
 }
