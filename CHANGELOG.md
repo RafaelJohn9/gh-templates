@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (5275894)
+
+
+## [v0.1.15]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (5c8b2c2)
 
 - update documentation for v0.1.14 [skip ci] (16106a2)
@@ -17,15 +26,6 @@ All notable changes to this project will be documented in this file.
 ### Fix
 
 - shell errors in workflow (e207413)
-
-
-## [Unreleased]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (5c8b2c2)
 
 
 ## [v0.1.14]
