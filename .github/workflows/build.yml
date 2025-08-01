@@ -50,7 +50,9 @@ jobs:
         if: runner.os == 'Linux'
         run: cargo install cross --git https://github.com/cross-rs/cross
 
-      - name: Build and prepare
+      - name: Build and prepare (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           VERSION=$(echo "${{ github.ref_name }}" | sed 's/^v//')
           
@@ -62,16 +64,11 @@ jobs:
           fi
           
           # Copy binary
-          if [[ "${{ matrix.build.TARGET }}" == *"windows"* ]]; then
-            BINARY="gh-templates.exe"
-            cp target/${{ matrix.build.TARGET }}/release/$BINARY .
-          else
-            BINARY="gh-templates"
-            cp target/${{ matrix.build.TARGET }}/release/$BINARY .
-            chmod +x $BINARY
-          fi
+          BINARY="gh-templates"
+          cp target/${{ matrix.build.TARGET }}/release/$BINARY .
+          chmod +x $BINARY
           
-          # Create npm package
+          # Create packages
           mkdir -p npm/bin python/gh_templates_bin
           cp $BINARY npm/bin/
           cp $BINARY python/gh_templates_bin/
@@ -83,7 +80,7 @@ jobs:
             "version": "$VERSION",
             "bin": { "gh-templates": "./bin/$BINARY" },
             "files": ["bin/"],
-            "license": "APACHE-2.0",
+            "license": "Apache-2.0"
           }
           EOF
           
@@ -96,7 +93,7 @@ jobs:
               packages=['gh_templates_bin'],
               package_data={'gh_templates_bin': ['*']},
               entry_points={'console_scripts': ['gh-templates=gh_templates_bin:main']},
-              license='APACHE-2.0",'
+              license='Apache-2.0'
           )
           EOF
           
@@ -104,9 +101,59 @@ jobs:
           cat > python/gh_templates_bin/__init__.py << 'EOF'
           import os, sys, subprocess
           def main():
-              binary = os.path.join(os.path.dirname(__file__), '$BINARY')
+              binary = os.path.join(os.path.dirname(__file__), 'gh-templates')
               sys.exit(subprocess.run([binary] + sys.argv[1:]).returncode)
           EOF
+
+      - name: Build and prepare (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $VERSION = "${{ github.ref_name }}" -replace '^v', ''
+          
+          # Build
+          cargo build --release --target ${{ matrix.build.TARGET }}
+          
+          # Copy binary
+          $BINARY = "gh-templates.exe"
+          Copy-Item "target/${{ matrix.build.TARGET }}/release/$BINARY" .
+          
+          # Create packages
+          New-Item -ItemType Directory -Force -Path npm/bin, python/gh_templates_bin
+          Copy-Item $BINARY npm/bin/
+          Copy-Item $BINARY python/gh_templates_bin/
+          
+          # npm package.json
+          @"
+          {
+            "name": "@rafaeljohn9/gh-templates-${{ matrix.build.NAME }}",
+            "version": "$VERSION",
+            "bin": { "gh-templates": "./bin/$BINARY" },
+            "files": ["bin/"],
+            "license": "Apache-2.0"
+          }
+          "@ | Out-File -FilePath npm/package.json -Encoding UTF8
+          
+          # Python setup.py
+          @"
+          from setuptools import setup
+          setup(
+              name='gh-templates-${{ matrix.build.NAME }}',
+              version='$VERSION',
+              packages=['gh_templates_bin'],
+              package_data={'gh_templates_bin': ['*']},
+              entry_points={'console_scripts': ['gh-templates=gh_templates_bin:main']},
+              license='Apache-2.0'
+          )
+          "@ | Out-File -FilePath python/setup.py -Encoding UTF8
+          
+          # Python __init__.py
+          @'
+          import os, sys, subprocess
+          def main():
+              binary = os.path.join(os.path.dirname(__file__), 'gh-templates.exe')
+              sys.exit(subprocess.run([binary] + sys.argv[1:]).returncode)
+          '@ | Out-File -FilePath python/gh_templates_bin/__init__.py -Encoding UTF8
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
@@ -115,12 +162,14 @@ jobs:
 
       - name: Publish to npm
         if: matrix.build.NAME != 'linux-x64-musl'
+        shell: bash
         run: |
           cd npm
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           npm publish --access public
 
       - name: Publish to PyPI
+        shell: bash
         run: |
           cd python
           pip install twine
@@ -151,7 +200,7 @@ jobs:
           DARWIN_ARM_SHA=$(shasum -a 256 darwin-arm-binary | cut -d' ' -f1)
           DARWIN_X64_SHA=$(shasum -a 256 darwin-x64-binary | cut -d' ' -f1)
           
-          # Clone homebrew tap (replace with your tap)
+          # Clone homebrew tap
           git clone https://github.com/rafaeljohn9/homebrew-tap.git
           cd homebrew-tap
           
@@ -185,9 +234,9 @@ jobs:
           end
           EOF
           
-          # ComAPACHE-2.0", and push
+          # Commit and push
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Formula/gh-templates.rb
-          git comAPACHE-2.0", -m "Update gh-templates to $VERSION"
+          git commit -m "Update gh-templates to $VERSION"
           git push https://x-access-token:${{ secrets.HOMEBREW_GITHUB_TOKEN }}@github.com/rafaeljohn9/homebrew-tap.git
