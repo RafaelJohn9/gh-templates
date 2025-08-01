@@ -7,11 +7,32 @@ All notable changes to this project will be documented in this file.
 
 
 
+### Chore
+
+- update CHANGELOG [skip ci] (2b9729d)
+
+
+## [v0.1.13]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (5cb58c3)
+
+- update documentation for v0.1.12 [skip ci] (ad1f640)
+
+- update cargo.toml  with meta description (29defb4)
+
+
+### Feat
+
+- added manual trigger for build (ea49c2c)
+
+- added cargo version (da3b0bb)
+
+
 ## [v0.1.12]
-
-
-
-## [Unreleased]
 
 
 
