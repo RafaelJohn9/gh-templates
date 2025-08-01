@@ -3,3 +3,12 @@
 type: pull_request
 templates:
   - default.md
+  - bugfix.md
+  - detailed.md
+  - documentation.md
+  - feature.md
+  - hotfix.md
+  - performance.md
+  - refactor.md
+  - security.md
+  - simple.md
