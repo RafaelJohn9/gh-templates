@@ -233,7 +233,7 @@ fn download_all_licenses(config: &LicenseDownloadConfig) -> Result<()> {
             .and_then(|id| id.as_str())
             .ok_or_else(|| anyhow!("License ID not found"))?;
 
-        if let Err(e) = download_single_license(license_id, config, None) {
+        if let Err(e) = download_single_license(license_id, config, Some(license_id.to_string())) {
             eprintln!(
                 "{}",
                 format!("⚠️  Failed to download {}: {}", license_id, e).red()
