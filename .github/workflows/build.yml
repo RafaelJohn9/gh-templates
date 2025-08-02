@@ -24,7 +24,7 @@ jobs:
 
   publish-binaries:
     name: Publish binaries
-    runs-on: ${{ matrix.build.os }}
+    runs-on: ${{ matrix.build.OS }}
     needs: publish-cargo
     strategy:
       fail-fast: false
@@ -33,6 +33,7 @@ jobs:
           - { 
               NAME: linux-x64-glibc, 
               OS: ubuntu-22.04, 
+              TOOLCHAIN: stable,
               TARGET: x86_64-unknown-linux-gnu,
               NPM_PUBLISH: true,
               PYPI_PUBLISH: true
@@ -40,27 +41,79 @@ jobs:
           - { 
               NAME: linux-x64-musl, 
               OS: ubuntu-22.04, 
+              TOOLCHAIN: stable,
               TARGET: x86_64-unknown-linux-musl,
+              NPM_PUBLISH: false,
+              PYPI_PUBLISH: true
+            }
+          - { 
+              NAME: linux-x86-glibc, 
+              OS: ubuntu-22.04, 
+              TOOLCHAIN: stable,
+              TARGET: i686-unknown-linux-gnu,
+              NPM_PUBLISH: false,
+              PYPI_PUBLISH: false
+            }
+          - { 
+              NAME: linux-x86-musl, 
+              OS: ubuntu-22.04, 
+              TOOLCHAIN: stable,
+              TARGET: i686-unknown-linux-musl,
               NPM_PUBLISH: false,
               PYPI_PUBLISH: true
             }
           - { 
               NAME: linux-arm64-glibc, 
               OS: ubuntu-22.04, 
+              TOOLCHAIN: stable,
               TARGET: aarch64-unknown-linux-gnu,
               NPM_PUBLISH: true,
               PYPI_PUBLISH: true
             }
           - { 
+              NAME: linux-arm64-musl, 
+              OS: ubuntu-22.04, 
+              TOOLCHAIN: stable,
+              TARGET: aarch64-unknown-linux-musl,
+              NPM_PUBLISH: false,
+              PYPI_PUBLISH: true
+            }
+          - { 
+              NAME: win32-x64-mingw, 
+              OS: windows-latest, 
+              TOOLCHAIN: stable,
+              TARGET: x86_64-pc-windows-gnu,
+              NPM_PUBLISH: false,
+              PYPI_PUBLISH: false
+            }
+          - { 
               NAME: win32-x64-msvc, 
               OS: windows-latest, 
+              TOOLCHAIN: stable,
               TARGET: x86_64-pc-windows-msvc,
               NPM_PUBLISH: true,
               PYPI_PUBLISH: true
             }
           - { 
+              NAME: win32-x86-msvc, 
+              OS: windows-latest, 
+              TOOLCHAIN: stable,
+              TARGET: i686-pc-windows-msvc,
+              NPM_PUBLISH: false,
+              PYPI_PUBLISH: true
+            }
+          - { 
+              NAME: win32-arm64-msvc, 
+              OS: windows-latest, 
+              TOOLCHAIN: stable,
+              TARGET: aarch64-pc-windows-msvc,
+              NPM_PUBLISH: true,
+              PYPI_PUBLISH: false
+            }
+          - { 
               NAME: darwin-x64, 
               OS: macos-15, 
+              TOOLCHAIN: stable,
               TARGET: x86_64-apple-darwin,
               NPM_PUBLISH: true,
               PYPI_PUBLISH: true
@@ -68,6 +121,7 @@ jobs:
           - { 
               NAME: darwin-arm64, 
               OS: macos-15, 
+              TOOLCHAIN: stable,
               TARGET: aarch64-apple-darwin,
               NPM_PUBLISH: true,
               PYPI_PUBLISH: true
@@ -79,7 +133,7 @@ jobs:
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: ${{ matrix.build.TOOLCHAIN }}
           target: ${{ matrix.build.TARGET }}
 
       - name: Install cross
@@ -387,12 +441,19 @@ jobs:
                       return 'gh-templates-linux-x64-glibc'
                   elif arch == 'arm64':
                       return 'gh-templates-linux-arm64-glibc'
+                  elif arch == 'x86':
+                      return 'gh-templates-linux-x86-musl'
                   else:
                       return f'gh-templates-linux-{arch}-glibc'
               elif system == 'darwin':
                   return f'gh-templates-darwin-{arch}'
               elif system == 'windows':
-                  return f'gh-templates-win32-{arch}-msvc'
+                  if arch == 'x64':
+                      return 'gh-templates-win32-x64-msvc'
+                  elif arch == 'x86':
+                      return 'gh-templates-win32-x86-msvc'
+                  else:
+                      return f'gh-templates-win32-{arch}-msvc'
               else:
                   # Fallback to linux x64
                   return 'gh-templates-linux-x64-glibc'
@@ -418,9 +479,9 @@ jobs:
           
           ## Supported Platforms
           
-          - Linux (x64, ARM64)
+          - Linux (x64, x86, ARM64) - glibc and musl variants
           - macOS (x64, ARM64)  
-          - Windows (x64)
+          - Windows (x64, x86, ARM64)
               ''',
               long_description_content_type='text/markdown',
               packages=find_packages(),
@@ -506,9 +567,9 @@ jobs:
                   print("2. The platform-specific package failed to install")
                   print()
                   print("Supported platforms:")
-                  print("- Linux x64/ARM64")
+                  print("- Linux x64/x86/ARM64 (glibc/musl)")
                   print("- macOS x64/ARM64")
-                  print("- Windows x64")
+                  print("- Windows x64/x86/ARM64")
                   print()
                   print("Please report this issue at:")
                   print("https://github.com/RafaelJohn9/gh-templates/issues")
@@ -546,9 +607,9 @@ jobs:
           
           This package automatically installs the correct binary for your platform:
           
-          - **Linux**: x64, ARM64 (glibc and musl)
+          - **Linux**: x64, x86, ARM64 (glibc and musl variants)
           - **macOS**: x64 (Intel), ARM64 (Apple Silicon)
-          - **Windows**: x64
+          - **Windows**: x64, x86, ARM64
           
           ## How it Works
           
@@ -608,7 +669,8 @@ jobs:
               "gh-templates-linux-arm64": "${{ env.RELEASE_VERSION }}",
               "gh-templates-darwin-x64": "${{ env.RELEASE_VERSION }}",
               "gh-templates-darwin-arm64": "${{ env.RELEASE_VERSION }}",
-              "gh-templates-windows-x64": "${{ env.RELEASE_VERSION }}"
+              "gh-templates-windows-x64": "${{ env.RELEASE_VERSION }}",
+              "gh-templates-windows-arm64": "${{ env.RELEASE_VERSION }}"
             },
             "files": ["bin/"],
             "engines": {
@@ -630,7 +692,11 @@ jobs:
           
           let packageName;
           if (platform === 'win32') {
-            packageName = 'gh-templates-windows-x64';
+            if (arch === 'arm64') {
+              packageName = 'gh-templates-windows-arm64';
+            } else {
+              packageName = 'gh-templates-windows-x64';
+            }
           } else if (platform === 'darwin') {
             packageName = arch === 'arm64' ? 'gh-templates-darwin-arm64' : 'gh-templates-darwin-x64';
           } else if (platform === 'linux') {
