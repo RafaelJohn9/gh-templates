@@ -9,20 +9,20 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
-- update CHANGELOG [skip ci] (3005962)
-
-- update documentation for v0.1.29 [skip ci] (95995f6)
-
-- bump version in Cargo.toml (b95f9e7)
+- update CHANGELOG [skip ci] (8c9ebaf)
 
 
-## [Unreleased]
+## [v0.1.30]
 
 
 
 ### Chore
 
 - update CHANGELOG [skip ci] (3005962)
+
+- update documentation for v0.1.29 [skip ci] (95995f6)
+
+- bump version in Cargo.toml (b95f9e7)
 
 
 ## [v0.1.29]
