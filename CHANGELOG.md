@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (3005962)
+
+
+## [v0.1.29]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (10e96b6)
 
 - update documentation for v0.1.28 [skip ci] (2f153c1)
@@ -17,15 +26,6 @@ All notable changes to this project will be documented in this file.
 ### Fix
 
 - deploy docs (removed deprecated version) && bumped version in toml (f86d604)
-
-
-## [Unreleased]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (10e96b6)
 
 
 ## [v0.1.28]
