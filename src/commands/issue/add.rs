@@ -124,7 +124,14 @@ fn download_single_template(
     output: Option<String>,
 ) -> anyhow::Result<()> {
     let fetcher = Fetcher::new();
-    let url = format!("{}/issue-templates/{}.yml", GITHUB_RAW_BASE, template_name);
+
+    // If template_name does not have an extension, append ".yml"
+    let template_file = if Path::new(template_name).extension().is_some() {
+        template_name.to_string()
+    } else {
+        format!("{}.yml", template_name)
+    };
+    let url = format!("{}/issue-templates/{}", GITHUB_RAW_BASE, template_file);
 
     let msg = format!("Downloading issue template: {}", template_name);
     let pb = progress::spinner(&msg);
@@ -145,8 +152,8 @@ fn download_single_template(
         // Default: .github/ISSUE_TEMPLATE/<template_name>.yml
         let default_path = Path::new(OUTPUT_BASE_PATH).join(OUTPUT);
         dir_path
-            .map(|p| p.join(format!("{}.yml", template_name)))
-            .unwrap_or_else(|| default_path.join(format!("{}.yml", template_name)))
+            .map(|p| p.join(format!("{}", template_file)))
+            .unwrap_or_else(|| default_path.join(format!("{}", template_file)))
     };
 
     file::save_file(&content, &dest_path, force)?;
