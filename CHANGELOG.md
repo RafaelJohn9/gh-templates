@@ -11,6 +11,22 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (4ae0c08)
 
+- update documentation for v0.1.18 [skip ci] (1bb656a)
+
+
+### Fix
+
+- publish with ref to git cliff (0a642cc)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (4ae0c08)
+
 
 ## [v0.1.18]
 
