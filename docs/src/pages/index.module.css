@@ -1,15 +1,11 @@
 /* Container */
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
   transition: all 0.3s ease;
 }
 
-.container.dark {
-  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
-}
-
-/* Theme Toggle */
+/* Theme Toggle - keeping this for reference but it's now non-functional */
 .themeToggle {
   position: fixed;
   top: 1rem;
@@ -23,8 +19,8 @@
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
   transform: scale(1);
-  background-color: #1f2937;
-  color: #fbbf24;
+  background-color: #eab308;
+  color: #713f12;
   border: none;
   cursor: pointer;
   font-size: 1.25rem;
@@ -32,15 +28,6 @@
 
 .toggleButton:hover {
   transform: scale(1.1);
-  background-color: #374151;
-}
-
-.toggleButtonDark {
-  background-color: #eab308;
-  color: #713f12;
-}
-
-.toggleButtonDark:hover {
   background-color: #facc15;
 }
 
@@ -54,10 +41,6 @@
   position: absolute;
   inset: 0;
   opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-}
-
-.backgroundPatternDark {
   background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
@@ -97,23 +80,18 @@
   align-items: center;
   padding: 0.5rem 1rem;
   border-radius: 9999px;
-  background-color: #dcfce7;
-  color: #166534;
+  background-color: #14532d;
+  color: #bbf7d0;
   font-size: 0.875rem;
   font-weight: 500;
   margin-bottom: 1.5rem;
-}
-
-.badgeDark {
-  background-color: #14532d;
-  color: #bbf7d0;
 }
 
 .title {
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, #111827 0%, #6b7280 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #d1d5db 100%);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
@@ -125,15 +103,9 @@
   }
 }
 
-.titleDark {
-  background: linear-gradient(135deg, #ffffff 0%, #d1d5db 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-}
-
 .subtitle {
   font-size: 1.25rem;
-  color: #6b7280;
+  color: #d1d5db;
   margin-bottom: 2rem;
   max-width: 48rem;
   margin-left: auto;
@@ -144,10 +116,6 @@
   .subtitle {
     font-size: 1.5rem;
   }
-}
-
-.subtitleDark {
-  color: #d1d5db;
 }
 
 /* Terminal */
@@ -291,8 +259,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 1rem 2rem;
-  border: 2px solid #d1d5db;
-  color: #374151;
+  border: 2px solid #4b5563;
+  color: #d1d5db;
   font-weight: 600;
   border-radius: 0.5rem;
   transform: scale(1);
@@ -306,19 +274,10 @@
   transform: scale(1.05);
 }
 
-.secondaryButtonDark {
-  border-color: #4b5563;
-  color: #d1d5db;
-}
-
 /* Installation Section */
 .installationSection {
-  background-color: #f9fafb;
-  padding: 4rem 0;
-}
-
-.installationSectionDark {
   background-color: #1f2937;
+  padding: 4rem 0;
 }
 
 .sectionContent {
@@ -343,12 +302,8 @@
 .sectionTitle {
   font-size: 1.875rem;
   font-weight: 700;
-  color: #111827;
-  margin-bottom: 2rem;
-}
-
-.sectionTitleDark {
   color: #ffffff;
+  margin-bottom: 2rem;
 }
 
 .installationGrid {
@@ -363,27 +318,18 @@
 }
 
 .installationCard {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  background-color: #111827;
+  border: 1px solid #374151;
   border-radius: 0.5rem;
   padding: 1.5rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-.installationCardDark {
-  background-color: #111827;
-  border-color: #374151;
-}
-
 .cardTitle {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
-  margin-bottom: 1rem;
-}
-
-.cardTitleDark {
   color: #ffffff;
+  margin-bottom: 1rem;
 }
 
 .codeBlock {
@@ -410,23 +356,15 @@
 .featuresTitle {
   font-size: 2.25rem;
   font-weight: 700;
-  color: #111827;
-  margin-bottom: 1rem;
-}
-
-.featuresTitleDark {
   color: #ffffff;
+  margin-bottom: 1rem;
 }
 
 .featuresSubtitle {
   font-size: 1.25rem;
-  color: #6b7280;
+  color: #d1d5db;
   max-width: 32rem;
   margin: 0 auto;
-}
-
-.featuresSubtitleDark {
-  color: #d1d5db;
 }
 
 .featuresGrid {
@@ -447,8 +385,8 @@
 }
 
 .featureCard {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  background-color: #111827;
+  border: 1px solid #374151;
   border-radius: 0.75rem;
   padding: 2rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -459,11 +397,6 @@
 .featureCard:hover {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   transform: translateY(-0.25rem);
-}
-
-.featureCardDark {
-  background-color: #111827;
-  border-color: #374151;
 }
 
 .featureEmoji {
@@ -479,21 +412,13 @@
 .featureTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #111827;
+  color: #ffffff;
   margin-bottom: 0.75rem;
 }
 
-.featureTitleDark {
-  color: #ffffff;
-}
-
 .featureDescription {
-  color: #6b7280;
-  margin-bottom: 1rem;
-}
-
-.featureDescriptionDark {
   color: #d1d5db;
+  margin-bottom: 1rem;
 }
 
 .featureHighlight {
@@ -501,15 +426,10 @@
   align-items: center;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  background-color: #dcfce7;
-  color: #166534;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.featureHighlightDark {
   background-color: #14532d;
   color: #bbf7d0;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 /* Stats Section */
@@ -548,10 +468,6 @@
 /* Final CTA Section */
 .finalCtaSection {
   padding: 5rem 0;
-  background-color: #f9fafb;
-}
-
-.finalCtaSectionDark {
   background-color: #1f2937;
 }
 
@@ -577,22 +493,14 @@
 .finalCtaTitle {
   font-size: 2.25rem;
   font-weight: 700;
-  color: #111827;
-  margin-bottom: 1.5rem;
-}
-
-.finalCtaTitleDark {
   color: #ffffff;
+  margin-bottom: 1.5rem;
 }
 
 .finalCtaSubtitle {
   font-size: 1.25rem;
-  color: #6b7280;
-  margin-bottom: 2rem;
-}
-
-.finalCtaSubtitleDark {
   color: #d1d5db;
+  margin-bottom: 2rem;
 }
 
 .finalCtaButtons {
@@ -629,8 +537,8 @@
 
 .finalSecondaryButton {
   padding: 1rem 2rem;
-  border: 2px solid #16a34a;
-  color: #16a34a;
+  border: 2px solid #22c55e;
+  color: #22c55e;
   font-weight: 600;
   border-radius: 0.5rem;
   transform: scale(1);
@@ -641,17 +549,7 @@
 }
 
 .finalSecondaryButton:hover {
-  background-color: #16a34a;
-  color: #ffffff;
-  transform: scale(1.05);
-}
-
-.finalSecondaryButtonDark {
-  color: #22c55e;
-  border-color: #22c55e;
-}
-
-.finalSecondaryButtonDark:hover {
   background-color: #22c55e;
   color: #ffffff;
+  transform: scale(1.05);
 }

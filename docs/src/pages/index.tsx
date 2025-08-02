@@ -1,31 +1,17 @@
+// Pasted_Text_1754161025956.txt
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import styles from './index.module.css';
 
 export default function Home() {
-  // Custom dark mode state management
-  const [colorMode, setColorMode] = useState('light');
+  // Hardcode colorMode to 'dark' as light mode is no longer supported
+  const colorMode = 'dark'; // Removed state and setter
   const [currentCommand, setCurrentCommand] = useState(0);
   const [typedText, setTypedText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
 
-  // Initialize dark mode from localStorage or system preference
-  useEffect(() => {
-    const savedMode = localStorage.getItem('theme') ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    setColorMode(savedMode);
-
-    // Apply theme to document
-    document.documentElement.setAttribute('data-theme', savedMode);
-  }, []);
-
-  // Handle theme toggle
-  const toggleColorMode = () => {
-    const newMode = colorMode === 'dark' ? 'light' : 'dark';
-    setColorMode(newMode);
-    localStorage.setItem('theme', newMode);
-    document.documentElement.setAttribute('data-theme', newMode);
-  };
+  // Removed the useEffect hook that initialized theme from localStorage/system preference
+  // Removed the toggleColorMode function
 
   const commands = [
     // Add commands
@@ -33,7 +19,6 @@ export default function Home() {
     'gh-templates license add mit',
     'gh-templates gitignore add node',
     'gh-templates pr add default',
-
     // List commands
     'gh-templates issue list',
     'gh-templates license list',
@@ -47,14 +32,12 @@ export default function Home() {
     'gh-templates gitignore list --global',
     'gh-templates gitignore list --community',
     'gh-templates pr list',
-
     // Preview commands
     'gh-templates issue preview bug',
     'gh-templates license preview mit',
     'gh-templates gitignore preview node',
     'gh-templates pr preview default',
   ];
-
 
   const features = [
     {
@@ -128,27 +111,19 @@ export default function Home() {
     };
   }, [typedText, isTyping, currentCommand, commands]);
 
-  const isDark = colorMode === 'dark';
+  // Simplified check for dark mode (always true)
+  const isDark = true; // colorMode === 'dark';
 
   return (
     <div className={clsx(styles.container, isDark && styles.dark)}>
-      {/* Custom Dark Mode Toggle Button */}
+      {/* Theme Toggle - Kept for layout but made non-functional */}
       <div className={styles.themeToggle}>
-        <button
-          onClick={toggleColorMode}
-          className={clsx(styles.toggleButton, isDark && styles.toggleButtonDark)}
-          aria-label="Toggle dark mode"
-          title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-        >
-          {isDark ? '🌞' : '🌙'}
-        </button>
       </div>
 
       {/* Hero Section */}
       <div className={styles.heroSection}>
         {/* Background Pattern */}
         <div className={clsx(styles.backgroundPattern, isDark && styles.backgroundPatternDark)} />
-
         <div className={styles.heroContent}>
           <div className={styles.heroText}>
             {/* Main Heading */}
@@ -163,7 +138,6 @@ export default function Home() {
                 The fastest way to create professional GitHub templates for issues, PRs, licenses, and more
               </p>
             </div>
-
             {/* Interactive Terminal */}
             <div className={styles.terminalContainer}>
               <div className={styles.terminal}>
@@ -186,7 +160,6 @@ export default function Home() {
                 </div>
               </div>
             </div>
-
             {/* CTA Buttons */}
             <div className={styles.ctaButtons}>
               <a href="/gh-templates/installation" className={styles.primaryButton}>
@@ -265,7 +238,6 @@ export default function Home() {
               Built by developers, for developers. Every feature designed to save you time and effort.
             </p>
           </div>
-
           <div className={styles.featuresGrid}>
             {features.map((feature, index) => (
               <div
