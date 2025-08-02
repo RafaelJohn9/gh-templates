@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (8811d4f)
+
+
+## [v0.1.23]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (dc92a6a)
 
 - update documentation for v0.1.22 [skip ci] (94f810a)
@@ -17,15 +26,6 @@ All notable changes to this project will be documented in this file.
 ### Fix
 
 - pypi npm homebrew package deployment (40421c4)
-
-
-## [Unreleased]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (dc92a6a)
 
 
 ## [v0.1.22]
