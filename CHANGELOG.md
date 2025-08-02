@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (4ae0c08)
+
+
+## [v0.1.18]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (f31ee48)
 
 - update documentation for v0.1.17 [skip ci] (bfd94cc)
@@ -17,15 +26,6 @@ All notable changes to this project will be documented in this file.
 ### Fix
 
 - publish workflow (61ab339)
-
-
-## [Unreleased]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (f31ee48)
 
 
 ## [v0.1.17]
