@@ -355,27 +355,82 @@ jobs:
 
       - name: Create unified Python package
         run: |
-          mkdir -p python-unified/gh_templates_unified
+          mkdir -p python-unified/gh_templates
           
           # Create setup.py for unified package
-          cat > python-unified/setup.py << EOF
+          cat > python-unified/setup.py << 'EOF'
+          import platform
           from setuptools import setup, find_packages
+          
+          # Determine the correct platform-specific package
+          def get_platform_package():
+              system = platform.system().lower()
+              machine = platform.machine().lower()
+              
+              # Normalize architecture names
+              if machine in ['x86_64', 'amd64']:
+                  arch = 'x64'
+              elif machine in ['aarch64', 'arm64']:
+                  arch = 'arm64'
+              elif machine in ['i386', 'i686']:
+                  arch = 'x86'
+              else:
+                  arch = machine
+              
+              # Map to our package names
+              if system == 'linux':
+                  if arch == 'x64':
+                      return 'gh-templates-linux-x64-glibc'
+                  elif arch == 'arm64':
+                      return 'gh-templates-linux-arm64-glibc'
+                  else:
+                      return f'gh-templates-linux-{arch}-glibc'
+              elif system == 'darwin':
+                  return f'gh-templates-darwin-{arch}'
+              elif system == 'windows':
+                  return f'gh-templates-win32-{arch}-msvc'
+              else:
+                  # Fallback to linux x64
+                  return 'gh-templates-linux-x64-glibc'
+          
+          platform_package = get_platform_package()
+          version = '${RELEASE_VERSION}'
           
           setup(
               name='gh-templates',
-              version='${{ env.RELEASE_VERSION }}',
+              version=version,
               description='GitHub Templates CLI tool - unified installer',
+              long_description='''
+              # gh-templates
+              
+              GitHub Templates CLI tool for managing and using GitHub repository templates.
+              
+              This package automatically installs the correct binary for your platform.
+              
+              ## Usage
+              
+              ```bash
+              pip install gh-templates
+              gh-templates --help
+              ```
+              
+              ## Supported Platforms
+              
+              - Linux (x64, ARM64)
+              - macOS (x64, ARM64) 
+              - Windows (x64)
+              ''',
+              long_description_content_type='text/markdown',
               packages=find_packages(),
-              entry_points={'console_scripts': ['gh-templates=gh_templates_unified:main']},
-              license='Apache-2.0',
+              entry_points={
+                  'console_scripts': ['gh-templates=gh_templates:main']
+              },
               install_requires=[
-                  'gh-templates-linux-x64-glibc==${{ env.RELEASE_VERSION }}; platform_system=="Linux" and platform_machine=="x86_64"',
-                  'gh-templates-linux-x64-musl==${{ env.RELEASE_VERSION }}; platform_system=="Linux" and platform_machine=="x86_64"',
-                  'gh-templates-linux-arm64-glibc==${{ env.RELEASE_VERSION }}; platform_system=="Linux" and platform_machine=="aarch64"',
-                  'gh-templates-win32-x64-msvc==${{ env.RELEASE_VERSION }}; platform_system=="Windows" and platform_machine=="AMD64"',
-                  'gh-templates-darwin-x64==${{ env.RELEASE_VERSION }}; platform_system=="Darwin" and platform_machine=="x86_64"',
-                  'gh-templates-darwin-arm64==${{ env.RELEASE_VERSION }}; platform_system=="Darwin" and platform_machine=="arm64"',
+                  f'{platform_package}=={version}'
               ],
+              license='Apache-2.0',
+              author='Rafael John',
+              url='https://github.com/RafaelJohn9/gh-templates',
               classifiers=[
                   'Development Status :: 4 - Beta',
                   'Intended Audience :: Developers',
@@ -387,53 +442,141 @@ jobs:
                   'Programming Language :: Python :: 3.10',
                   'Programming Language :: Python :: 3.11',
                   'Programming Language :: Python :: 3.12',
+                  'Operating System :: OS Independent',
+                  'Topic :: Software Development :: Tools',
+                  'Topic :: Utilities',
               ],
               python_requires='>=3.7',
           )
           EOF
           
           # Create main module that delegates to platform-specific package
-          cat > python-unified/gh_templates_unified/__init__.py << 'EOF'
+          cat > python-unified/gh_templates/__init__.py << 'EOF'
+          """
+          GitHub Templates CLI tool - unified installer
+          
+          This package automatically delegates to the appropriate platform-specific binary.
+          """
+          
           import sys
           import platform
+          import importlib
+          import subprocess
+          import os
+          
+          __version__ = "${RELEASE_VERSION}"
+          
+          def get_platform_package_name():
+              """Determine the platform-specific package name."""
+              system = platform.system().lower()
+              machine = platform.machine().lower()
+              
+              # Normalize architecture names
+              if machine in ['x86_64', 'amd64']:
+                  arch = 'x64'
+              elif machine in ['aarch64', 'arm64']:
+                  arch = 'arm64'
+              elif machine in ['i386', 'i686']:
+                  arch = 'x86'
+              else:
+                  arch = machine
+              
+              # Map to our package names
+              if system == 'linux':
+                  if arch == 'x64':
+                      return 'gh_templates_bin'  # from gh-templates-linux-x64-glibc
+                  elif arch == 'arm64':
+                      return 'gh_templates_bin'  # from gh-templates-linux-arm64-glibc
+                  else:
+                      return 'gh_templates_bin'
+              elif system == 'darwin':
+                  return 'gh_templates_bin'  # from gh-templates-darwin-{arch}
+              elif system == 'windows':
+                  return 'gh_templates_bin'  # from gh-templates-win32-{arch}-msvc
+              else:
+                  return 'gh_templates_bin'
           
           def main():
+              """Main entry point that delegates to the platform-specific binary."""
               try:
-                  # Try to import the platform-specific package
+                  # Import the platform-specific package
+                  package_name = get_platform_package_name()
+                  platform_module = importlib.import_module(package_name)
+                  
+                  # Call the main function from the platform-specific package
+                  if hasattr(platform_module, 'main'):
+                      platform_module.main()
+                  else:
+                      print(f"Error: No main function found in {package_name}")
+                      sys.exit(1)
+                      
+              except ImportError as e:
                   system = platform.system()
                   machine = platform.machine()
                   
-                  if system == "Linux":
-                      if machine in ["x86_64", "AMD64"]:
-                          try:
-                              from gh_templates_bin import main as platform_main
-                              platform_main()
-                          except ImportError:
-                              print("Error: Platform-specific package not found. Try: pip install gh-templates-linux-x64-glibc")
-                              sys.exit(1)
-                      elif machine in ["aarch64", "arm64"]:
-                          from gh_templates_bin import main as platform_main
-                          platform_main()
-                      else:
-                          print(f"Unsupported Linux architecture: {machine}")
-                          sys.exit(1)
-                  elif system == "Darwin":
-                      from gh_templates_bin import main as platform_main
-                      platform_main()
-                  elif system == "Windows":
-                      from gh_templates_bin import main as platform_main
-                      platform_main()
-                  else:
-                      print(f"Unsupported platform: {system}-{machine}")
-                      sys.exit(1)
-              except ImportError as e:
-                  print(f"Error: Could not import platform-specific gh-templates package: {e}")
-                  print("Please ensure the correct platform-specific package is installed.")
+                  print(f"Error: Platform-specific package not found for {system}-{machine}")
+                  print(f"Import error: {e}")
+                  print()
+                  print("This usually means:")
+                  print("1. Your platform is not supported")
+                  print("2. The platform-specific package failed to install")
+                  print()
+                  print("Supported platforms:")
+                  print("- Linux x64/ARM64")
+                  print("- macOS x64/ARM64")  
+                  print("- Windows x64")
+                  print()
+                  print("Please report this issue at:")
+                  print("https://github.com/RafaelJohn9/gh-templates/issues")
                   sys.exit(1)
+              except Exception as e:
+                  print(f"Error running gh-templates: {e}")
+                  sys.exit(1)
+          
+          # Allow direct module execution
+          if __name__ == '__main__':
+              main()
           EOF
           
-          # Create empty __init__.py for package
-          touch python-unified/gh_templates_unified/__init__.py
+          # Create README for PyPI
+          cat > python-unified/README.md << 'EOF'
+          # gh-templates
+          
+          GitHub Templates CLI tool for managing and using GitHub repository templates.
+          
+          ## Installation
+          
+          ```bash
+          pip install gh-templates
+          ```
+          
+          ## Usage
+          
+          ```bash
+          gh-templates --help
+          gh-templates --version
+          ```
+          
+          ## Platform Support
+          
+          This package automatically installs the correct binary for your platform:
+          
+          - **Linux**: x64, ARM64 (glibc and musl)
+          - **macOS**: x64 (Intel), ARM64 (Apple Silicon)
+          - **Windows**: x64
+          
+          ## How it Works
+          
+          This is a unified installer package that:
+          
+          1. Detects your platform during installation
+          2. Installs the appropriate platform-specific package as a dependency
+          3. Provides a unified `gh-templates` command that delegates to the platform binary
+          
+          ## License
+          
+          Apache-2.0
+          EOF
           
           # Install dependencies and publish
           cd python-unified
@@ -459,21 +602,15 @@ jobs:
 
       - name: Create unified package
         run: |
-          mkdir -p gh-templates-unified
-          
-          # Create package.json for the main package that depends on platform-specific ones
+          mkdir -p gh-templates-unified/bin
+
+          # Create package.json
           cat > gh-templates-unified/package.json << EOF
           {
             "name": "gh-templates",
             "version": "${{ env.RELEASE_VERSION }}",
-            "description": "GitHub Templates CLI tool",
-            "bin": {
-              "gh-templates": "./bin/gh-templates"
-            },
-            "scripts": {
-              "postinstall": "node install.js"
-            },
-            "files": ["bin/", "install.js"],
+            "description": "GitHub Templates CLI tool (platform-aware wrapper)",
+            "bin": "./bin/gh-templates",
             "license": "Apache-2.0",
             "repository": {
               "type": "git",
@@ -486,121 +623,57 @@ jobs:
               "gh-templates-darwin-arm64": "${{ env.RELEASE_VERSION }}",
               "gh-templates-windows-x64": "${{ env.RELEASE_VERSION }}"
             },
-            "peerDependencies": {
-              "gh-templates-linux-x64": "${{ env.RELEASE_VERSION }}",
-              "gh-templates-linux-arm64": "${{ env.RELEASE_VERSION }}",
-              "gh-templates-darwin-x64": "${{ env.RELEASE_VERSION }}",
-              "gh-templates-darwin-arm64": "${{ env.RELEASE_VERSION }}",
-              "gh-templates-windows-x64": "${{ env.RELEASE_VERSION }}"
-            },
-            "peerDependenciesMeta": {
-              "gh-templates-linux-x64": { "optional": true },
-              "gh-templates-linux-arm64": { "optional": true },
-              "gh-templates-darwin-x64": { "optional": true },
-              "gh-templates-darwin-arm64": { "optional": true },
-              "gh-templates-windows-x64": { "optional": true }
+            "files": ["bin/"],
+            "engines": {
+              "node": ">=14"
             }
           }
           EOF
-          
-          # Create install script that downloads the binary directly
-          cat > gh-templates-unified/install.js << 'EOF'
-          const fs = require('fs');
+
+          # Create the smart wrapper
+          cat > gh-templates-unified/bin/gh-templates << 'EOF'
+          #!/usr/bin/env node
+          const { execFileSync } = require('child_process');
           const path = require('path');
           const os = require('os');
-          const https = require('https');
-          
+
           const platform = os.platform();
           const arch = os.arch();
-          const version = require('./package.json').version;
-          
+
           let packageName;
-          let binaryName = 'gh-templates';
-          let downloadUrl;
-          
+
           if (platform === 'win32') {
             packageName = 'gh-templates-windows-x64';
-            binaryName = 'gh-templates.exe';
           } else if (platform === 'darwin') {
             packageName = arch === 'arm64' ? 'gh-templates-darwin-arm64' : 'gh-templates-darwin-x64';
           } else if (platform === 'linux') {
             packageName = arch === 'arm64' ? 'gh-templates-linux-arm64' : 'gh-templates-linux-x64';
           } else {
-            console.error(`Unsupported platform: ${platform}-${arch}`);
+            console.error(\`❌ Unsupported platform: \${platform}-\${arch}\`);
             process.exit(1);
           }
-          
-          // First try to find the platform package (for local installs)
-          const packagePath = path.join(__dirname, '..', packageName);
-          const binDir = path.join(__dirname, 'bin');
-          const targetBinary = path.join(binDir, binaryName);
-          
-          if (fs.existsSync(packagePath)) {
-            const sourceBinary = path.join(packagePath, 'bin', binaryName);
-            if (fs.existsSync(sourceBinary)) {
-              if (!fs.existsSync(binDir)) {
-                fs.mkdirSync(binDir, { recursive: true });
-              }
-              fs.copyFileSync(sourceBinary, targetBinary);
-              if (platform !== 'win32') {
-                fs.chmodSync(targetBinary, 0o755);
-              }
-              console.log(`Installed ${packageName} binary`);
-              return;
-            }
+
+          try {
+            const pkgPath = require.resolve(\`\${packageName}/package.json\`);
+            const binPath = path.join(path.dirname(pkgPath), 'bin', platform === 'win32' ? 'gh-templates.exe' : 'gh-templates');
+            execFileSync(binPath, process.argv.slice(2), { stdio: 'inherit' });
+          } catch (err) {
+            console.error(\`❌ Platform-specific package not found: \${packageName}\`);
+            console.error(\`💡 Install it directly:\`);
+            console.error(\`   npm install -g \${packageName}\`);
+            console.error(\`   OR\`);
+            console.error(\`   npm install -g gh-templates-\${platform}-\${arch}\`);
+            process.exit(1);
           }
-          
-          // Fallback: try to install the platform-specific package using npm
-          console.log(`Platform package not found locally, installing ${packageName}...`);
-          const { spawn } = require('child_process');
-          
-          const npmInstall = spawn('npm', ['install', `${packageName}@${version}`], {
-            stdio: 'inherit',
-            cwd: __dirname
-          });
-          
-          npmInstall.on('close', (code) => {
-            if (code === 0) {
-              // Try again after install
-              const newPackagePath = path.join(__dirname, 'node_modules', packageName);
-              const sourceBinary = path.join(newPackagePath, 'bin', binaryName);
-              
-              if (fs.existsSync(sourceBinary)) {
-                if (!fs.existsSync(binDir)) {
-                  fs.mkdirSync(binDir, { recursive: true });
-                }
-                fs.copyFileSync(sourceBinary, targetBinary);
-                if (platform !== 'win32') {
-                  fs.chmodSync(targetBinary, 0o755);
-                }
-                console.log(`Successfully installed ${packageName} binary`);
-              } else {
-                console.error(`Binary not found after installing ${packageName}`);
-                process.exit(1);
-              }
-            } else {
-              console.error(`Failed to install ${packageName}`);
-              console.log('You can install the platform-specific package directly:');
-              console.log(`npm install -g ${packageName}`);
-              process.exit(1);
-            }
-          });
           EOF
-          
-          # Create bin directory and wrapper
-          mkdir -p gh-templates-unified/bin
-          cat > gh-templates-unified/bin/gh-templates << 'EOF'
-          #!/usr/bin/env node
-          console.error('gh-templates binary not installed. Please run: npm install');
-          process.exit(1);
-          EOF
+
           chmod +x gh-templates-unified/bin/gh-templates
-          
+
           cd gh-templates-unified
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
+          
   publish-homebrew:
     name: Update Homebrew formula
     runs-on: macos-latest
