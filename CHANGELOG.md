@@ -11,6 +11,19 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (72f6356)
 
+- update documentation for v0.1.31 [skip ci] (6e4d6da)
+
+- updated docs readme && bump cargo toml version (ecf9f64)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (72f6356)
+
 
 ## [v0.1.31]
 
