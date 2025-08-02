@@ -356,15 +356,21 @@ jobs:
       - name: Create unified Python package
         run: |
           mkdir -p python-unified/gh_templates
-          # Create setup.py for unified package - ALLOW VARIABLE SUBSTITUTION
-          # Note: EOF is NOT quoted, allowing ${{ env.RELEASE_VERSION }} substitution
-          cat > python-unified/setup.py << EOF
+          
+          # Create setup.py for unified package
+          cat > python-unified/setup.py << 'EOF'
           import platform
           from setuptools import setup, find_packages
+          import os
+          
+          # Get version from environment
+          version = os.environ.get('RELEASE_VERSION', '0.0.0')
+          
           # Determine the correct platform-specific package
           def get_platform_package():
               system = platform.system().lower()
               machine = platform.machine().lower()
+              
               # Normalize architecture names
               if machine in ['x86_64', 'amd64']:
                   arch = 'x64'
@@ -374,6 +380,7 @@ jobs:
                   arch = 'x86'
               else:
                   arch = machine
+              
               # Map to our package names
               if system == 'linux':
                   if arch == 'x64':
@@ -389,25 +396,31 @@ jobs:
               else:
                   # Fallback to linux x64
                   return 'gh-templates-linux-x64-glibc'
+          
           platform_package = get_platform_package()
-          version = '${{ env.RELEASE_VERSION }}' # This will be substituted now
+          
           setup(
               name='gh-templates',
               version=version,
               description='GitHub Templates CLI tool - unified installer',
               long_description='''
-              # gh-templates
-              GitHub Templates CLI tool for managing and using GitHub repository templates.
-              This package automatically installs the correct binary for your platform.
-              ## Usage
-              ```bash
-              pip install gh-templates
-              gh-templates --help
-              ```
-              ## Supported Platforms
-              - Linux (x64, ARM64)
-              - macOS (x64, ARM64)
-              - Windows (x64)
+          # gh-templates
+          
+          GitHub Templates CLI tool for managing and using GitHub repository templates.
+          This package automatically installs the correct binary for your platform.
+          
+          ## Usage
+          
+          ```bash
+          pip install gh-templates
+          gh-templates --help
+          ```
+          
+          ## Supported Platforms
+          
+          - Linux (x64, ARM64)
+          - macOS (x64, ARM64)  
+          - Windows (x64)
               ''',
               long_description_content_type='text/markdown',
               packages=find_packages(),
@@ -415,7 +428,7 @@ jobs:
                   'console_scripts': ['gh-templates=gh_templates:main']
               },
               install_requires=[
-                  f'{platform_package}=={version}' # This f-string will work correctly now
+                  f'{platform_package}=={version}'
               ],
               license='Apache-2.0',
               author='Rafael John',
@@ -432,15 +445,14 @@ jobs:
                   'Programming Language :: Python :: 3.11',
                   'Programming Language :: Python :: 3.12',
                   'Operating System :: OS Independent',
-                  'Topic :: Software Development :: Tools',
                   'Topic :: Utilities',
               ],
               python_requires='>=3.7',
           )
           EOF
+          
           # Create main module that delegates to platform-specific package
-          # (This part uses quoted EOF, which is fine if no workflow vars are needed inside)
-          cat > python-unified/gh_templates/__init__.py << 'EOF_PY'
+          cat > python-unified/gh_templates/__init__.py << 'EOF'
           """
           GitHub Templates CLI tool - unified installer
           This package automatically delegates to the appropriate platform-specific binary.
@@ -450,11 +462,12 @@ jobs:
           import importlib
           import subprocess
           import os
-          __version__ = "${RELEASE_VERSION}" # This substitution happens in setup.py, not here
+          
           def get_platform_package_name():
               """Determine the platform-specific package name."""
               system = platform.system().lower()
               machine = platform.machine().lower()
+              
               # Normalize architecture names
               if machine in ['x86_64', 'amd64']:
                   arch = 'x64'
@@ -464,32 +477,24 @@ jobs:
                   arch = 'x86'
               else:
                   arch = machine
-              # Map to our package names
-              if system == 'linux':
-                  if arch == 'x64':
-                      return 'gh_templates_bin'  # from gh-templates-linux-x64-glibc
-                  elif arch == 'arm64':
-                      return 'gh_templates_bin'  # from gh-templates-linux-arm64-glibc
-                  else:
-                      return 'gh_templates_bin'
-              elif system == 'darwin':
-                  return 'gh_templates_bin'  # from gh-templates-darwin-{arch}
-              elif system == 'windows':
-                  return 'gh_templates_bin'  # from gh-templates-win32-{arch}-msvc
-              else:
-                  return 'gh_templates_bin'
+              
+              # All platform-specific packages use the same module name
+              return 'gh_templates_bin'
+          
           def main():
               """Main entry point that delegates to the platform-specific binary."""
               try:
                   # Import the platform-specific package
                   package_name = get_platform_package_name()
                   platform_module = importlib.import_module(package_name)
+                  
                   # Call the main function from the platform-specific package
                   if hasattr(platform_module, 'main'):
                       platform_module.main()
                   else:
                       print(f"Error: No main function found in {package_name}")
                       sys.exit(1)
+                      
               except ImportError as e:
                   system = platform.system()
                   machine = platform.machine()
@@ -508,39 +513,56 @@ jobs:
                   print("Please report this issue at:")
                   print("https://github.com/RafaelJohn9/gh-templates/issues")
                   sys.exit(1)
+                  
               except Exception as e:
                   print(f"Error running gh-templates: {e}")
                   sys.exit(1)
+          
           # Allow direct module execution
           if __name__ == '__main__':
               main()
-          EOF_PY
-          # Create README for PyPI (this part is fine)
-          cat > python-unified/README.md << 'EOF_README'
+          EOF
+          
+          # Create README for PyPI
+          cat > python-unified/README.md << 'EOF'
           # gh-templates
+          
           GitHub Templates CLI tool for managing and using GitHub repository templates.
+          
           ## Installation
+          
           ```bash
           pip install gh-templates
           ```
+          
           ## Usage
+          
           ```bash
           gh-templates --help
           gh-templates --version
           ```
+          
           ## Platform Support
+          
           This package automatically installs the correct binary for your platform:
+          
           - **Linux**: x64, ARM64 (glibc and musl)
           - **macOS**: x64 (Intel), ARM64 (Apple Silicon)
           - **Windows**: x64
+          
           ## How it Works
+          
           This is a unified installer package that:
+          
           1. Detects your platform during installation
           2. Installs the appropriate platform-specific package as a dependency
           3. Provides a unified `gh-templates` command that delegates to the platform binary
+          
           ## License
+          
           Apache-2.0
-          EOF_README
+          EOF
+          
           # Install dependencies and publish
           cd python-unified
           python -m pip install --upgrade pip setuptools wheel twine
@@ -560,16 +582,22 @@ jobs:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Set release version
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
       - name: Create unified package
         run: |
           mkdir -p gh-templates-unified/bin
-          # Create package.json (this part is fine)
+          
+          # Create package.json
           cat > gh-templates-unified/package.json << EOF
           {
             "name": "gh-templates",
             "version": "${{ env.RELEASE_VERSION }}",
             "description": "GitHub Templates CLI tool (platform-aware wrapper)",
-            "bin": "./bin/gh-templates",
+            "bin": {
+              "gh-templates": "./bin/gh-templates"
+            },
             "license": "Apache-2.0",
             "repository": {
               "type": "git",
@@ -588,14 +616,18 @@ jobs:
             }
           }
           EOF
-          # Create the smart wrapper - ESCAPE DOLLAR SIGNS for JavaScript
-          cat > gh-templates-unified/bin/gh-templates << 'EOF_WRAPPER'
+          
+          # Create the smart wrapper
+          cat > gh-templates-unified/bin/gh-templates << 'EOF'
           #!/usr/bin/env node
+          
           const { execFileSync } = require('child_process');
           const path = require('path');
           const os = require('os');
+          
           const platform = os.platform();
           const arch = os.arch();
+          
           let packageName;
           if (platform === 'win32') {
             packageName = 'gh-templates-windows-x64';
@@ -607,6 +639,7 @@ jobs:
             console.error(`❌ Unsupported platform: ${platform}-${arch}`);
             process.exit(1);
           }
+          
           try {
             const pkgPath = require.resolve(`${packageName}/package.json`);
             const binPath = path.join(path.dirname(pkgPath), 'bin', platform === 'win32' ? 'gh-templates.exe' : 'gh-templates');
@@ -619,7 +652,8 @@ jobs:
             console.error(`   npm install -g gh-templates-${platform}-${arch}`);
             process.exit(1);
           }
-          EOF_WRAPPER
+          EOF
+          
           chmod +x gh-templates-unified/bin/gh-templates
           cd gh-templates-unified
           npm publish
@@ -631,9 +665,12 @@ jobs:
     runs-on: macos-latest
     needs: publish-binaries
     steps:
+      - name: Set release version
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
       - name: Update Homebrew formula
         run: |
-          VERSION=$(echo "${{ github.ref_name }}" | sed 's/^v//')
+          VERSION="${{ env.RELEASE_VERSION }}"
           
           # Get release assets - use platform-specific URLs
           LINUX_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/gh-templates"
@@ -649,16 +686,9 @@ jobs:
           DARWIN_ARM_SHA=$(shasum -a 256 darwin-arm-binary | cut -d' ' -f1)
           DARWIN_X64_SHA=$(shasum -a 256 darwin-x64-binary | cut -d' ' -f1)
           
-          # Clone or create homebrew tap
-          if git clone https://github.com/rafaeljohn9/homebrew-tap.git; then
-            cd homebrew-tap
-          else
-            echo "Failed to clone homebrew-tap, creating new repository structure"
-            mkdir homebrew-tap
-            cd homebrew-tap
-            git init
-            git remote add origin https://github.com/rafaeljohn9/homebrew-tap.git
-          fi
+          # Clone homebrew tap using the PAT
+          git clone https://${{ secrets.HOMEBREW_GITHUB_TOKEN }}@github.com/rafaeljohn9/homebrew-tap.git
+          cd homebrew-tap
           
           # Create Formula directory if it doesn't exist
           mkdir -p Formula
@@ -707,4 +737,4 @@ jobs:
             git commit -m "Initial commit: Add gh-templates formula $VERSION"
           fi
           
-          git push https://x-access-token:${{ secrets.HOMEBREW_GITHUB_TOKEN }}@github.com/rafaeljohn9/homebrew-tap.git
+          git push
