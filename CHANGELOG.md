@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (5d9333b)
+
+
+## [v0.1.24]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (8811d4f)
 
 - update documentation for v0.1.23 [skip ci] (1390df3)
@@ -17,15 +26,6 @@ All notable changes to this project will be documented in this file.
 ### Fix
 
 - homebrew cloning (93c827d)
-
-
-## [Unreleased]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (8811d4f)
 
 
 ## [v0.1.23]
