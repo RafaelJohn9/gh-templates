@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (72f6356)
+
+
+## [v0.1.31]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (8c9ebaf)
 
 - update documentation for v0.1.30 [skip ci] (0e4147c)
@@ -17,15 +26,6 @@ All notable changes to this project will be documented in this file.
 ### Fix
 
 - add manual trigger and changes to docs/ on docs deployment and bump version to 0.1.31 (ea5da1f)
-
-
-## [Unreleased]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (8c9ebaf)
 
 
 ## [v0.1.30]
