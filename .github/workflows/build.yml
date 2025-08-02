@@ -78,14 +78,7 @@ jobs:
               NPM_PUBLISH: false,
               PYPI_PUBLISH: true
             }
-          - { 
-              NAME: win32-x64-mingw, 
-              OS: windows-latest, 
-              TOOLCHAIN: stable,
-              TARGET: x86_64-pc-windows-gnu,
-              NPM_PUBLISH: false,
-              PYPI_PUBLISH: false
-            }
+
           - { 
               NAME: win32-x64-msvc, 
               OS: windows-latest, 
@@ -160,12 +153,49 @@ jobs:
           cp target/${{ matrix.build.TARGET }}/release/$BINARY .
           chmod +x $BINARY
 
+      - name: Setup MinGW environment (Windows MinGW builds)
+        if: runner.os == 'Windows' && contains(matrix.build.TARGET, 'windows-gnu')
+        shell: pwsh
+        run: |
+          # Install MSYS2 and MinGW-w64
+          choco install msys2 -y
+          
+          # Update MSYS2 and install required packages
+          C:\tools\msys64\usr\bin\bash.exe -lc "pacman -Syu --noconfirm"
+          C:\tools\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm mingw-w64-x86_64-gcc mingw-w64-x86_64-openssl mingw-w64-x86_64-pkg-config perl"
+          
+          # Add MinGW to PATH
+          echo "C:\tools\msys64\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\tools\msys64\usr\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Build (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          # Build
-          cargo build --release --target ${{ matrix.build.TARGET }}
+          # Set environment variables for MinGW builds
+          if ("${{ matrix.build.TARGET }}" -like "*windows-gnu*") {
+            $env:OPENSSL_DIR = "C:\tools\msys64\mingw64"
+            $env:PKG_CONFIG_PATH = "C:\tools\msys64\mingw64\lib\pkgconfig"
+            $env:PKG_CONFIG_ALLOW_CROSS = "1"
+            $env:OPENSSL_STATIC = "1"
+            # Use the MSYS2 Perl instead of Windows Perl
+            $env:PATH = "C:\tools\msys64\usr\bin;C:\tools\msys64\mingw64\bin;" + $env:PATH
+          }
+          
+          # Build with retry mechanism for MinGW
+          if ("${{ matrix.build.TARGET }}" -like "*windows-gnu*") {
+            # Try building with native OpenSSL first
+            try {
+              cargo build --release --target ${{ matrix.build.TARGET }}
+            } catch {
+              Write-Host "First build attempt failed, trying with vendored OpenSSL..."
+              $env:OPENSSL_STATIC = "1"
+              $env:OPENSSL_VENDOR = "1"
+              cargo build --release --target ${{ matrix.build.TARGET }} --features vendored-openssl
+            }
+          } else {
+            cargo build --release --target ${{ matrix.build.TARGET }}
+          }
           
           # Copy binary
           $BINARY = "gh-templates.exe"
