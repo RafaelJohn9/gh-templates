@@ -11,6 +11,19 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (ee99247)
 
+- update documentation for v0.1.33 [skip ci] (9f24047)
+
+- Cargo toml app version to 0.1.34 (71e9587)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (ee99247)
+
 
 ## [v0.1.33]
 
