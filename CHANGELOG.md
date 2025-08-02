@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (6da4262)
+
+
+## [v0.1.21]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (85966c5)
 
 - update documentation for v0.1.20 [skip ci] (68ce744)
@@ -17,15 +26,6 @@ All notable changes to this project will be documented in this file.
 ### Fix
 
 - publish to have a unified namespace and fixed npm wrapper (0113323)
-
-
-## [Unreleased]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (85966c5)
 
 
 ## [v0.1.20]
