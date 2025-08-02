@@ -67,87 +67,186 @@ iwr -useb https://raw.githubusercontent.com/RafaelJohn9/gh-templates/main/instal
 If you prefer to install manually, download the appropriate binary for your platform from the [GitHub Releases](https://github.com/RafaelJohn9/gh-templates/releases) page:
 
 <details>
-<summary>Linux (x86_64, GNU)</summary>
+<summary>Linux (x86_64, glibc) - Most common</summary>
 
 ```bash
-wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-x86_64-unknown-linux-gnu
-chmod +x gh-templates-x86_64-unknown-linux-gnu
+wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates
+chmod +x gh-templates
 mkdir -p ~/.local/bin
-mv gh-templates-x86_64-unknown-linux-gnu ~/.local/bin/gh-templates
+mv gh-templates ~/.local/bin/
 ```
 
 </details>
 
 <details>
-<summary>Linux (x86_64, musl)</summary>
+<summary>Linux (x86_64, musl) - Alpine Linux, static builds</summary>
 
 ```bash
-wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-x86_64-unknown-linux-musl
-chmod +x gh-templates-x86_64-unknown-linux-musl
+wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates
+chmod +x gh-templates
 mkdir -p ~/.local/bin
-mv gh-templates-x86_64-unknown-linux-musl ~/.local/bin/gh-templates
+mv gh-templates ~/.local/bin/
 ```
 
 </details>
 
 <details>
-<summary>Linux (aarch64)</summary>
+<summary>Linux (x86, 32-bit glibc) - Older systems</summary>
 
 ```bash
-wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-aarch64-unknown-linux-gnu
-chmod +x gh-templates-aarch64-unknown-linux-gnu
+wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates
+chmod +x gh-templates
 mkdir -p ~/.local/bin
-mv gh-templates-aarch64-unknown-linux-gnu ~/.local/bin/gh-templates
+mv gh-templates ~/.local/bin/
 ```
 
 </details>
 
 <details>
-<summary>macOS (Apple Silicon)</summary>
+<summary>Linux (x86, 32-bit musl) - Alpine Linux 32-bit</summary>
 
 ```bash
-curl -LO https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-aarch64-apple-darwin
-chmod +x gh-templates-aarch64-apple-darwin
+wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates
+chmod +x gh-templates
 mkdir -p ~/.local/bin
-mv gh-templates-aarch64-apple-darwin ~/.local/bin/gh-templates
+mv gh-templates ~/.local/bin/
 ```
 
 </details>
 
 <details>
-<summary>macOS (Intel)</summary>
+<summary>Linux (ARM64, glibc) - Raspberry Pi 4, ARM servers</summary>
 
 ```bash
-curl -LO https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-x86_64-apple-darwin
-chmod +x gh-templates-x86_64-apple-darwin
+wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates
+chmod +x gh-templates
 mkdir -p ~/.local/bin
-mv gh-templates-x86_64-apple-darwin ~/.local/bin/gh-templates
+mv gh-templates ~/.local/bin/
 ```
 
 </details>
 
 <details>
-<summary>Windows (x86_64)</summary>
+<summary>Linux (ARM64, musl) - Alpine Linux on ARM64</summary>
+
+```bash
+wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates
+chmod +x gh-templates
+mkdir -p ~/.local/bin
+mv gh-templates ~/.local/bin/
+```
+
+</details>
+
+<details>
+<summary>macOS (Apple Silicon) - M1, M2, M3+ Macs</summary>
+
+```bash
+curl -LO https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates
+chmod +x gh-templates
+mkdir -p ~/.local/bin
+mv gh-templates ~/.local/bin/
+```
+
+</details>
+
+<details>
+<summary>macOS (Intel) - Pre-2020 Macs</summary>
+
+```bash
+curl -LO https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates
+chmod +x gh-templates
+mkdir -p ~/.local/bin
+mv gh-templates ~/.local/bin/
+```
+
+</details>
+
+<details>
+<summary>Windows (x86_64) - 64-bit Windows</summary>
 
 ```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\bin"
-Invoke-WebRequest -Uri "https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-x86_64-pc-windows-gnu.exe" -OutFile "$env:USERPROFILE\bin\gh-templates.exe"
+Invoke-WebRequest -Uri "https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates.exe" -OutFile "$env:USERPROFILE\bin\gh-templates.exe"
 ```
 
 > **Note:** Make sure `$env:USERPROFILE\bin` is in your `PATH` environment variable.
+
+**Alternative using curl (if available):**
+
+```cmd
+mkdir "%USERPROFILE%\bin"
+curl -LO https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates.exe
+move gh-templates.exe "%USERPROFILE%\bin\"
+```
+
 </details>
 
----
+<details>
+<summary>Windows (x86, 32-bit) - Older Windows systems</summary>
 
-## From Source
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\bin"
+Invoke-WebRequest -Uri "https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates.exe" -OutFile "$env:USERPROFILE\bin\gh-templates.exe"
+```
 
-Clone the repository and build from source:
+> **Note:** Make sure `$env:USERPROFILE\bin` is in your `PATH` environment variable.
+
+</details>
+
+<details>
+<summary>Windows (ARM64) - Surface Pro X, Windows on ARM</summary>
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\bin"
+Invoke-WebRequest -Uri "https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates.exe" -OutFile "$env:USERPROFILE\bin\gh-templates.exe"
+```
+
+> **Note:** Make sure `$env:USERPROFILE\bin` is in your `PATH` environment variable.
+
+</details>
+
+### Adding to PATH
+
+After installation, you may need to add the binary location to your PATH:
+
+<details>
+<summary>Linux/macOS - Adding ~/.local/bin to PATH</summary>
+
+Add this line to your shell configuration file (`~/.bashrc`, `~/.zshrc`, etc.):
 
 ```bash
-git clone https://github.com/RafaelJohn9/gh-templates.git
-cd gh-templates
-cargo install --path .
+export PATH="$HOME/.local/bin:$PATH"
 ```
+
+Then reload your shell:
+
+```bash
+source ~/.bashrc  # or ~/.zshrc
+```
+
+</details>
+
+<details>
+<summary>Windows - Adding to PATH</summary>
+
+1. **Via System Properties (GUI):**
+   - Press `Win + R`, type `sysdm.cpl`, press Enter
+   - Click "Environment Variables"
+   - Under "User variables", select "Path" and click "Edit"
+   - Click "New" and add `%USERPROFILE%\bin`
+   - Click OK to save
+
+2. **Via PowerShell (Command):**
+
+   ```powershell
+   $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+   [Environment]::SetEnvironmentVariable("Path", "$userPath;$env:USERPROFILE\bin", "User")
+   ```
+
+3. **Restart your terminal** for changes to take effect.
+
+</details>
 
 ---
 
