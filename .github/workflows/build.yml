@@ -687,7 +687,7 @@ jobs:
           DARWIN_X64_SHA=$(shasum -a 256 darwin-x64-binary | cut -d' ' -f1)
           
           # Clone homebrew tap using the PAT
-          git clone https://${{ secrets.HOMEBREW_GITHUB_TOKEN }}@github.com/rafaeljohn9/homebrew-tap.git
+          git clone https://rafaeljohn9:${{ secrets.HOMEBREW_GITHUB_TOKEN }}@github.com/rafaeljohn9/homebrew-tap.git
           cd homebrew-tap
           
           # Create Formula directory if it doesn't exist
