@@ -1,41 +1,38 @@
-# Website
+# gh-templates Documentation
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+Welcome to the documentation for **gh-templates**—your command-line companion for scaffolding GitHub templates with ease.
 
-## Installation
+This documentation explains how to use `gh-templates` to quickly add and manage templates for issues, pull requests, licenses, and `.gitignore` files in your repositories. Whether you're starting a new project or standardizing existing ones, these docs will guide you through installation, usage, and customization.
+
+## About gh-templates
+
+`gh-templates` streamlines the process of adding professional templates to your GitHub repositories. With a single command, you can:
+
+- Add structured **issue templates** for better bug reports and feature requests
+- Create standardized **pull request templates** to improve code review workflows
+- Add popular **license templates** to your projects
+- Generate language-specific **.gitignore** files to keep your repos clean
+
+## Using the Documentation
+
+- **Getting Started**: Learn how to install and set up `gh-templates`
+- **Usage Guides**: Step-by-step instructions for each template type
+- **Customization**: Tips for customizing templates and output locations
+- **Reference**: Detailed command and option documentation
+
+You can view and edit this documentation locally:
 
 ```bash
 yarn
-```
-
-## Local Development
-
-```bash
 yarn start
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
-
-## Build
+To build a static version for deployment:
 
 ```bash
 yarn build
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+For deployment instructions and more, see the additional guides in this directory.
 
-## Deployment
-
-Using SSH:
-
-```bash
-USE_SSH=true yarn deploy
-```
-
-Not using SSH:
-
-```bash
-GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+Ready to scaffold your GitHub templates? Start with the [Introduction](./intro.md) or jump to the [Installation Guide](./installation.md).
