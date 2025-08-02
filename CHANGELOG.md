@@ -11,6 +11,22 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (6f8b40f)
 
+- update documentation for v0.1.26 [skip ci] (34b7526)
+
+
+### Fix
+
+- removed MinGW build (a386535)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (6f8b40f)
+
 
 ## [v0.1.26]
 
