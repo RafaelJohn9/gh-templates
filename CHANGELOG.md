@@ -7,13 +7,25 @@ All notable changes to this project will be documented in this file.
 
 
 
-## [Unreleased]
+### Chore
+
+- update CHANGELOG [skip ci] (6f8b40f)
+
+
+## [v0.1.26]
 
 
 
 ### Chore
 
 - update CHANGELOG [skip ci] (8bd9fcf)
+
+- update documentation for v0.1.25 [skip ci] (bebd445)
+
+
+### Feat
+
+- added 6 more platforms (bdc6a22)
 
 
 ## [v0.1.25]
