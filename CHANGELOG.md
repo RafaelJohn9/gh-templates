@@ -11,6 +11,22 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (6da4262)
 
+- update documentation for v0.1.21 [skip ci] (bb98229)
+
+
+### Fix
+
+- pypi and npm publish (31bbdd5)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (6da4262)
+
 
 ## [v0.1.21]
 
