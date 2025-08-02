@@ -7,13 +7,51 @@ All notable changes to this project will be documented in this file.
 
 
 
-## [Unreleased]
+### Chore
+
+- update CHANGELOG [skip ci] (10e96b6)
+
+
+## [v0.1.28]
 
 
 
 ### Chore
 
 - update CHANGELOG [skip ci] (0208876)
+
+- update documentation for v0.1.27 [skip ci] (0e8eba4)
+
+- added starter comments to pr templates (a90b5bf)
+
+
+### Docs
+
+- added docusaurus documentation (010ed25)
+
+- added more supported platforms in installation md file && added package-lock json (fa23713)
+
+
+### Feat
+
+- added more pr templates (bb00fb8)
+
+- added separator during preview (64f36d7)
+
+- issue:add allow passing of template with ext (0f46367)
+
+- issue:list:  pass file without ext (0063564)
+
+- updated pr manifest.yml (154cfa4)
+
+- license:add:all:: when downloading all licenses save with remote file name (fee6175)
+
+- deploy docs workflow (5cea7d3)
+
+
+### Fix
+
+- removed misplaced LICENSE (9749bbe)
 
 
 ## [v0.1.27]
