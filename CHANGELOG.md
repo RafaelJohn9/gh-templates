@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (ee99247)
+
+
+## [v0.1.33]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (51bfd59)
 
 - update documentation for v0.1.32 [skip ci] (4de0f81)
@@ -19,15 +28,6 @@ All notable changes to this project will be documented in this file.
 ### Docs
 
 - removed toggling between light and dark theme && bump version of Cargo toml (4d7a8d4)
-
-
-## [Unreleased]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (51bfd59)
 
 
 ## [v0.1.32]
