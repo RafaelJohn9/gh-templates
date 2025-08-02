@@ -7,13 +7,25 @@ All notable changes to this project will be documented in this file.
 
 
 
-## [Unreleased]
+### Chore
+
+- update CHANGELOG [skip ci] (85966c5)
+
+
+## [v0.1.20]
 
 
 
 ### Chore
 
 - update CHANGELOG [skip ci] (8004893)
+
+- update documentation for v0.1.19 [skip ci] (6e60afb)
+
+
+### Fix
+
+- publish homebrew automated versioning and npm to handle global install correctly (6d497a7)
 
 
 ## [v0.1.19]
