@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (dc92a6a)
+
+
+## [v0.1.22]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (6da4262)
 
 - update documentation for v0.1.21 [skip ci] (bb98229)
@@ -17,15 +26,6 @@ All notable changes to this project will be documented in this file.
 ### Fix
 
 - pypi and npm publish (31bbdd5)
-
-
-## [Unreleased]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (6da4262)
 
 
 ## [v0.1.21]
