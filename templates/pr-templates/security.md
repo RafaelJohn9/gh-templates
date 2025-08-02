@@ -1,3 +1,8 @@
+<!-- 
+👋 Welcome! Thank you for contributing to our project's security. 
+Please carefully fill out this template to help us review your changes efficiently and keep our users safe.
+-->
+
 # Security Change PR Template
 
 ## 🔒 Security Change Summary

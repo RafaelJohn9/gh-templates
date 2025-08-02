@@ -1,3 +1,8 @@
+<!-- 
+👋 Welcome! Thank you for contributing to this project.
+Please fill out the pull request template below to help us review your changes efficiently.
+-->
+
 # Pull Request
 
 ## Description

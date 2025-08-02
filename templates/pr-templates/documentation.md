@@ -1,3 +1,7 @@
+<!-- 
+Welcome! Thank you for contributing to our documentation. 
+Your efforts help improve the project for everyone.
+-->
 # Documentation PR Template
 
 ## Summary

@@ -1,3 +1,7 @@
+<!-- 
+👋 Welcome! Thank you for contributing a bug fix. 
+Please fill out the sections below to help us review your PR efficiently.
+-->
 # Bug Fix PR
 
 ## Overview

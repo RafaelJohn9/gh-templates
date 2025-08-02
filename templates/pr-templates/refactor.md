@@ -1,3 +1,9 @@
+<!-- 
+👋 Welcome! Thank you for contributing to our codebase.
+Please use this template to clearly describe your refactoring PR.
+Your effort to improve our project is greatly appreciated!
+-->
+
 # Refactoring PR
 
 ## Summary

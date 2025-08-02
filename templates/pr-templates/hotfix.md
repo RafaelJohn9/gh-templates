@@ -1,3 +1,8 @@
+<!-- 
+👋 Welcome! Thank you for taking swift action to address this hotfix.
+Please ensure all sections are completed for a smooth review process.
+-->
+
 # 🚨 HOTFIX PR
 
 ## Issue Summary

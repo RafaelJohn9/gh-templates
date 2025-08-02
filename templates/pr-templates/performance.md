@@ -1,10 +1,10 @@
-# Performance Improvement PR Template
-
 <!--
 This template is designed for PRs focused on performance improvements.
 Fill in relevant sections and delete any that don't apply to your specific changes.
 Provide metrics where possible to clearly demonstrate the impact of your changes.
 -->
+
+# Performance Improvement PR Template
 
 ## Performance Summary
 <!-- Provide a brief description of the performance improvements implemented -->
