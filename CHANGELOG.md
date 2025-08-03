@@ -7,13 +7,20 @@ All notable changes to this project will be documented in this file.
 
 
 
-## [Unreleased]
+### Chore
+
+- update CHANGELOG [skip ci] (e32fef1)
+
+
+## [v0.1.35]
 
 
 
 ### Chore
 
 - update CHANGELOG [skip ci] (83b2dda)
+
+- update documentation for v0.1.34 [skip ci] (9a1171d)
 
 
 ## [v0.1.34]
