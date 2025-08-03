@@ -11,6 +11,22 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (e32fef1)
 
+- update documentation for v0.1.35 [skip ci] (5fde181)
+
+
+### Fix
+
+- broken links && bump tool version in cargotoml 0.1.36 (aab9021)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (e32fef1)
+
 
 ## [v0.1.35]
 
