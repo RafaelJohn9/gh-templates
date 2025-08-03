@@ -7,13 +7,25 @@ All notable changes to this project will be documented in this file.
 
 
 
-## [Unreleased]
+### Chore
+
+- update CHANGELOG [skip ci] (b50b7f4)
+
+
+## [v0.1.37]
 
 
 
 ### Chore
 
 - update CHANGELOG [skip ci] (988f20c)
+
+- update documentation for v0.1.36 [skip ci] (8c8bd0a)
+
+
+### Fix
+
+- problem with uploading new bin && bump version to 0.1.37 (3c5d76c)
 
 
 ## [v0.1.36]
