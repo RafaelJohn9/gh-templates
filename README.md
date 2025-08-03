@@ -2,8 +2,19 @@
 
 This repository provides a collection of reusable Git templates to streamline your workflow across multiple repositories. It includes fully supported **Issue Templates**, **Pull Request Templates**, and more.
 
-[![GitHub Release](https://img.shields.io/github/v/release/rafaeljohn9/gh-templates)](https://github.com/rafaeljohn9/gh-templates/releases)
-[![License](https://img.shields.io/github/license/rafaeljohn9/gh-templates)](LICENSE)
+
+[![GitHub Release](https://img.shields.io/github/v/release/rafaeljohn9/gh-templates?label=GitHub%20Release)](https://github.com/rafaeljohn9/gh-templates/releases)
+[![License](https://img.shields.io/github/license/rafaeljohn9/gh-templates?label=License)](LICENSE)
+
+[![Crates.io](https://img.shields.io/crates/v/gh-templates?label=crates.io)](https://crates.io/crates/gh-templates)
+[![Crate Downloads](https://img.shields.io/crates/d/gh-templates?label=downloads)](https://crates.io/crates/gh-templates)
+
+[![PyPI version](https://img.shields.io/pypi/v/gh-templates?label=PyPI)](https://pypi.org/project/gh-templates/)
+[![PyPI downloads](https://static.pepy.tech/personalized-badge/gh-templates?period=month&units=international_system&left_color=black&right_color=blue&left_text=PyPI%20Downloads)](https://pepy.tech/project/gh-templates)
+
+[![npm version](https://img.shields.io/npm/v/gh-templates?label=npm)](https://www.npmjs.com/package/gh-templates)
+[![npm downloads](https://img.shields.io/npm/dm/gh-templates?label=npm%20downloads)](https://www.npmjs.com/package/gh-templates)
+
 
 ---
 
