@@ -149,9 +149,9 @@ jobs:
           fi
           
           # Copy binary
-          BINARY="gh-templates"
-          cp target/${{ matrix.build.TARGET }}/release/$BINARY .
-          chmod +x $BINARY
+          echo "BINARY_NAME=gh-templates" >> $GITHUB_ENV
+          cp target/${{ matrix.build.TARGET }}/release/gh-templates .
+          chmod +x gh-templates
 
       - name: Setup MinGW environment (Windows MinGW builds)
         if: runner.os == 'Windows' && contains(matrix.build.TARGET, 'windows-gnu')
@@ -197,14 +197,14 @@ jobs:
             cargo build --release --target ${{ matrix.build.TARGET }}
           }
           
-          # Copy binary
-          $BINARY = "gh-templates.exe"
-          Copy-Item "target/${{ matrix.build.TARGET }}/release/$BINARY" .
+          # Set binary name and copy binary
+          echo "BINARY_NAME=gh-templates.exe" >> $env:GITHUB_ENV
+          Copy-Item "target/${{ matrix.build.TARGET }}/release/gh-templates.exe" .
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: gh-templates*
+          files: ${{ env.BINARY_NAME }}
 
       - name: Setup Node.js for NPM
         if: matrix.build.NPM_PUBLISH == true
