@@ -14,7 +14,7 @@ const config: Config = {
 
   // Production URL (GitHub Pages URL)
   url: 'https://rafaeljohn9.github.io', // Your GitHub Pages URL
-  baseUrl: '/gh-templates/', // Project repo name as base path
+  baseUrl: '/', // Project repo name as base path
 
   // GitHub Pages deployment settings
   organizationName: 'rafaeljohn9', // GitHub username
