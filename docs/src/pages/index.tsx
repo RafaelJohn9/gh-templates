@@ -162,11 +162,11 @@ export default function Home() {
             </div>
             {/* CTA Buttons */}
             <div className={styles.ctaButtons}>
-              <a href="/gh-templates/installation" className={styles.primaryButton}>
+              <a href="/installation" className={styles.primaryButton}>
                 <span>🚀</span>
                 Get Started
               </a>
-              <a href="/gh-templates/intro" className={clsx(styles.secondaryButton, isDark && styles.secondaryButtonDark)}>
+              <a href="/intro" className={clsx(styles.secondaryButton, isDark && styles.secondaryButtonDark)}>
                 <span>📖</span>
                 View Documentation
               </a>
@@ -296,10 +296,10 @@ export default function Home() {
             Join developers who save hours every week with gh-templates
           </p>
           <div className={styles.finalCtaButtons}>
-            <a href="/gh-templates/installation" className={styles.finalPrimaryButton}>
+            <a href="/installation" className={styles.finalPrimaryButton}>
               Start Building →
             </a>
-            <a href="/gh-templates/intro" className={clsx(styles.finalSecondaryButton, isDark && styles.finalSecondaryButtonDark)}>
+            <a href="/intro" className={clsx(styles.finalSecondaryButton, isDark && styles.finalSecondaryButtonDark)}>
               Read the Docs
             </a>
           </div>
