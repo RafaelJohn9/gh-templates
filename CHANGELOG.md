@@ -9,20 +9,20 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
-- update CHANGELOG [skip ci] (4ef13a7)
-
-- update documentation for v0.1.38 [skip ci] (16f7649)
-
-- bump version to 0.1.39 (a30421d)
+- update CHANGELOG [skip ci] (caf9c53)
 
 
-## [Unreleased]
+## [v0.1.39]
 
 
 
 ### Chore
 
 - update CHANGELOG [skip ci] (4ef13a7)
+
+- update documentation for v0.1.38 [skip ci] (16f7649)
+
+- bump version to 0.1.39 (a30421d)
 
 
 ## [v0.1.38]
