@@ -7,7 +7,12 @@ All notable changes to this project will be documented in this file.
 
 
 
-## [Unreleased]
+### Chore
+
+- update CHANGELOG [skip ci] (4ef13a7)
+
+
+## [v0.1.38]
 
 
 
@@ -17,14 +22,12 @@ All notable changes to this project will be documented in this file.
 
 - update documentation for v0.1.37 [skip ci] (2911756)
 
-
-## [Unreleased]
-
+- update CHANGELOG [skip ci] (9d208df)
 
 
-### Chore
+### Feat
 
-- update CHANGELOG [skip ci] (b50b7f4)
+- replaced use of emojis with react svg icons && bump package version in toml to 0.1.38 (7cfe98d)
 
 
 ## [v0.1.37]
