@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import styles from './index.module.css';
+import { FaBolt, FaBullseye, FaWrench, FaChartBar, FaSyncAlt, FaPuzzlePiece } from 'react-icons/fa';
 
 export default function Home() {
   // Hardcode colorMode to 'dark' as light mode is no longer supported
@@ -41,37 +42,37 @@ export default function Home() {
 
   const features = [
     {
-      emoji: '⚡',
+      icon: <FaBolt />,
       title: 'Lightning Fast',
       description: 'Generate professional GitHub templates in seconds, not minutes. Built with Rust for maximum performance.',
       highlight: 'Rust-powered'
     },
     {
-      emoji: '🎯',
+      icon: <FaBullseye />,
       title: 'Smart Templates',
       description: 'AI-curated templates that follow GitHub best practices and community standards.',
       highlight: 'Best Practices'
     },
     {
-      emoji: '🔧',
+      icon: <FaWrench />,
       title: 'Fully Customizable',
       description: 'Tailor every template to your project needs with powerful customization options.',
       highlight: 'Your Way'
     },
     {
-      emoji: '📊',
+      icon: <FaChartBar />,
       title: 'Preview Mode',
       description: 'See exactly what your templates will look like before committing to your repository. With syntax highlighting and formatting.',
       highlight: 'Zero Surprises'
     },
     {
-      emoji: '🔄',
+      icon: <FaSyncAlt />,
       title: 'Version Sync',
       description: 'Keep your templates up-to-date with the latest GitHub features and community trends.',
       highlight: 'Always Current'
     },
     {
-      emoji: '🧩',
+      icon: <FaPuzzlePiece />,
       title: 'Custom Sources & Groups',
       description: "Add, organize, and apply templates from custom sources and groups for ultimate flexibility.",
       highlight: 'Customizable Sources & Groups (coming soon)'
@@ -244,8 +245,8 @@ export default function Home() {
                 key={index}
                 className={clsx(styles.featureCard, isDark && styles.featureCardDark)}
               >
-                <div className={styles.featureEmoji}>
-                  {feature.emoji}
+                <div className={styles.featureIcon}>
+                  {feature.icon}
                 </div>
                 <h3 className={clsx(styles.featureTitle, isDark && styles.featureTitleDark)}>
                   {feature.title}
