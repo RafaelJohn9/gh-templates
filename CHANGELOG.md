@@ -11,6 +11,19 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (4ef13a7)
 
+- update documentation for v0.1.38 [skip ci] (16f7649)
+
+- bump version to 0.1.39 (a30421d)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (4ef13a7)
+
 
 ## [v0.1.38]
 
