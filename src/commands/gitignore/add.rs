@@ -210,12 +210,7 @@ fn download_templates(
         // Save each template to its own file as specified in output
         for (template_name, output_file) in templates.iter().zip(output.iter()) {
             // check if the template_name has  a .gitignore ext rm it to normalize it
-            let template_name = if template_name.ends_with(".gitignore") {
-                template_name.strip_suffix(".gitignore").unwrap()
-            } else {
-                template_name
-            };
-            
+            let template_name = template_name.strip_suffix(".gitignore").unwrap_or(template_name);
             let template_path = find_template_in_cache(template_name, cache)?;
             let url = format!("{}/{}", GITHUB_RAW_BASE, template_path);
 

@@ -37,11 +37,7 @@ impl super::Runnable for PreviewArgs {
 
 fn preview_single_template(template: &str, cache: &super::Cache<String>) -> anyhow::Result<()> {
     // normalize template if it has the .gitignore ext
-    let template = if template.ends_with(".gitignore") {
-        template.strip_suffix(".gitignore").unwrap()
-    } else {
-        template
-    };
+    let template = template.strip_suffix(".gitignore").unwrap_or(template);
     
     // Find the template path in cache
     let template_path = find_template_in_cache(template, cache)?;
