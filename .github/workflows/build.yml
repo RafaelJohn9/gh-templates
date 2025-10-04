@@ -83,20 +83,34 @@ jobs:
             cp target/${{ matrix.build.TARGET }}/release/gh-templates $BINARY
             chmod +x $BINARY
           fi
-
           echo "BINARY=$BINARY" >> $GITHUB_ENV
 
-          # Prepare npm + python packages (still generic inside folders)
+          # Prepare npm + python packages
           mkdir -p npm/bin python/gh_templates_bin
-          cp $BINARY npm/bin/
-          cp $BINARY python/gh_templates_bin/
 
-          # npm package.json
+          # For npm, copy the platform-specific binary but also create a generic named version
+          cp $BINARY npm/bin/
+          if [[ "${{ matrix.build.TARGET }}" == *"windows"* ]]; then
+            cp $BINARY npm/bin/gh-templates.exe
+          else
+            cp $BINARY npm/bin/gh-templates
+          fi
+
+          # For python, use the generic name since the wrapper handles execution
+          if [[ "${{ matrix.build.TARGET }}" == *"windows"* ]]; then
+            cp $BINARY python/gh_templates_bin/gh-templates.exe
+          else
+            cp $BINARY python/gh_templates_bin/gh-templates
+          fi
+
+          # npm package.json - reference generic binary name
           cat > npm/package.json << EOF
           {
             "name": "@rafaeljohn9/gh-templates-${{ matrix.build.NAME }}",
             "version": "$VERSION",
-            "bin": { "gh-templates": "./bin/$BINARY" },
+            "bin": { 
+              "gh-templates": "./bin/gh-templates$([[ "${{ matrix.build.TARGET }}" == *"windows"* ]] && echo ".exe" || echo "")"
+            },
             "files": ["bin/"],
             "license": "APACHE-2.0"
           }
@@ -114,7 +128,6 @@ jobs:
             license='APACHE-2.0'
           )
           EOF
-
           # Python __init__.py
           cat > python/gh_templates_bin/__init__.py << 'EOF'
           import os, sys, subprocess
