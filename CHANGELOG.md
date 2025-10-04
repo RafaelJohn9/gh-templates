@@ -11,6 +11,22 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (9283431)
 
+- update documentation for v0.1.41 [skip ci] (e1e3f6e)
+
+
+### Feat
+
+- (version) bumped version to 0.1.42 (3a07769)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (9283431)
+
 
 ## [v0.1.41]
 
