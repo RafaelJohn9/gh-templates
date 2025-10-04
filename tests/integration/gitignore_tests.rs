@@ -13,6 +13,7 @@ use crate::common::test_utils::{
  This test suite covers the following scenarios:
 
 - `test_gitignore_add_rust`: Verifies that adding a Rust gitignore creates the correct file with expected content.
+- `test_gitignore_add_rust.gitignore`: Ensures that adding a Rust gitignore with a .gitignore extension creates the correct file with expected content.
 - `test_gitignore_add_multiple`: Validates that multiple gitignore templates can be added and merged.
 - `test_gitignore_add_with_dir`: Ensures that a gitignore can be added to a specified directory.
 - `test_gitignore_add_force_overwrite`: Tests that an existing .gitignore file is not overwritten unless the `--force` flag is used.
@@ -27,6 +28,7 @@ use crate::common::test_utils::{
 - `test_gitignore_list_community`: Ensures the list command with --community displays community templates.
 - `test_gitignore_list_update_cache`: Ensures the list command with --update-cache refreshes the cache.
 - `test_gitignore_preview_single_template`: Tests previewing a single gitignore template.
+- `test_gitignore_preview_rust.gitignore`: Tests previewing a gitignore template with a .gitignore extension.
 - `test_gitignore_preview_multiple_templates`: Tests previewing multiple gitignore templates.
 - `test_gitignore_preview_update_cache`: Tests previewing a template with cache update.
 - `test_gitignore_preview_invalid_template`: Ensures that previewing an invalid template returns an error.
@@ -48,6 +50,26 @@ fn test_gitignore_add_rust() {
     let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
     cmd.current_dir(&temp_path);
     cmd.args(&["gitignore", "add", "rust"])
+        .assert()
+        .success()
+        .stdout(
+            predicate::str::contains("Added gitignore templates").or(predicate::str::contains("✓")),
+        );
+
+    assert_file_exists(&temp_path.join(".gitignore"));
+    assert_file_contains(&temp_path.join(".gitignore"), "Rust");
+}
+
+#[test]
+fn test_gitignore_add_rust_gitignore() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    create_git_repo(&temp_path);
+
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&["gitignore", "add", "rust.gitignore"])
         .assert()
         .success()
         .stdout(
@@ -393,6 +415,19 @@ fn test_gitignore_preview_single_template() {
     let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
     cmd.current_dir(&temp_path);
     cmd.args(&["gitignore", "preview", "rust"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Rust"));
+}
+
+#[test]
+fn test_gitignore_preview_single_template_update_cache() {
+    let temp_dir = setup_test_env();
+    let temp_path = temp_dir.path().to_path_buf();
+
+    let mut cmd = AssertCommand::cargo_bin("gh-templates").unwrap();
+    cmd.current_dir(&temp_path);
+    cmd.args(&["gitignore", "preview", "rust", "--update-cache"])
         .assert()
         .success()
         .stdout(predicate::str::contains("Rust"));
