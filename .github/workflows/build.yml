@@ -657,7 +657,7 @@ jobs:
           } else if (platform === 'linux') {
             packageName = arch === 'arm64' ? 'gh-templates-linux-arm64' : 'gh-templates-linux-x64';
           } else {
-            console.error(`❌ Unsupported platform: ${platform}-${arch}`);
+            console.error(`Unsupported platform: ${platform}-${arch}`);
             process.exit(1);
           }
           
@@ -666,8 +666,8 @@ jobs:
             const binPath = path.join(path.dirname(pkgPath), 'bin', platform === 'win32' ? 'gh-templates.exe' : 'gh-templates');
             execFileSync(binPath, process.argv.slice(2), { stdio: 'inherit' });
           } catch (err) {
-            console.error(`❌ Platform-specific package not found: ${packageName}`);
-            console.error(`💡 Install it directly:`);
+            console.error(`Platform-specific package not found: ${packageName}`);
+            console.error(`Install it directly:`);
             console.error(`   npm install -g ${packageName}`);
             console.error(`   OR`);
             console.error(`   npm install -g gh-templates-${platform}-${arch}`);
