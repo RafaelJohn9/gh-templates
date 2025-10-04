@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (4faee01)
+
+
+## [v0.1.40]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (caf9c53)
 
 - update documentation for v0.1.39 [skip ci] (608f2ad)
@@ -27,15 +36,6 @@ All notable changes to this project will be documented in this file.
 ### Test
 
 - added tests to verify fetching, previewing and adding of templates with .gitignore is succesful. (05a4439)
-
-
-## [Unreleased]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (caf9c53)
 
 
 ## [v0.1.39]
