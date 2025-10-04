@@ -7,13 +7,25 @@ All notable changes to this project will be documented in this file.
 
 
 
-## [Unreleased]
+### Chore
+
+- update CHANGELOG [skip ci] (9283431)
+
+
+## [v0.1.41]
 
 
 
 ### Chore
 
 - update CHANGELOG [skip ci] (2f590a2)
+
+- update documentation for v0.1.40 [skip ci] (2b9e4e0)
+
+
+### Finx
+
+- npm configuration for build workflow (2fa77aa)
 
 
 ## [v0.1.40]
