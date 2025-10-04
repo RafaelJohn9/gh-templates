@@ -15,10 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+
       - name: Publish to crates.io
         run: cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
@@ -30,95 +32,17 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - { 
-              NAME: linux-x64-glibc, 
-              OS: ubuntu-22.04, 
-              TOOLCHAIN: stable,
-              TARGET: x86_64-unknown-linux-gnu,
-              NPM_PUBLISH: true,
-              PYPI_PUBLISH: true
-            }
-          - { 
-              NAME: linux-x64-musl, 
-              OS: ubuntu-22.04, 
-              TOOLCHAIN: stable,
-              TARGET: x86_64-unknown-linux-musl,
-              NPM_PUBLISH: false,
-              PYPI_PUBLISH: true
-            }
-          - { 
-              NAME: linux-x86-glibc, 
-              OS: ubuntu-22.04, 
-              TOOLCHAIN: stable,
-              TARGET: i686-unknown-linux-gnu,
-              NPM_PUBLISH: false,
-              PYPI_PUBLISH: false
-            }
-          - { 
-              NAME: linux-x86-musl, 
-              OS: ubuntu-22.04, 
-              TOOLCHAIN: stable,
-              TARGET: i686-unknown-linux-musl,
-              NPM_PUBLISH: false,
-              PYPI_PUBLISH: true
-            }
-          - { 
-              NAME: linux-arm64-glibc, 
-              OS: ubuntu-22.04, 
-              TOOLCHAIN: stable,
-              TARGET: aarch64-unknown-linux-gnu,
-              NPM_PUBLISH: true,
-              PYPI_PUBLISH: true
-            }
-          - { 
-              NAME: linux-arm64-musl, 
-              OS: ubuntu-22.04, 
-              TOOLCHAIN: stable,
-              TARGET: aarch64-unknown-linux-musl,
-              NPM_PUBLISH: false,
-              PYPI_PUBLISH: true
-            }
-
-          - { 
-              NAME: win32-x64-msvc, 
-              OS: windows-latest, 
-              TOOLCHAIN: stable,
-              TARGET: x86_64-pc-windows-msvc,
-              NPM_PUBLISH: true,
-              PYPI_PUBLISH: true
-            }
-          - { 
-              NAME: win32-x86-msvc, 
-              OS: windows-latest, 
-              TOOLCHAIN: stable,
-              TARGET: i686-pc-windows-msvc,
-              NPM_PUBLISH: false,
-              PYPI_PUBLISH: true
-            }
-          - { 
-              NAME: win32-arm64-msvc, 
-              OS: windows-latest, 
-              TOOLCHAIN: stable,
-              TARGET: aarch64-pc-windows-msvc,
-              NPM_PUBLISH: true,
-              PYPI_PUBLISH: false
-            }
-          - { 
-              NAME: darwin-x64, 
-              OS: macos-15, 
-              TOOLCHAIN: stable,
-              TARGET: x86_64-apple-darwin,
-              NPM_PUBLISH: true,
-              PYPI_PUBLISH: true
-            }
-          - { 
-              NAME: darwin-arm64, 
-              OS: macos-15, 
-              TOOLCHAIN: stable,
-              TARGET: aarch64-apple-darwin,
-              NPM_PUBLISH: true,
-              PYPI_PUBLISH: true
-            }
+          - { NAME: linux-x64-glibc, OS: ubuntu-22.04, TOOLCHAIN: stable, TARGET: x86_64-unknown-linux-gnu, NPM_PUBLISH: true, PYPI_PUBLISH: true }
+          - { NAME: linux-x64-musl, OS: ubuntu-22.04, TOOLCHAIN: stable, TARGET: x86_64-unknown-linux-musl, NPM_PUBLISH: false, PYPI_PUBLISH: true }
+          - { NAME: linux-x86-glibc, OS: ubuntu-22.04, TOOLCHAIN: stable, TARGET: i686-unknown-linux-gnu, NPM_PUBLISH: false, PYPI_PUBLISH: false }
+          - { NAME: linux-x86-musl, OS: ubuntu-22.04, TOOLCHAIN: stable, TARGET: i686-unknown-linux-musl, NPM_PUBLISH: false, PYPI_PUBLISH: true }
+          - { NAME: linux-arm64-glibc, OS: ubuntu-22.04, TOOLCHAIN: stable, TARGET: aarch64-unknown-linux-gnu, NPM_PUBLISH: true, PYPI_PUBLISH: true }
+          - { NAME: linux-arm64-musl, OS: ubuntu-22.04, TOOLCHAIN: stable, TARGET: aarch64-unknown-linux-musl, NPM_PUBLISH: false, PYPI_PUBLISH: true }
+          - { NAME: win32-x64-msvc, OS: windows-latest, TOOLCHAIN: stable, TARGET: x86_64-pc-windows-msvc, NPM_PUBLISH: true, PYPI_PUBLISH: true }
+          - { NAME: win32-x86-msvc, OS: windows-latest, TOOLCHAIN: stable, TARGET: i686-pc-windows-msvc, NPM_PUBLISH: false, PYPI_PUBLISH: true }
+          - { NAME: win32-arm64-msvc, OS: windows-latest, TOOLCHAIN: stable, TARGET: aarch64-pc-windows-msvc, NPM_PUBLISH: true, PYPI_PUBLISH: false }
+          - { NAME: darwin-x64, OS: macos-15, TOOLCHAIN: stable, TARGET: x86_64-apple-darwin, NPM_PUBLISH: true, PYPI_PUBLISH: true }
+          - { NAME: darwin-arm64, OS: macos-15, TOOLCHAIN: stable, TARGET: aarch64-apple-darwin, NPM_PUBLISH: true, PYPI_PUBLISH: true }
 
     steps:
       - uses: actions/checkout@v4
@@ -141,71 +65,72 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
+          VERSION=$(echo "${{ github.ref_name }}" | sed 's/^v//')
+
           # Build
           if [[ "${{ runner.os }}" == "Linux" ]]; then
             cross build --release --target ${{ matrix.build.TARGET }}
           else
             cargo build --release --target ${{ matrix.build.TARGET }}
           fi
-          
-          # Copy binary
-          echo "BINARY_NAME=gh-templates" >> $GITHUB_ENV
-          cp target/${{ matrix.build.TARGET }}/release/gh-templates .
-          chmod +x gh-templates
 
-      - name: Setup MinGW environment (Windows MinGW builds)
-        if: runner.os == 'Windows' && contains(matrix.build.TARGET, 'windows-gnu')
-        shell: pwsh
-        run: |
-          # Install MSYS2 and MinGW-w64
-          choco install msys2 -y
-          
-          # Update MSYS2 and install required packages
-          C:\tools\msys64\usr\bin\bash.exe -lc "pacman -Syu --noconfirm"
-          C:\tools\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm mingw-w64-x86_64-gcc mingw-w64-x86_64-openssl mingw-w64-x86_64-pkg-config perl"
-          
-          # Add MinGW to PATH
-          echo "C:\tools\msys64\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "C:\tools\msys64\usr\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          # Prepare binary with unique name
+          if [[ "${{ matrix.build.TARGET }}" == *"windows"* ]]; then
+            BINARY="gh-templates-${{ matrix.build.NAME }}.exe"
+            cp target/${{ matrix.build.TARGET }}/release/gh-templates.exe $BINARY
+          else
+            BINARY="gh-templates-${{ matrix.build.NAME }}"
+            cp target/${{ matrix.build.TARGET }}/release/gh-templates $BINARY
+            chmod +x $BINARY
+          fi
 
-      - name: Build (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          # Set environment variables for MinGW builds
-          if ("${{ matrix.build.TARGET }}" -like "*windows-gnu*") {
-            $env:OPENSSL_DIR = "C:\tools\msys64\mingw64"
-            $env:PKG_CONFIG_PATH = "C:\tools\msys64\mingw64\lib\pkgconfig"
-            $env:PKG_CONFIG_ALLOW_CROSS = "1"
-            $env:OPENSSL_STATIC = "1"
-            # Use the MSYS2 Perl instead of Windows Perl
-            $env:PATH = "C:\tools\msys64\usr\bin;C:\tools\msys64\mingw64\bin;" + $env:PATH
+          echo "BINARY=$BINARY" >> $GITHUB_ENV
+
+          # Prepare npm + python packages (still generic inside folders)
+          mkdir -p npm/bin python/gh_templates_bin
+          cp $BINARY npm/bin/
+          cp $BINARY python/gh_templates_bin/
+
+          # npm package.json
+          cat > npm/package.json << EOF
+          {
+            "name": "@rafaeljohn9/gh-templates-${{ matrix.build.NAME }}",
+            "version": "$VERSION",
+            "bin": { "gh-templates": "./bin/$BINARY" },
+            "files": ["bin/"],
+            "license": "APACHE-2.0"
           }
-          
-          # Build with retry mechanism for MinGW
-          if ("${{ matrix.build.TARGET }}" -like "*windows-gnu*") {
-            # Try building with native OpenSSL first
-            try {
-              cargo build --release --target ${{ matrix.build.TARGET }}
-            } catch {
-              Write-Host "First build attempt failed, trying with vendored OpenSSL..."
-              $env:OPENSSL_STATIC = "1"
-              $env:OPENSSL_VENDOR = "1"
-              cargo build --release --target ${{ matrix.build.TARGET }} --features vendored-openssl
-            }
-          } else {
-            cargo build --release --target ${{ matrix.build.TARGET }}
-          }
-          
-          # Set binary name and copy binary
-          echo "BINARY_NAME=gh-templates.exe" >> $env:GITHUB_ENV
-          Copy-Item "target/${{ matrix.build.TARGET }}/release/gh-templates.exe" .
+          EOF
+
+          # Python setup.py
+          cat > python/setup.py << EOF
+          from setuptools import setup
+          setup(
+            name='gh-templates-${{ matrix.build.NAME }}',
+            version='$VERSION',
+            packages=['gh_templates_bin'],
+            package_data={'gh_templates_bin': ['*']},
+            entry_points={'console_scripts': ['gh-templates=gh_templates_bin:main']},
+            license='APACHE-2.0'
+          )
+          EOF
+
+          # Python __init__.py
+          cat > python/gh_templates_bin/__init__.py << 'EOF'
+          import os, sys, subprocess
+          def main():
+              binary = os.path.join(os.path.dirname(__file__), os.getenv("BINARY", "gh-templates"))
+              sys.exit(subprocess.run([binary] + sys.argv[1:]).returncode)
+          EOF
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.BINARY_NAME }}
+          files: ${{ env.BINARY }}
+          overwrite: true
+          fail_on_unmatched_files: false
 
+      # (rest of your npm + PyPI steps remain unchanged below …)
       - name: Setup Node.js for NPM
         if: matrix.build.NPM_PUBLISH == true
         uses: actions/setup-node@v4
@@ -766,36 +691,31 @@ jobs:
 
       - name: Update Homebrew formula
         run: |
-          VERSION="${{ env.RELEASE_VERSION }}"
-          
-          # Get release assets - use platform-specific URLs
-          LINUX_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/gh-templates"
-          DARWIN_ARM_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/gh-templates"
-          DARWIN_X64_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/gh-templates"
-          
+          VERSION=$(echo "${{ github.ref_name }}" | sed 's/^v//')
+
+          # Get release assets
+          LINUX_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/gh-templates-linux-x64-glibc"
+          DARWIN_ARM_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/gh-templates-darwin-arm64"
+          DARWIN_X64_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/gh-templates-darwin-x64"
+
           # Calculate checksums
           wget -q $LINUX_URL -O linux-binary
           wget -q $DARWIN_ARM_URL -O darwin-arm-binary
           wget -q $DARWIN_X64_URL -O darwin-x64-binary
-          
           LINUX_SHA=$(shasum -a 256 linux-binary | cut -d' ' -f1)
           DARWIN_ARM_SHA=$(shasum -a 256 darwin-arm-binary | cut -d' ' -f1)
           DARWIN_X64_SHA=$(shasum -a 256 darwin-x64-binary | cut -d' ' -f1)
-          
-          # Clone homebrew tap using the PAT
-          git clone https://rafaeljohn9:${{ secrets.HOMEBREW_GITHUB_TOKEN }}@github.com/rafaeljohn9/homebrew-tap.git
+
+          # Clone homebrew tap
+          git clone https://github.com/rafaeljohn9/homebrew-tap.git
           cd homebrew-tap
-          
-          # Create Formula directory if it doesn't exist
-          mkdir -p Formula
-          
+
           # Create/update formula
           cat > Formula/gh-templates.rb << EOF
           class GhTemplates < Formula
             desc "GitHub Templates CLI tool"
             homepage "https://github.com/${{ github.repository }}"
             version "$VERSION"
-            
             on_macos do
               if Hardware::CPU.arm?
                 url "$DARWIN_ARM_URL"
@@ -805,12 +725,10 @@ jobs:
                 sha256 "$DARWIN_X64_SHA"
               end
             end
-            
             on_linux do
               url "$LINUX_URL"
               sha256 "$LINUX_SHA"
             end
-            
             def install
               bin.install "gh-templates"
             end
@@ -820,17 +738,10 @@ jobs:
             end
           end
           EOF
-          
+
           # Commit and push
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Formula/gh-templates.rb
-          
-          # Check if this is the first commit
-          if git rev-parse --verify HEAD >/dev/null 2>&1; then
-            git commit -m "Update gh-templates to $VERSION"
-          else
-            git commit -m "Initial commit: Add gh-templates formula $VERSION"
-          fi
-          
-          git push
+          git commit -m "Update gh-templates to $VERSION"
+          git push https://x-access-token:${{ secrets.HOMEBREW_GITHUB_TOKEN }}@github.com/rafaeljohn9/homebrew-tap.git
