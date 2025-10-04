@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 
 ### Chore
 
+- update CHANGELOG [skip ci] (2f590a2)
+
+
+## [v0.1.40]
+
+
+
+### Chore
+
 - update CHANGELOG [skip ci] (caf9c53)
 
 - update documentation for v0.1.39 [skip ci] (608f2ad)
@@ -27,47 +36,6 @@ All notable changes to this project will be documented in this file.
 ### Feat
 
 - (version) Updated Cargo.toml to version 0.1.40 (33a5384)
-
-
-### Fix
-
-- gitignore template names with the '.gitignore' to be parsed correctly.\n\nInitially we used to allow only the template name without the the ext though some users may pass the '.gitignore' ext. It shouldn't fail but be parsed correctly\n (26d5b34)
-
-
-### Refactor
-
-- used a more idiomatic rust pattern. related with normalization of the gitignore template name with ext (6031f50)
-
-
-### Test
-
-- added tests to verify fetching, previewing and adding of templates with .gitignore is succesful. (05a4439)
-
-
-## [Unreleased]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (6c4f365)
-
-
-## [v0.1.40]
-
-
-
-### Chore
-
-- update CHANGELOG [skip ci] (caf9c53)
-
-- update documentation for v0.1.39 [skip ci] (608f2ad)
-
-- update CHANGELOG [skip ci] (4faee01)
-
-- update documentation for v0.1.40 [skip ci] (e2892c7)
-
-- remove emoji from exception raised in npm (483bbba)
 
 
 ### Fix
