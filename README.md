@@ -1,6 +1,14 @@
-# 📁 Gh Templates
+# GitForge (formerly GH Templates)
 
-This repository provides a collection of reusable Git templates to streamline your workflow across multiple repositories. It includes fully supported **Issue Templates**, **Pull Request Templates**, and more.
+> [!NOTE]
+> This project is currently being renamed and restructured.  
+> Some documentation and package references may still use the old name  
+> **`gh-templates`** until the migration is complete.
+
+GitForge is a developer-friendly toolkit for managing and applying reusable **GitHub repository templates** — including **Issue Templates**, **Pull Request Templates**, **.gitignore files**, **Licenses**, and more.  
+It helps you quickly scaffold standard project configurations without repetitive manual setup.
+
+---
 
 
 [![GitHub Release](https://img.shields.io/github/v/release/rafaeljohn9/gh-templates?label=GitHub%20Release)](https://github.com/rafaeljohn9/gh-templates/releases)
@@ -15,62 +23,43 @@ This repository provides a collection of reusable Git templates to streamline yo
 [![npm version](https://img.shields.io/npm/v/gh-templates?label=npm)](https://www.npmjs.com/package/gh-templates)
 [![npm downloads](https://img.shields.io/npm/dm/gh-templates?label=npm%20downloads)](https://www.npmjs.com/package/gh-templates)
 
-
 ---
 
-## 📚 Table of Contents
+## About
 
-- [Contributing](#contributing)
-- [Features](#features)
-- [Beta Release Downloads](#beta-release-downloads)
-- [Installation](#installation)
-  - [Quick Install (Recommended)](#quick-install-recommended)
-  - [Manual Installation](#manual-installation)
-- [Example Usage](#example-usage)
-  - [Issue Templates](#issue-templates)
-  - [Pull Request Templates](#pull-request-templates)
-  - [License Files](#license-files)
-  - [Gitignore Files](#gitignore-files)
-  - [Code of Conduct (Coming Soon)](#code-of-conduct-coming-soon)
+**GitForge** is designed to simplify repository setup and management by offering ready-to-use templates and configuration files.  
+Instead of manually creating `.gitignore`, license, and issue templates for each new project, GitForge helps you **generate them instantly** from trusted sources.
+
+It works across different ecosystems and supports multiple package managers — **Rust (Cargo)**, **Python (PyPI)**, and **Node (npm)**.
 
 ---
 
 ## Contributing
 
-We welcome contributions from everyone! Don’t worry if you’re not familiar with Rust—the project is primarily composed of YAML files (for workflows), Markdown files (for templates and documentation), and license files. Rust is only used for the CLI interface.
+We welcome contributions from everyone — whether you’re improving templates, fixing docs, or enhancing CLI commands.
+
+Most of the repository consists of:
+- **YAML files** – for GitHub workflows  
+- **Markdown files** – for templates & documentation  
+- **License files** – for open source compliance  
+
+Rust, Python, or Node are only used for the CLI layer, so you can contribute without deep language knowledge.
 
 You can help by:
-- Opening issues
-- Suggesting new GitHub templates
-- Sharing feedback to improve the project
-
-Your ideas and participation are valued, and we’re happy to support you as you get involved.
+- Opening issues  
+- Suggesting new templates  
+- Improving command UX or documentation  
 
 ---
 
 ## Features
 
-- **Issue Templates**: Standardized templates for bug reports, feature requests, documentation, community collaboration, developer experience feedback, support questions, and tests.
-- **Pull Request Templates**: Easily add consistent PR templates to your repositories.
-- **Easy Installation**: Quickly set up templates using a provided installation script.
-- **Customizable**: All templates can be tailored to fit your project's needs.
-
----
-
-## Beta Release Downloads
-
-You can download the latest alpha release binaries for your platform from the `/releases/<tag>` directory. These are currently available as artifacts for different operating systems and architectures:
-
-| Platform                          | Filename                                    |
-|------------------------------------|---------------------------------------------|
-| macOS (Apple Silicon)              | `gh-templates-aarch64-apple-darwin`        |
-| Linux (aarch64)                    | `gh-templates-aarch64-unknown-linux-gnu`   |
-| macOS (Intel)                      | `gh-templates-x86_64-apple-darwin`         |
-| Windows (x86_64)                   | `gh-templates-x86_64-pc-windows-gnu.exe`   |
-| Linux (x86_64, GNU)                | `gh-templates-x86_64-unknown-linux-gnu`    |
-| Linux (x86_64, musl)               | `gh-templates-x86_64-unknown-linux-musl`   |
-
-To download, visit the [releases page](https://github.com/rafaeljohn9/gh-templates/releases) and select the appropriate binary for your OS and architecture. Verify the SHA256 checksum after downloading.
+- **Reusable Templates:** Standardized templates for issues, PRs, and licenses.  
+- **CLI Commands:** Apply templates quickly via a simple command-line interface.  
+- **Gitignore Management:** Add, list, or preview `.gitignore` templates from the official GitHub source.  
+- **License Templates:** Instantly add popular license files (MIT, Apache, GPL, etc.).  
+- **Cross-Platform:** Works on Linux, macOS, and Windows.  
+- **Extensible:** Designed to support new template categories in the future (like Codes of Conduct, Security Policies, etc.).
 
 ---
 
@@ -78,176 +67,86 @@ To download, visit the [releases page](https://github.com/rafaeljohn9/gh-templat
 
 ### Quick Install (Recommended)
 
-Install `gh-templates` automatically with a single command:
-
-#### Linux/macOS
-
+#### Using npm:
 ```bash
-curl -sSL https://raw.githubusercontent.com/RafaelJohn9/gh-templates/main/install/install.sh | bash
+npm install -g gitforge
 ```
 
-#### Windows (PowerShell)
+#### Using pip:
 
-```powershell
-iwr -useb https://raw.githubusercontent.com/RafaelJohn9/gh-templates/main/install/install.ps1 | iex
+```
+pip install gitforge
 ```
 
-> ✅ The installer automatically:
-> - Detects your OS and architecture
-> - Downloads the latest version
-> - Installs to the appropriate location (`~/.local/bin` on Linux/macOS, `~/bin` on Windows)
-> - Makes the binary executable
 
-> ⚠️ **Note**: Make sure your install directory is in your `PATH`. On Linux/macOS, you may need to add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile.
+#### Using Cargo:
 
----
+```
+cargo install gitforge
+```
 
-### Manual Installation
 
-If you prefer to install manually, download the appropriate binary for your platform:
 
-#### Linux (x86_64, GNU)
+### Example Usage
+
+> [!NOTE]
+> Some commands may still appear under the old name gh-templates
+> until the migration is finalized.
+
+
+#### New Command Syntax
 
 ```sh
-wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-x86_64-unknown-linux-gnu
-chmod +x gh-templates-x86_64-unknown-linux-gnu
-mkdir -p ~/.local/bin
-mv gh-templates-x86_64-unknown-linux-gnu ~/.local/bin/gh-templates
+# Add a Python .gitignore
+gitforge add gitignore python
+
+# List available gitignore templates
+gitforge list gitignores
+
+# Add a bug report issue template
+gitforge add issue-template bug
+
+# Preview a pull request template
+gitforge preview pr-template
+
+# List available licenses
+gitforge list licenses
 ```
 
-#### Linux (x86_64, musl)
+#### Old Syntax (Still Supported Temporarily)
 
 ```sh
-wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-x86_64-unknown-linux-musl
-chmod +x gh-templates-x86_64-unknown-linux-musl
-mkdir -p ~/.local/bin
-mv gh-templates-x86_64-unknown-linux-musl ~/.local/bin/gh-templates
-```
-
-#### Linux (aarch64)
-
-```sh
-wget https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-aarch64-unknown-linux-gnu
-chmod +x gh-templates-aarch64-unknown-linux-gnu
-mkdir -p ~/.local/bin
-mv gh-templates-aarch64-unknown-linux-gnu ~/.local/bin/gh-templates
-```
-
-#### macOS (Apple Silicon)
-
-```sh
-curl -LO https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-aarch64-apple-darwin
-chmod +x gh-templates-aarch64-apple-darwin
-mkdir -p ~/.local/bin
-mv gh-templates-aarch64-apple-darwin ~/.local/bin/gh-templates
-```
-
-#### macOS (Intel)
-
-```sh
-curl -LO https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-x86_64-apple-darwin
-chmod +x gh-templates-x86_64-apple-darwin
-mkdir -p ~/.local/bin
-mv gh-templates-x86_64-apple-darwin ~/.local/bin/gh-templates
-```
-
-#### Windows (x86_64)
-
-```powershell
-New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\bin"
-Invoke-WebRequest -Uri "https://github.com/RafaelJohn9/gh-templates/releases/latest/download/gh-templates-x86_64-pc-windows-gnu.exe" -OutFile "$env:USERPROFILE\bin\gh-templates.exe"
-```
-
-> ⚠️ **Note**: Make sure `$env:USERPROFILE\bin` is in your `PATH` environment variable.
-
----
-
-## Example Usage
-
-Below are some example commands for using `gh-templates` to add templates to your repository:
-
-> 💡 **Tip:**  
-> It is recommended you use the labels from this repository by running:  
-> `gh label clone rafaeljohn9/gh-templates`
-
-### Issue Templates
-
-```sh
-# Add an issue template
+gh-templates gitignore add python
 gh-templates issue add bug
-
-# Add multiple issues
-gh-templates issue add bug feature dx
-
-# Preview an issue template
-gh-templates issue preview bug
-
-# List available issue templates
-gh-templates issue list
 ```
 
-### Pull Request Templates
 
-```sh
-# Add a PR template
-gh-templates pr add default
+### Migration Notice
 
-# Preview a PR template
-gh-templates pr preview default
+- GitForge is the next evolution of GH Templates — bringing a cleaner command structure, modern UX, and broader language support.
+- You may still see references to gh-templates across:
+  - Code imports
+  - Package registries (npm, PyPI, crates.io)
+  - Docs and badges
 
-# List available PR templates
-gh-templates pr list
 
-# Add template and specify output location
-gh-templates pr add bug --output .github/pull_request_template.md
-```
 
-### License Files
 
-```sh
-# Add a LICENSE file (MIT)
-gh-templates license add mit
+These will be updated as the migration completes.
 
-# Add a LICENSE file (Apache 2.0)
-gh-templates license add apache-2.0
 
-# Preview a license file
-gh-templates license preview mit
+# License:
 
-# List available license files
-gh-templates license list
+- Licensed under the Apache 2.0 License.
 
-# List popular licenses
-gh-templates license list --popular
 
-# List non-software licenses
-gh-templates license list --non-software
+---
 
-# Force overwrite existing file
-gh-templates license add mit --force
-```
+### Key Highlights:
+- Renamed to **GitForge**, with a clear **transition notice**.
+- Updated **badges, usage examples**, and **command syntax**.
+- Introduced new **natural language CLI syntax** (`gitforge add gitignore python`).
+- Kept **backward compatibility** note for developers still using `gh-templates`.
 
-### Gitignore Files
+---
 
-```sh
-# Add a .gitignore for Rust
-gh-templates gitignore add Rust
-
-# Add a .gitignore for Node.js
-gh-templates gitignore add Node
-
-# Preview a .gitignore file
-gh-templates gitignore preview Rust
-
-# List available .gitignore templates
-gh-templates gitignore list
-```
-
-### Code of Conduct (Coming Soon)
-
-```sh
-# Add a code of conduct file (not yet available)
-gh-templates conduct add default
-```
-
-> 📌 **Note:** Currently, `issue`, `pr`, `license`, and `gitignore` templates are supported. Support for code of conduct and other templates will be added in future releases.
