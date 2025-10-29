@@ -11,6 +11,17 @@ All notable changes to this project will be documented in this file.
 
 - update CHANGELOG [skip ci] (deb09bb)
 
+- update documentation for v0.1.42 [skip ci] (3c38d14)
+
+
+## [Unreleased]
+
+
+
+### Chore
+
+- update CHANGELOG [skip ci] (deb09bb)
+
 
 ## [v0.1.42]
 
